@@ -10,13 +10,20 @@ const loadBrand = async (req, res) => {
   const page = parseInt(req.query.page) || 1; // Default to page 1
   const itemsPerPage = 10; // Number of brands per page
   const skip = (page - 1) * itemsPerPage;
+  const search = req.query.search || '';
+
 
   try {
       // Get total number of brands
       const totalBrand = await brandSchema.countDocuments();
 
+      // search 
+      const filter = search
+      ? { brandName: { $regex: search, $options: 'i' } } 
+      : {};
+
       // Fetch paginated brands
-      const brands = await brandSchema.find()
+      const brands = await brandSchema.find(filter)
           .skip(skip) // Skip items for previous pages
           .limit(itemsPerPage); // Limit to itemsPerPage number
 

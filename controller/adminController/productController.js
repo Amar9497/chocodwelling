@@ -9,8 +9,14 @@ const cloudinary = require('cloudinary').v2;
 const loadProduct = async (req, res) => {
     const page = Math.max(parseInt(req.query.page) || 1, 1); // Ensure page is at least 1
     const itemsPerPage = 10;
+    const search = req.query.search || '';
 
     try {
+         // search 
+         const filter = search
+            ? { productName: { $regex: search, $options: 'i' } } 
+            : {};
+
         const totalProduct = await productSchema.countDocuments();
         const totalPages = Math.max(Math.ceil(totalProduct / itemsPerPage), 1);
         const currentPage = Math.min(page, totalPages); // Prevent exceeding totalPages
@@ -18,7 +24,7 @@ const loadProduct = async (req, res) => {
         // Adjust skip calculation
         const skip = Math.max((currentPage - 1) * itemsPerPage, 0);
 
-        const products = await productSchema.find()
+        const products = await productSchema.find(filter)
             .skip(skip) // Skip cannot be negative
             .limit(itemsPerPage);
 

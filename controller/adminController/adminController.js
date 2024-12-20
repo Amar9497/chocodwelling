@@ -43,10 +43,18 @@ const loadHome=(req,res)=>{
     }
 }
 
+// ------------------------------ admin logout --------------------------
+
 const logout = (req,res) =>{
-    req.session.destroy();
-    res.redirect('/admin/logout')   
+    try {
+        req.session.destroy();
+        res.redirect('/admin/logout') 
+    } catch (error) {
+        console.log(error)
+        res.status(500).send("Error occured")
+    }  
 }
+
 
 
 

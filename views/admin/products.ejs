@@ -36,7 +36,7 @@
       
                   <span >Brand</span>
               </a>
-                <a href="/admin/customer" class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg">
+                <a href="/admin/customers" class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg">
       
                     <span>Customers</span>
                 </a>
@@ -61,18 +61,12 @@
 
         <!-- Products Section -->
         <main class="flex-1 p-6 bg-white">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-semibold">Products</h2>
-                <div class="flex items-center space-x-4">
-                    <a href="/admin/addproduct">
-                        <button class="bg-[#A79277] text-white px-4 py-2 rounded-lg shadow-md hover:bg-[#E5E7EB] hover:text-black">Add Product</button>
-                    </a>
-                    
-                    <div class="flex items-center">
-                        <input type="text" placeholder="Search" class="border border-[#A79277] rounded-l-lg px-3 py-1 text-sm w-64">
-                        <button class="bg-[#A79277] text-white px-4 py-1 rounded-r-lg">Search</button>
-                    </div>
-                </div>
+            <div class="flex justify-between items-center mb-6 flex-wrap gap-4">
+                <h2 class="text-2xl font-bold">Products</h2>
+                <form action="/admin/products" method="get" class="flex items-center gap-2">
+                    <input type="text" name="search" placeholder="Search" class="border border-gray-300 rounded-lg px-4 py-2">
+                    <input type="submit" value="Search" class="bg-[#A79277] text-white px-4 py-2 rounded-lg cursor-pointer">
+                </form>
             </div>
 
             <!-- Products Table -->

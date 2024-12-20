@@ -4,9 +4,10 @@ const passport=require("passport")
 const userController=require('../controller/userController/userController');
 const categoryController=require('../controller/userController/categoryController');
 const productController= require('../controller/userController/productController');
+const auth = require('../middleware/userSession')
 
 // -------------------- login --------------------
-user.get('/login',userController.loadLogin);
+user.get('/login',auth.isLogin,userController.loadLogin);
 
 user.post('/login',userController.loginPost);
 
@@ -32,17 +33,21 @@ user.get('/resendotp',userController.otpResend);
 
 // --------------------- home -----------------------------
 
-user.get('/home', userController.home);
+user.get('/home',auth.isCheck,userController.home);
 
 // ------------------- category -----------------------
 
-user.get('/category',categoryController.categoryget);
+user.get('/category',auth.isCheck,categoryController.categoryget);
 
-// ------------ product -----------------------
+// --------------------- product -------------------------
 
-user.get('/allproduct',productController.allProduct);
+user.get('/allproduct',auth.isCheck,productController.allProduct);
 
-user.get('/productDetail/:id',productController.productDetail);
+user.get('/productDetail/:id',auth.isCheck,productController.productDetail);
+
+// --------------------- logout --------------------
+
+user.get('/logout',auth.isCheck,userController.logout);
 
 
 module.exports= user ;

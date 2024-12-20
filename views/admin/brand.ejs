@@ -55,19 +55,13 @@
 
         <!-- Brand Section -->
         <main class="flex-1 p-6 bg-white">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-semibold">Brand</h2>
-                <div class="flex items-center space-x-4">
-                    
-                        <button class="bg-[#A79277] text-white px-4 py-2 rounded-lg shadow-md hover:bg-[#E5E7EB] hover:text-black" onclick="toggleModal(true)">Add Brand</button>
-
-                    
-                    <div class="flex items-center">
-                        <input type="text" placeholder="Search" class="border border-[#A79277] rounded-l-lg px-3 py-1 text-sm w-64">
-                        <button class="bg-[#A79277] text-white px-4 py-1 rounded-r-lg">Search</button>
-                    </div>
-                </div>
-            </div>
+          <div class="flex justify-between items-center mb-6 flex-wrap gap-4">
+            <h2 class="text-2xl font-bold">Brands</h2>
+            <form action="/admin/brand" method="get" class="flex items-center gap-2">
+                <input type="text" name="search" placeholder="Search" class="border border-gray-300 rounded-lg px-4 py-2">
+                <input type="submit" value="Search" class="bg-[#A79277] text-white px-4 py-2 rounded-lg cursor-pointer">
+            </form>
+        </div>
 
             
             

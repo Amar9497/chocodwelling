@@ -6,10 +6,15 @@ const loadCategory= async(req,res)=>{
     const page = parseInt(req.query.page) || 1; 
     const itemsPerPage = 10; 
     const skip = (page - 1) * itemsPerPage;
+    const search = req.query.search || '';
 
     try {
+        // search 
+        const filter = search
+        ? { categoryName: { $regex: search, $options: 'i' } } 
+        : {};
         const totalCategories = await categorySchema.countDocuments(); 
-        const categories = await categorySchema.find({})
+        const categories = await categorySchema.find(filter)
             .skip(skip) 
             .limit(itemsPerPage); 
 

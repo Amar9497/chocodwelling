@@ -249,6 +249,18 @@ const home = async(req,res)=>{
     });
 }
 
+// ---------------- logout ----------------
+
+const logout = (req,res)=>{
+    try {
+        req.session.destroy();
+        res.redirect('/login');
+    } catch (error) {
+        console.log(error)
+        res.status(500).send("Error occured")
+    }
+}
+
 module.exports={
     loadSignup,
     loadLogin,
@@ -259,5 +271,6 @@ module.exports={
     loginPost,
     googleAuth,
     googleAuthCallback,
-    home
+    home,
+    logout
 }
