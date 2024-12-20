@@ -65,6 +65,7 @@ app.use((req,res,next)=>{
     next();
 })
 
+// -------- passport ----------
 
 app.use(passport.initialize());
 app.use(passport.session());
