@@ -1,0 +1,412 @@
+
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+
+
+<body class=" min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <%- include('navbar') %>
+
+    <!-- alert -->
+     <%- include('alert') %>
+
+    <!-- Main Content -->
+    <div class="flex flex-grow">
+        <!-- Sidebar -->
+        <aside class="bg-[#E5E7EB] text-black w-64 py-6 px-4 hidden lg:block">
+            <nav class="space-y-6">
+                
+                <a href="/admin/home" class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg">
+      
+                    <span >Dashboard</span>
+                </a>
+                <a href="/admin/products" class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg">
+                    
+                    <span >Products</span>
+                </a>
+                <a href="/admin/category" class="flex items-center space-x-4 py-2 px-3 bg-white text-black rounded-lg shadow-md">
+      
+                    <span class="poppins-semibold">Category</span>
+                </a>
+                <a href="/admin/brand" class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg">
+      
+                  <span >Brand</span>
+              </a>
+                <a href="/admin/customers" class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg">
+      
+                    <span>Customers</span>
+                </a>
+                <a href="#" class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg">
+      
+                    <span>Orders</span>
+                </a>
+                <a href="#" class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg">
+      
+                    <span>Coupons</span>
+                </a>
+                <a href="#" class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg">
+      
+                    <span>Offers</span>
+                </a>
+                <a href="#" class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg">
+      
+                    <span>Banner</span>
+                </a>
+            </nav>
+          </aside>
+
+        <!-- Products Section -->
+        <main class="flex-1 p-6 bg-white">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-semibold">Category</h2>
+                <div class="flex items-center space-x-4">
+                    
+                        <button class="bg-[#A79277] text-white px-4 py-2 rounded-lg shadow-md hover:bg-[#E5E7EB] hover:text-black" onclick="toggleModal(true)">Add Category</button>
+
+                    
+                    <div class="flex items-center">
+                        <input type="text" placeholder="Search" class="border border-[#A79277] rounded-l-lg px-3 py-1 text-sm w-64">
+                        <button class="bg-[#A79277] text-white px-4 py-1 rounded-r-lg">Search</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Table -->
+            <div class="bg-[#A79277] rounded-lg shadow-lg overflow-hidden">
+                <table class="w-full text-left text-base border-collapse">
+                    <thead class="bg-[#A79277] text-white">
+                        <tr>
+                            <th class="py-4 px-5 text-center w-1/12">SL.No</th>
+                            <th class="py-4 px-5 text-center w-1/12">Name</th>
+                            <th class="py-4 px-5 text-center w-1/12">Added on</th>
+                            <th class="py-4 px-5 text-center w-1/12">Status</th>
+                            <th class="py-4 px-5 text-center w-1/12">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-[#A79277] text-white">
+                        <% categories.forEach((category, index) => { %>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2 text-center"><%= index + 1 %></td>
+                                <td class="border border-gray-300 px-4 py-2 text-center"><%= category.categoryName %></td>
+                                <td class="border border-gray-300 px-4 py-2 text-center">
+                                    <%= category.createdAt.toDateString() %> <!-- Assuming `createdAt` is available -->
+                                </td>
+
+                                <td class="border border-gray-300 px-4 py-2 text-center">
+                                    <%= category.isActive ? 'Active' : 'Inactive' %>
+                                </td>
+                                <td class="border border-gray-300 px-4 py-2 text-center">
+                                    <!-- Edit Button -->
+                                    <button 
+                                        class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                                        onclick="toggleEditModal('<%= category.id %>', '<%= category.categoryName %>')">
+                                        Edit
+                                    </button>
+            
+                                    <!-- Block/Unblock Button -->
+                                    <form action="/admin/status/<%= category._id %>" method="POST" class="inline">
+                                        <button
+                                        onclick="toggleCategoryStatus(event, this, '<%= category._id %>')" 
+                                            class="px-3 py-1 text-sm font-medium text-white rounded shadow 
+                                            <%= category.isActive ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700' %>">
+                                            <%= category.isActive ? 'Block' : 'Unblock' %>
+                                        </button>
+                                    </form>
+                                    
+
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+           
+            <div class="flex justify-center mt-6">
+                <div class="flex space-x-2">
+                    <!-- Previous Page Button -->
+                    <a href="/admin/category?page=<%= currentPage - 1 %>" class="px-3 py-1 bg-gray-200 rounded-md text-sm text-gray-600 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed" <%= currentPage <= 1 ? 'disabled' : '' %>>
+                        Prev
+                    </a>
+            
+                    <!-- Page Numbers -->
+                    <% for (let i = 1; i <= totalPages; i++) { %>
+                        <a href="/admin/category?page=<%= i %>" class="px-3 py-1 bg-gray-200 rounded-md text-sm text-gray-600 hover:bg-blue-600 hover:text-white <%= i === currentPage ? 'bg-blue-600 text-white' : '' %>">
+                            <%= i %>
+                        </a>
+                    <% } %>
+            
+                    <!-- Next Page Button -->
+                    <a href="/admin/category?page=<%= currentPage + 1 %>" class="px-3 py-1 bg-gray-200 rounded-md text-sm text-gray-600 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed" <%= currentPage >= totalPages ? 'disabled' : '' %>>
+                        Next
+                    </a>
+                </div>
+            </div>
+            
+
+            
+        </main>
+
+    </div>
+
+
+    <!-- add collection modal -->
+
+    <div
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden"
+      id="addCategoryModal"
+    >
+    <div class="bg-white rounded-lg w-96 p-6 shadow-lg">
+    <h2 class="text-xl font-bold mb-4 text-gray-800">Add New Category</h2>
+    <form
+      action="/admin/addcategory"
+      method="POST"
+      id="addCategoryForm"
+      onsubmit="return validateCategoryForm()"
+    >
+      <div class="mb-4">
+        <label for="categoryName" class="block text-sm font-medium text-gray-700">
+          Category Name
+        </label>
+        <input
+          type="text"
+          name="categoryName"
+          id="categoryName"
+          class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Enter category name"
+          required
+        />
+        <!-- Error Message -->
+        <div
+          id="categoryError"
+          class="text-red-500 text-sm mt-2 hidden"
+        >
+          Please enter a valid category name.
+        </div>
+      </div>
+      <div class="flex justify-end space-x-3">
+        <button
+          type="button"
+          class="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300"
+          onclick="toggleModal(false)"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+        >
+          Add Category
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+    
+
+    <!-- editCategory modal -->
+
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden" id="editCategoryModal">
+        <div class="bg-white rounded-lg w-96 p-6 shadow-lg">
+            <!-- Modal Header -->
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Edit Category</h2>
+            
+            <!-- Edit Category Form -->
+            <form action="/admin/editcategory" method="POST" id="editCategoryForm">
+                <!-- Hidden Input for Category ID -->
+                <input 
+                    type="hidden" 
+                    name="categoryId" 
+                    id="editCategoryId">
+                
+                
+    
+                <!-- Category Name Input -->
+                <div class="mb-4">
+                    <label for="editCategoryName" class="block text-sm font-medium text-gray-700">Category Name</label>
+                    <input 
+                        type="text" 
+                        name="categoryName" 
+                        id="editCategoryName" 
+                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" 
+                        placeholder="Enter updated category name" 
+                        required>
+                        <!-- Error Message Div -->
+                        <div id="editCategoryError" class="text-red-500 text-sm mt-2 hidden">
+                            <!-- Error message will be injected here -->
+                        </div>
+                </div>
+
+
+                <!-- Modal Actions -->
+                <div class="flex justify-end space-x-3">
+                    <!-- Cancel Button -->
+                    <button 
+                        type="button" 
+                        class="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300"
+                        onclick="toggleEditModal(false)">
+                        Cancel
+                    </button>
+                    <!-- Save Changes Button -->
+                    <button 
+                        type="submit" 
+                        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    
+    <!-- Footer -->
+    <%- include('footer') %>
+</body>
+    <script>
+
+        // -------------------------- add category modal visibility button --------------------
+        const toggleModal = (isVisible) => {
+            const modal = document.getElementById('addCategoryModal');
+            if (isVisible) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        };
+
+        // ----------------------------- Edit Category Function ------------------------------
+        function toggleEditModal(categoryId, categoryName) {
+            //console.log(categoryId)
+
+            const modal = document.getElementById('editCategoryModal');
+            const categoryInput = document.getElementById('editCategoryName');
+            const categoryIdInput = document.getElementById('editCategoryId');
+
+            if (categoryId && categoryName) {
+                // Populate the inputs with the selected category data
+                categoryInput.value = categoryName;
+                categoryIdInput.value = categoryId;
+                modal.classList.remove('hidden'); // Show modal
+            } else {
+                // Clear inputs and hide modal
+                categoryInput.value = '';
+                categoryIdInput.value = '';
+                modal.classList.add('hidden'); // Hide modal
+            }
+        }
+
+        
+
+    // -------------------------------- Validation for Add Category Form ---------------------------------
+function validateAddCategoryForm() {
+    const categoryNameInput = document.getElementById("categoryName");
+    const categoryErrorDiv = document.getElementById("categoryError");
+
+    const categoryName = categoryNameInput.value.trim();
+
+    // Validation: Check for invalid characters
+    if (/[^a-zA-Z\s]/.test(categoryName)) {
+        categoryErrorDiv.textContent = "Category name must contain only letters.";
+        categoryErrorDiv.classList.remove("hidden");
+        return false; // Prevent form submission
+    }
+
+    // Validation: Check for length
+    if (categoryName.length < 3) {
+        categoryErrorDiv.textContent = "Category name must have at least 3 characters.";
+        categoryErrorDiv.classList.remove("hidden");
+        return false; // Prevent form submission
+    }
+
+    // Hide error message if validation passes
+    categoryErrorDiv.classList.add("hidden");
+    return true; // Allow form submission
+}
+
+// Attach validation to the Add Category Form
+document.getElementById("addCategoryForm").addEventListener("submit", function (event) {
+    if (!validateAddCategoryForm()) {
+        event.preventDefault(); // Prevent form submission if validation fails
+    }
+});
+
+
+
+
+
+// ---------------------- Validation for Edit Category Form ----------------------------
+function validateEditCategoryForm() {
+    const categoryNameInput = document.getElementById("editCategoryName");
+    const categoryErrorDiv = document.getElementById("editCategoryError");
+
+    const categoryName = categoryNameInput.value.trim();
+
+    // Validation: Check for invalid characters
+    if (/[^a-zA-Z\s]/.test(categoryName)) {
+        categoryErrorDiv.textContent = "Category name must contain only letters.";
+        categoryErrorDiv.classList.remove("hidden");
+        return false; // Prevent form submission
+    }
+
+    // Validation: Check for length
+    if (categoryName.length < 3) {
+        categoryErrorDiv.textContent = "Category name must have at least 3 characters.";
+        categoryErrorDiv.classList.remove("hidden");
+        return false; // Prevent form submission
+    }
+
+    // Hide error message if validation passes
+    categoryErrorDiv.classList.add("hidden");
+    return true; // Allow form submission
+}
+
+// Attach validation to the Edit Category Form
+document.getElementById("editCategoryForm").addEventListener("submit", function (event) {
+    if (!validateEditCategoryForm()) {
+        event.preventDefault(); // Prevent form submission if validation fails
+    }
+});
+
+
+// ---------------- block alert -------------
+function toggleCategoryStatus(event, button, brandId) {
+    // Prevent form submission by default
+    event.preventDefault();
+
+    // Determine the action (block or unblock)
+    const action = button.innerText.trim() === "Block" ? "block" : "unblock";
+
+    // SweetAlert confirmation dialog
+    Swal.fire({
+        title: `Are you sure you want to ${action} this category?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: `Yes, ${action} it!`,
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Submit the form manually on confirmation
+            const form = button.closest("form");
+            form.submit();
+        } else {
+            // Optionally log or handle cancel
+            console.log("Action cancelled by the user.");
+        }
+    });
+}
+
+
+   
+    </script>
+    
+
+
+
+

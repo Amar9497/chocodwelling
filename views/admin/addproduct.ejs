@@ -1,0 +1,317 @@
+<link href="https://unpkg.com/cropperjs/dist/cropper.min.css" rel="stylesheet">
+<style>
+    #imagePreview img {
+        max-width: 100%;  /* Ensure images don’t exceed their container width */
+        height: auto;     /* Maintain aspect ratio */
+        object-fit: cover; /* Ensure the image fills the space without distortion */
+        max-height: 200px; /* Set a maximum height for images */
+        border-radius: 8px; /* Optional: Adds rounded corners */
+    }
+    
+    .close-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    color: white;
+    font-size: 20px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    padding: 5px;
+    cursor: pointer;
+}
+
+.close-button:hover {
+    background-color: rgba(255, 0, 0, 0.5);
+}
+
+</style>
+
+
+  <!-- Navbar -->
+  <%- include('navbar') %>
+
+  <!-- alert -->
+   <%- include('alert') %>
+
+  <!-- Page Container -->
+  <div class="max-w-5xl mx-auto mt-10 p-8 bg-white rounded-lg shadow-md">
+
+    <!-- Page Title -->
+    <h2 class="text-3xl font-bold text-gray-700 mb-6 text-center">Add New Product</h2>
+
+    <!-- Product Form -->
+    <form class="space-y-6" action="/admin/addproduct" method="post" enctype="multipart/form-data" id="add-product-form">
+
+      <!-- Product Name -->
+      <div>
+        <label for="productName" class="block text-sm font-medium text-gray-700 mb-2">Product Name*</label>
+        <input type="text" id="productName" placeholder="Enter product name" name="name" class="w-full px-4 py-2 rounded-md border border-gray-300 focus:ring focus:ring-blue-500 focus:outline-none">
+      </div>
+
+      <!-- Product Brand & Category -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label for="brand" class="block text-sm font-medium text-gray-700 mb-2">Product Brand*</label>
+          <select name="brand" id="brand" class="block w-full border border-gray-300 rounded-md p-2 mt-1 focus:ring-blue-500 focus:border-blue-500" >
+            <option value="" selected disabled>Select a brand</option>
+            <% brand.forEach((brand) => { %>
+                <option value="<%= brand.brandName %>">
+                    <%= brand.brandName %>
+                </option>
+            <% }) %>
+        </select>
+        </div>
+        <div>
+          <label for="category" class="block text-sm font-medium text-gray-700 mb-2">Category*</label>
+          <select name="category" id="category" class="block w-full border border-gray-300 rounded-md p-2 mt-1 focus:ring-blue-500 focus:border-blue-500" >
+            <option value="" selected disabled>Select a category</option>
+            <% category.forEach((category) => { %>
+                <option value="<%= category.categoryName %>">
+                    <%= category.categoryName %>
+                </option>
+            <% }) %>
+        </select>
+        </div>
+      </div>
+
+      <!-- Product Description -->
+      <div>
+        <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Description*</label>
+        <textarea id="description" rows="4" placeholder="Enter product description" name="description" class="w-full px-4 py-2 rounded-md border border-gray-300 focus:ring focus:ring-blue-500 focus:outline-none"></textarea>
+      </div>
+
+
+      <!-- Product Images Section -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Product Images</label>
+        <!-- Image Upload -->
+        <div class="col-span-full flex justify-center items-center mt-6">
+            <input type="file" name="images" id="image-upload" accept="image/png, image/jpeg" multiple class="hidden" onchange="previewImages(event)">
+            <label for="image-upload" class="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                Choose Images
+            </label>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+            <!-- Image Preview -->
+            <div id="imagePreview" class="col-span-full flex flex-wrap gap-4 justify-center mt-4">
+                <!-- The images will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+    
+        
+    
+      
+      <!-- Product Variants -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Product Variants</label>
+        <div class="grid grid-cols-3 gap-4">
+          
+          <input type="text" placeholder="Weight" name="weight" class="w-full px-4 py-2 rounded-md border border-gray-300 focus:ring focus:ring-blue-500 focus:outline-none">
+          
+          <input type="text" placeholder="Price" name="price" class="w-full px-4 py-2 rounded-md border border-gray-300 focus:ring focus:ring-blue-500 focus:outline-none">
+          
+          <input type="text" placeholder="Stock" name="stock" class="w-full px-4 py-2 rounded-md border border-gray-300 focus:ring focus:ring-blue-500 focus:outline-none">
+        </div>
+        
+      </div>
+
+      <!-- Submit Button -->
+      <div class="text-center">
+        <button type="submit" class="w-full md:w-1/2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-md transition duration-300 shadow-lg">
+          Add Product
+        </button>
+      </div>
+      
+    </form>
+  </div>
+
+
+  <!-- Modal for Image Cropping -->
+<div id="cropModal" class="hidden fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div class="bg-white p-4 rounded-lg">
+        <div class="relative">
+            <img id="cropImage" src="" alt="Image to crop" />
+        </div>
+        <div class="mt-4 flex justify-between">
+            <button id="closeModal" class="bg-red-500 text-white px-4 py-2 rounded">Close</button>
+            <button id="cropImageButton" class="bg-green-500 text-white px-4 py-2 rounded">Crop & Save</button>
+        </div>
+    </div>
+</div>
+
+  <!-- Footer -->
+  <%- include('footer')%>
+  <script src="https://unpkg.com/cropperjs/dist/cropper.min.js"></script>
+  <script>
+
+// Variables
+const imageUploadInput = document.getElementById("image-upload");
+const imagePreview = document.getElementById("imagePreview");
+const cropModal = document.getElementById("cropModal");
+const cropImage = document.getElementById("cropImage");
+const closeModal = document.getElementById("closeModal");
+const cropImageButton = document.getElementById("cropImageButton");
+let cropper;
+let currentImageElement; // To keep track of the image being cropped
+
+// Function to Preview Images
+function previewImages(event) {
+    const files = event.target.files;
+    imagePreview.innerHTML = ''; // Clear the previous preview images
+
+    // Loop through the selected files and create image previews
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            // Create the image element
+            const imgElement = document.createElement('img');
+            imgElement.src = e.target.result;
+            imgElement.alt = `Preview ${i + 1}`;
+            imgElement.classList.add("preview-img");
+
+            // Create the close button for each image
+            const closeButton = document.createElement('span');
+            closeButton.innerHTML = '&times;';
+            closeButton.classList.add('close-button');
+            closeButton.addEventListener('click', () => removeImage(imageContainer)); // Pass the container for removal
+
+            // Create a container div for the image and close button
+            const imageContainer = document.createElement('div');
+            imageContainer.classList.add('relative', 'inline-block', 'm-2', 'border', 'rounded-md', 'overflow-hidden');
+            imageContainer.style.position = "relative"; // Ensure positioning for close button
+            imageContainer.appendChild(imgElement);
+            imageContainer.appendChild(closeButton);
+
+            // Append the image container to the preview
+            imagePreview.appendChild(imageContainer);
+
+            // Open crop modal when an image is clicked
+            imgElement.addEventListener('click', () => openCropModal(imgElement)); // Open modal on image click
+        };
+
+        reader.readAsDataURL(file);
+    }
+}
+
+// Function to Remove Image Container
+function removeImage(container) {
+    container.remove(); // Removes the entire container from DOM
+}
+
+// Function to Open Crop Modal
+function openCropModal(imageElement) {
+    currentImageElement = imageElement; // Keep track of the image being cropped
+    cropModal.classList.remove('hidden');
+    cropImage.src = imageElement.src;
+
+    // Initialize Cropper.js
+    cropper = new Cropper(cropImage, {
+        aspectRatio: 1,
+        viewMode: 2,
+        scalable: true,
+        zoomable: true,
+    });
+}
+
+// Close Crop Modal
+closeModal.addEventListener('click', () => {
+    cropModal.classList.add('hidden');
+    if (cropper) {
+        cropper.destroy(); // Destroy cropper when modal is closed
+    }
+});
+
+// Crop Image and Replace Original
+cropImageButton.addEventListener('click', () => {
+    const croppedCanvas = cropper.getCroppedCanvas();
+    const croppedImage = croppedCanvas.toDataURL(); // Get the base64 data URL of the cropped image
+
+    // Replace the original image with the cropped image
+    currentImageElement.src = croppedImage;
+
+    // Close modal
+    cropModal.classList.add('hidden');
+    if (cropper) {
+        cropper.destroy(); // Destroy cropper instance
+    }
+});
+
+
+// -------------------------- validation ------------------------------
+
+const form = document.getElementById('add-product-form');
+    const imageUpload = document.getElementById('image-upload');
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault(); // Prevent form submission until validation passes
+
+        const errors = [];
+        const productName = document.getElementById('productName').value.trim();
+        const brand = document.getElementById('brand').value.trim();
+        const category = document.getElementById('category').value.trim();
+        const description = document.getElementById('description').value.trim();
+        const weight = document.querySelector('input[name="weight"]').value.trim();
+        const price = document.querySelector('input[name="price"]').value.trim();
+        const stock = document.querySelector('input[name="stock"]').value.trim();
+
+        // Validate Product Name
+        if (!/^[A-Za-z\s]{3,}$/.test(productName)) {
+            errors.push('Product name must contain only letters and be at least 3 characters long.');
+        }
+
+        // Validate Brand
+        if (!brand) {
+            errors.push('Please select a product brand.');
+        }
+
+        // Validate Category
+        if (!category) {
+            errors.push('Please select a category.');
+        }
+
+        // Validate Description
+        if (!description) {
+            errors.push('Description cannot be empty.');
+        }
+
+        // Validate Weight, Price, and Stock
+        if (!/^\d+$/.test(weight)) {
+            errors.push('Weight must be a valid number.');
+        }
+        if (!/^\d+$/.test(price)) {
+            errors.push('Price must be a valid number.');
+        }
+        if (!/^\d+$/.test(stock)) {
+            errors.push('Stock must be a valid number.');
+        }
+
+        // Validate Images
+        const uploadedFiles = imageUpload.files;
+        if (uploadedFiles.length < 3) {
+            errors.push('Please select at least 3 images.');
+        } else if (uploadedFiles.length > 5) {
+            errors.push('You can upload a maximum of 5 images.');
+        }
+
+        // Display Errors
+        if (errors.length > 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Errors',
+                html: `<ul style="text-align: left;">${errors.map(err => `<li>${err}</li>`).join('')}</ul>`,
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        // Submit the form if validation passes
+        form.submit();
+    });
+
+  </script>
+ 
+
+

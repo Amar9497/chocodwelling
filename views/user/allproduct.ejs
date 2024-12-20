@@ -1,0 +1,95 @@
+<div class="bg-gray-100 min-h-screen">
+    <!-- Navbar -->
+    <%- include('navbar') %>
+  
+    <!-- Alert (if applicable) -->
+    <%- include('alert') %>
+  
+    <!-- ------------------- Breadcrumbs ----------------------- -->
+    <nav class="breadcrumbs text-sm text-gray-600 py-4">
+      <ul class="flex items-center space-x-2">
+        <li>
+          <a href="/user/home" class="text-blue-500 hover:text-blue-700 font-medium">Home</a>
+        </li>
+        <span class="text-gray-400">/</span>
+        <li>
+          <a href="/user/allproduct" class="text-blue-500 hover:text-blue-700 font-medium">All Products</a>
+        </li>
+      </ul>
+    </nav>
+  
+    <!-- Product Section -->
+    <section class="bg-white py-10">
+      <div class="container mx-auto px-6">
+        <h2 class="text-2xl font-semibold text-center mb-8 text-gray-800">All Products</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <% product.forEach((product) => { %>
+            <a href="/productDetail/<%- product.id %>" class="block bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+              <!-- Product Image -->
+              <img src="<%= product.productImage[0] %>" alt="<%= product.productName %>" class="w-full h-48 object-cover transform transition-transform duration-300 hover:scale-105">
+              
+              <!-- Product Details -->
+              <div class="p-4">
+                <!-- Product Name -->
+                <h3 class="text-lg font-medium text-gray-700 text-center mb-2 truncate">
+                  <%= product.productName %>
+                </h3>
+    
+                <!-- Product Description -->
+                <p class="text-sm text-gray-600 mb-4 text-center">
+                  <%= product.productDescription %>
+                </p>
+    
+                <!-- Product Price -->
+                <div class="flex justify-between items-center">
+                  <span class="text-lg font-semibold text-gray-800">
+                    ₹<% product.productVariants.forEach(variant => { %>
+                      <span><%= variant.price %></span>
+                    <% }) %>
+                  </span>
+                </div>
+              </div>
+            </a>
+          <% }) %>
+        </div>
+      </div>
+    </section>
+    
+  
+    <!-- Pagination Controls -->
+    <div class="flex justify-center mt-6">
+      <ul class="flex space-x-2">
+        <% if (currentPage > 1) { %>
+          <li>
+            <a href="/allproduct/?page=<%= currentPage - 1 %>&limit=<%= limit %>&search=<%= search %>" class="px-4 py-2 text-sm text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition duration-200">
+              Previous
+            </a>
+          </li>
+        <% } %>
+  
+        <% for (let i = 1; i <= totalPages; i++) { %>
+          <li>
+            <a href="/allproduct/?page=<%= i %>&limit=<%= limit %>&search=<%= search %>"
+              class="px-4 py-2 text-sm rounded transition duration-200
+              <%= currentPage == i ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %>">
+              <%= i %>
+            </a>
+          </li>
+        <% } %>
+  
+        <% if (currentPage < totalPages) { %>
+          <li>
+            <a href="/allproduct/?page=<%= currentPage + 1 %>&limit=<%= limit %>&search=<%= search %>" class="px-4 py-2 text-sm text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition duration-200">
+              Next
+            </a>
+          </li>
+        <% } %>
+      </ul>
+    </div>
+  
+    <!-- Footer -->
+    <%- include('footer') %>
+  </div>
+
+  
+  

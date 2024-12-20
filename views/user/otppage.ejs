@@ -1,0 +1,123 @@
+<div class=" font-sans">
+    <!-- Navbar -->
+    <%- include('navbar') %>
+    <%- include('alert') %>
+
+    <!-- OTP Section -->
+    <main class="flex justify-center items-center min-h-[60vh] px-4">
+        <div class="bg-[#A79277]/10 p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h2 class="text-xl font-semibold text-center text-[#A79277] mb-4">Enter the OTP</h2>
+            <form class="space-y-4" action="/otp" method="post" id="otpForm">
+                <div class="flex justify-center space-x-3">
+                    <% for (let i = 1; i <= 4; i++) { %>
+                        <input
+                            type="text"
+                            minlength="1"
+                            maxlength="1"
+                            name="otp<%= i %>"
+                            class="otp-input w-12 h-12 border border-gray-300 rounded-md text-center text-lg focus:outline-none focus:ring-2 focus:ring-[#A79277]"
+                            autocomplete="off"
+                            required
+                        />
+                    <% } %>
+                </div>
+                <input type="hidden" name="otp" id="otp">
+                <input type="hidden" name="otpTime" value="<%= otpTime %>" id="otpTime">
+    
+                <div id="otpTimer" class="text-center text-sm text-gray-600">Time remaining: <span id="timer">02:00</span></div>
+                <button
+                    type="submit"
+                    id="verify-btn"
+                    class="w-full bg-[#A79277] text-white py-2 rounded-md hover:bg-[#8F7B66]"
+                    disabled
+                >
+                    Submit
+                </button>
+            </form>
+            <p class="text-center text-gray-700 mt-4">
+                Didn’t get the OTP? <a href="/resendotp" class="text-[#A79277] hover:underline" id="resend-btn">Resend</a>
+            </p>
+        </div>
+    </main>
+    
+
+    <!-- Footer -->
+    <%- include('footer') %>
+
+</div>
+
+<script>
+    
+    const otpInputs = document.querySelectorAll('.otp-input');
+    const hiddenOtpInput = document.getElementById('otp');
+    const otpTimer = document.getElementById('otpTimer');
+    const otpTime = parseInt(document.getElementById('otpTime').value);
+    const duration = 60 * 2 * 1000;  // 2 minutes in milliseconds
+    const verifybtn = document.getElementById('verify-btn');
+    const resendbtn = document.getElementById('resend-btn');
+
+    // Go to next input when current OTP input is filled
+    otpInputs.forEach((input, index) => {
+        input.addEventListener('input', () => {
+            if (input.value.length === input.maxLength) {
+                const nextInput = otpInputs[index + 1];
+                if (nextInput) {
+                    nextInput.focus();
+                }
+            }
+
+            updateHiddenOtpInput();
+            enableSubmitButton();
+        });
+
+        // Go to previous input when Backspace is pressed
+        input.addEventListener('keydown', (event) => {
+            if (event.key === 'Backspace' && input.value.length === 0) {
+                const prevInput = otpInputs[index - 1];
+                if (prevInput) {
+                    prevInput.focus();
+                }
+            }
+        });
+    });
+
+    // Update hidden OTP input with concatenated OTP value
+    function updateHiddenOtpInput() {
+        let otpValue = '';
+        otpInputs.forEach(input => {
+            otpValue += input.value;
+        });
+        hiddenOtpInput.value = otpValue;
+    }
+
+    // Check if all OTP fields are filled to enable the submit button
+    function enableSubmitButton() {
+        const allFilled = [...otpInputs].every(input => input.value.length === 1);
+        if (allFilled) {
+            verifybtn.disabled = false;
+        } else {
+            verifybtn.disabled = true;
+        }
+    }
+
+    // Countdown timer for OTP expiration
+    function countDown() {
+        const interval = setInterval(() => {
+            const now = Date.now();
+            let remain = duration - (now - otpTime);
+
+            if (remain <= 0) {
+                otpTimer.remove();
+                verifybtn.disabled = true;
+                clearInterval(interval);
+            } else {
+                const min = Math.floor((remain % (1000 * 60 * 60)) / (1000 * 60));
+                const sec = Math.floor((remain % (1000 * 60)) / 1000);
+                otpTimer.innerHTML = `Time remaining: ${min}:${sec < 10 ? '0' : ''}${sec}`;
+            }
+        }, 1000);
+    }
+
+    countDown();
+</script>
+

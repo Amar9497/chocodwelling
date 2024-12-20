@@ -1,0 +1,387 @@
+<link href="https://unpkg.com/cropperjs/dist/cropper.min.css" rel="stylesheet">
+<style>
+    #imagePreview img {
+        max-width: 100%;  /* Ensure images don’t exceed their container width */
+        height: auto;     /* Maintain aspect ratio */
+        object-fit: cover; /* Ensure the image fills the space without distortion */
+        max-height: 200px; /* Set a maximum height for images */
+        border-radius: 8px; /* Optional: Adds rounded corners */
+    }
+    
+    .close-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    color: white;
+    font-size: 20px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    padding: 5px;
+    cursor: pointer;
+}
+
+.close-button:hover {
+    background-color: rgba(255, 0, 0, 0.5);
+}
+
+</style>
+
+
+  <!-- Navbar -->
+  <%- include('navbar') %>
+
+  <!-- alert -->
+   <%- include('alert') %>
+
+  <!-- Page Container -->
+  <div class="max-w-5xl mx-auto mt-10 p-8 bg-white rounded-lg shadow-md">
+
+    <!-- Page Title -->
+    <h2 class="text-3xl font-bold text-gray-700 mb-6 text-center">Edit Product</h2>
+
+    <!-- Product Form -->
+    <form class="space-y-6" action="/admin/editproduct/<%= products.id %>" method="post" enctype="multipart/form-data" id="add-product-form" onsubmit="return validateForm()">
+
+        <!-- Product Name -->
+        <div>
+          <label for="productName" class="block text-sm font-medium text-gray-700 mb-2">Product Name*</label>
+          <input type="text" id="productName" placeholder="Enter product name" name="name" value="<%= products.productName %>" class="w-full px-4 py-2 rounded-md border border-gray-300 focus:ring focus:ring-blue-500 focus:outline-none">
+        </div>
+      
+        <!-- Product Brand & Category -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="brand" class="block text-sm font-medium text-gray-700 mb-2">Product Brand*</label>
+            <select name="brand" id="brand" class="block w-full border border-gray-300 rounded-md p-2 mt-1 focus:ring-blue-500 focus:border-blue-500">
+              <option value="" disabled selected>Select a brand</option>
+              <% brand.forEach((brand) => { %>
+                <option value="<%= brand.brandName %>" <% if (brand.brandName === products.productBrand) { %> selected <% } %>><%= brand.brandName %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div>
+            <label for="category" class="block text-sm font-medium text-gray-700 mb-2">Category*</label>
+            <select name="category" id="category" class="block w-full border border-gray-300 rounded-md p-2 mt-1 focus:ring-blue-500 focus:border-blue-500">
+              <option value="" disabled selected>Select a category</option>
+              <% category.forEach((category) => { %>
+                <option value="<%= category.categoryName %>" <% if (category.categoryName === products.productCategory) { %> selected <% } %>><%= category.categoryName %></option>
+              <% }) %>
+            </select>
+          </div>
+        </div>
+      
+        <!-- Product Description -->
+        <div>
+          <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Description*</label>
+          <textarea id="description" rows="4" placeholder="Enter product description" name="description" class="w-full px-4 py-2 rounded-md border border-gray-300 focus:ring focus:ring-blue-500 focus:outline-none"><%= products.productDescription %></textarea>
+        </div>
+
+        <!-- Product Images Section -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Product Images</label>
+        <!-- File Input for Image Upload -->
+<div class="col-span-full flex justify-center items-center mt-6">
+    <input type="file" name="images" id="image-upload" accept="image/png, image/jpeg" multiple class="hidden" onchange="previewImages(event)">
+    <label for="image-upload" class="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+        Choose Images
+    </label>
+</div>
+        <!-- Image Preview Container -->
+<div class="image-upload-preview col-span-full flex flex-wrap gap-4 justify-center mt-5" id="image-upload-preview">
+    <!-- Existing Images -->
+    <% products.productImage.forEach((img) => { %>
+        <div class="product-image-box" style="width: 25%;" data-image-path="<%= img %>">
+            <img src="<%= img %>" alt="Product Image" class="preview-img w-full rounded">
+            <a
+                class="btn text-white px-2 py-1 rounded hover:bg-red-600 cursor-pointer mt-2 delete-btn"
+                onclick="deleteImage('<%= img %>')">❌</a>
+        </div>
+    <% }) %>
+</div>
+
+<!-- Hidden Inputs for Deleted and Cropped Images -->
+<input type="hidden" id="deletedImages" name="deletedImages" value='[]'>
+<input type="hidden" id="croppedImages" name="croppedImages" value='[]'>
+    </div>
+      
+        <!-- Product Variants -->
+<div>
+  <label class="block text-sm font-medium text-gray-700 mb-2">Product Variants</label>
+  <div class="grid grid-cols-3 gap-4 items-center">
+    <div>
+      <label for="weight" class="block text-sm font-medium text-gray-700 mb-1">Weight</label>
+      <input type="text" placeholder="Weight" name="weight" id="weight" 
+             value="<%= products.productVariants[0].weight %>" 
+             class="variant-input w-full px-4 py-2 rounded-md border border-gray-300 focus:ring focus:ring-blue-500 focus:outline-none">
+    </div>
+    <div>
+      <label for="price" class="block text-sm font-medium text-gray-700 mb-1">Price</label>
+      <input type="text" placeholder="Price" name="price" id="price" 
+             value="<%= products.productVariants[0].price %>" 
+             class="variant-input w-full px-4 py-2 rounded-md border border-gray-300 focus:ring focus:ring-blue-500 focus:outline-none">
+    </div>
+    <div>
+      <label for="stock" class="block text-sm font-medium text-gray-700 mb-1">Stock</label>
+      <input type="text" placeholder="Stock" name="stock" id="stock" 
+             value="<%= products.productVariants[0].stock %>" 
+             class="variant-input w-full px-4 py-2 rounded-md border border-gray-300 focus:ring focus:ring-blue-500 focus:outline-none">
+    </div>
+  </div>
+</div>
+
+      
+        <!-- Submit Button -->
+        <div class="text-center">
+          <button type="submit" class="w-full md:w-1/2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-md transition duration-300 shadow-lg">
+            Add Product
+          </button>
+        </div>
+      </form>
+  </div>
+
+
+  <!-- Crop Modal -->
+<div id="cropModal" class="hidden fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div class="bg-white p-4 rounded-lg">
+        <div class="relative">
+            <img id="cropImage" src="" alt="Image to crop" />
+        </div>
+        <div class="mt-4 flex justify-between">
+            <button id="closeModal" class="bg-red-500 text-white px-4 py-2 rounded">Close</button>
+            <button id="cropImageButton" class="bg-green-500 text-white px-4 py-2 rounded">Crop & Save</button>
+        </div>
+    </div>
+</div>
+
+  <!-- Footer -->
+  <%- include('footer')%>
+  <script src="https://unpkg.com/cropperjs/dist/cropper.min.js"></script>
+  <script>
+// Delete image function
+document.addEventListener("DOMContentLoaded", () => {
+    const deletedImagesInput = document.getElementById("deletedImages");
+
+    // Function to handle image deletion
+    window.deleteImage = (imagePath) => {
+        // SweetAlert2 confirmation dialog
+        Swal.fire({
+            title: "Are you sure?",
+            text: "This image will be deleted permanently!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "Cancel",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Find and remove the image box based on imagePath or src
+                let imageBox = document.querySelector(`[data-image-path="${imagePath}"]`);
+
+                if (!imageBox) {
+                    // If not found with data-image-path, try finding the image with src
+                    const imageElement = document.querySelector(`img[src="${imagePath}"]`);
+                    if (imageElement) {
+                        imageBox = imageElement.closest(".product-image-box"); // Get the closest parent div
+                    }
+                }
+
+                if (imageBox) {
+                    imageBox.remove();
+                }
+
+                // Update the hidden input with deleted images
+                let deletedImages = JSON.parse(deletedImagesInput.value || "[]");
+                if (!deletedImages.includes(imagePath)) {
+                    deletedImages.push(imagePath);
+                }
+                deletedImagesInput.value = JSON.stringify(deletedImages);
+
+                // SweetAlert2 success message
+                Swal.fire({
+                    title: "Deleted!",
+                    text: "Your image has been deleted.",
+                    icon: "success",
+                    timer: 2000, // Auto-close after 2 seconds
+                    showConfirmButton: false,
+                });
+            }
+        });
+    };
+});
+
+
+// delet image
+function deleteImage(imageUrl) {
+    const deletedImagesInput = document.getElementById('deletedImages');
+    const currentDeletedImages = JSON.parse(deletedImagesInput.value);
+    
+    // Add the image to the deleted list
+    currentDeletedImages.push(imageUrl);
+    deletedImagesInput.value = JSON.stringify(currentDeletedImages);
+
+    // Remove the image preview
+    const imageBox = document.querySelector(`[data-image-path="${imageUrl}"]`);
+    if (imageBox) imageBox.remove();
+}
+
+
+
+// Crop functions
+document.addEventListener("DOMContentLoaded", () => {
+    const imageUploadInput = document.getElementById("image-upload");
+    const cropModal = document.getElementById("cropModal");
+    const cropImage = document.getElementById("cropImage");
+    const closeModalButton = document.getElementById("closeModal");
+    const cropImageButton = document.getElementById("cropImageButton");
+    const imagePreviewContainer = document.getElementById("image-upload-preview");
+    const croppedImagesInput = document.getElementById("croppedImages");
+
+    let cropper; // Cropper.js instance
+    let selectedFile; // Store the file to crop
+
+    // Function to show the crop modal
+    const openCropModal = (imageURL) => {
+        cropImage.src = imageURL;
+        cropModal.classList.remove("hidden");
+        cropper = new Cropper(cropImage, {
+            aspectRatio: 1, // Adjust aspect ratio as needed
+            viewMode: 2,
+        });
+    };
+
+    // Close modal function
+    const closeCropModal = () => {
+        cropModal.classList.add("hidden");
+        if (cropper) {
+            cropper.destroy();
+        }
+    };
+
+    // Handle file input change
+    window.previewImages = (event) => {
+        const files = event.target.files;
+
+        if (files.length > 0) {
+            selectedFile = files[0];
+            const imageURL = URL.createObjectURL(selectedFile);
+            openCropModal(imageURL);
+        }
+    };
+
+    // Handle crop and save
+    cropImageButton.addEventListener("click", () => {
+        if (cropper) {
+            cropper.getCroppedCanvas().toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+
+                // Add cropped image to preview container
+                const imageBox = document.createElement("div");
+                imageBox.classList.add("product-image-box");
+                imageBox.style.width = "25%";
+
+                imageBox.innerHTML = `
+                    <img src="${url}" alt="Cropped Image" class="preview-img w-full rounded">
+                    <a class="btn text-white px-2 py-1 rounded hover:bg-red-600 cursor-pointer mt-2 delete-btn"
+                       onclick="deleteImage('${url}')">❌</a>
+                `;
+
+                imagePreviewContainer.appendChild(imageBox);
+
+                // Update hidden input with cropped image (simulating a new upload)
+                const reader = new FileReader();
+                reader.onload = () => {
+                    let croppedImages = JSON.parse(croppedImagesInput.value || "[]");
+                    croppedImages.push(reader.result); // Add base64 string
+                    croppedImagesInput.value = JSON.stringify(croppedImages);
+                };
+                reader.readAsDataURL(blob);
+
+                // Clean up and close modal
+                closeCropModal();
+            });
+        }
+    });
+
+    // Close modal event
+    closeModalButton.addEventListener("click", closeCropModal);
+});
+
+
+
+
+// ------------------- validation --------------------
+
+function validateForm() {
+  // Fetch values
+  const productName = document.getElementById("productName").value.trim();
+  const brand = document.getElementById("brand").value;
+  const category = document.getElementById("category").value;
+  const description = document.getElementById("description").value.trim();
+  const variantInputs = document.querySelectorAll(".variant-input");
+
+  // Regex for letters only
+  const lettersOnly = /^[a-zA-Z\s]{3,}$/;
+
+  // Validate Product Name
+  if (!lettersOnly.test(productName)) {
+    Swal.fire({
+      icon: "error",
+      title: "Invalid Product Name",
+      text: "Product Name must contain at least 3 letters and no numbers.",
+    });
+    return false;
+  }
+
+  // Validate Brand
+  if (brand === "") {
+    Swal.fire({
+      icon: "error",
+      title: "Brand Not Selected",
+      text: "Please select a product brand.",
+    });
+    return false;
+  }
+
+  // Validate Category
+  if (category === "") {
+    Swal.fire({
+      icon: "error",
+      title: "Category Not Selected",
+      text: "Please select a product category.",
+    });
+    return false;
+  }
+
+  // Validate Description
+  if (description.length === 0) {
+    Swal.fire({
+      icon: "error",
+      title: "Description Required",
+      text: "Product description cannot be empty.",
+    });
+    return false;
+  }
+
+  // Validate Product Variants (Weight, Price, Stock must be numbers)
+  for (const input of variantInputs) {
+    if (isNaN(input.value) || input.value.trim() === "") {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Product Variant",
+        text: "Product variants (Weight, Price, and Stock) must be valid numbers.",
+      });
+      return false;
+    }
+  }
+
+  // If all validations pass
+  return true;
+}
+
+    
+
+  </script>
+ 
+
+

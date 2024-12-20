@@ -1,0 +1,104 @@
+
+<!-- navbar -->
+  <%- include('navbar') %>
+
+  <!-- Layout Container -->
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="bg-[#E5E7EB] text-black w-64 py-6 px-4 hidden lg:block">
+      <nav class="space-y-6">
+          <a href="/admin/home" class=" flex items-center space-x-4 py-2 px-3 bg-white text-black rounded-lg shadow-md">
+              
+              <span class="poppins-semibold" >Dashboard</span>
+          </a>
+          <a href="/admin/products" class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg">
+
+              <span >Products</span>
+          </a>
+          <a href="/admin/category" class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg">
+
+              <span >Category</span>
+          </a>
+          <a href="/admin/brand" class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg">
+
+            <span >Brand</span>
+        </a>
+          <a href="/admin/customers" class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg">
+
+              <span>Customers</span>
+          </a>
+          <a href="/admin/offers" class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg">
+
+              <span>Orders</span>
+          </a>
+          <a href="#" class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg">
+
+              <span>Coupons</span>
+          </a>
+          <a href="#" class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg">
+
+              <span>Offers</span>
+          </a>
+          <a href="#" class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg">
+
+              <span>Banner</span>
+          </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6">
+      <header class="flex justify-between items-center">
+        <h1 class="text-xl font-bold text-brown-800">Sales Summary</h1>
+        <div class="flex items-center gap-4">
+          <select class="border p-2 rounded-lg">
+            <option>2024</option>
+            <option>2023</option>
+          </select>
+          <button class="bg-green-500 text-white px-4 py-2 rounded-lg">Download</button>
+        </div>
+      </header>
+
+      <!-- Summary Cards -->
+      <div class="grid grid-cols-4 gap-4 mt-6">
+        <div class="bg-white p-4 shadow rounded-lg">
+          <h2 class="text-gray-700 font-bold">Revenue</h2>
+          <p class="text-2xl font-semibold">$7,825</p>
+          <p class="text-green-500 text-sm">+22%</p>
+        </div>
+        <div class="bg-white p-4 shadow rounded-lg">
+          <h2 class="text-gray-700 font-bold">Orders</h2>
+          <p class="text-2xl font-semibold">920</p>
+          <p class="text-red-500 text-sm">-25%</p>
+        </div>
+        <div class="bg-white p-4 shadow rounded-lg">
+          <h2 class="text-gray-700 font-bold">Products Sold</h2>
+          <p class="text-2xl font-semibold">15.5K</p>
+          <p class="text-green-500 text-sm">+49%</p>
+        </div>
+        <div class="bg-white p-4 shadow rounded-lg">
+          <h2 class="text-gray-700 font-bold">Total Customers</h2>
+          <p class="text-2xl font-semibold">120</p>
+          <p class="text-green-500 text-sm">+4%</p>
+        </div>
+      </div>
+
+      <!-- Graph Section -->
+      <div class="bg-white mt-6 p-6 rounded-lg shadow">
+        <div class="flex justify-between items-center">
+          <h2 class="text-gray-700 font-bold">Orders Update</h2>
+          <a href="#" class="text-blue-500">View Details</a>
+        </div>
+        <div class="mt-4">
+          <!-- Placeholder for Chart -->
+          <div class="h-64 bg-gray-200 rounded-lg flex items-center justify-center">
+            <p class="text-gray-500">Graph Placeholder</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+   <!-- footer -->
+
+   <%- include('footer') %>
