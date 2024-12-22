@@ -1,10 +1,12 @@
-const express=require("express")
+const express=require("express");
 const user=express.Router();
-const passport=require("passport")
+const passport=require("passport");
 const userController=require('../controller/userController/userController');
 const categoryController=require('../controller/userController/categoryController');
 const productController= require('../controller/userController/productController');
-const auth = require('../middleware/userSession')
+const forgotPasswordController = require('../controller/userController/forgotPassworController');
+const profileController = require('../controller/userController/profileController');
+const auth = require('../middleware/userSession');
 
 // -------------------- login --------------------
 user.get('/login',auth.isLogin,userController.loadLogin);
@@ -31,9 +33,41 @@ user.post('/otp',userController.otpPost);
 
 user.get('/resendotp',userController.otpResend);
 
+// ------------------- forgot password ---------------
+
+user.get('/forgotpassword',forgotPasswordController.forgotPassword);
+
+user.post('/forgotpassword',forgotPasswordController.forgotPasswordPost);
+
+user.get('/forgotPasswordOtp',forgotPasswordController.forgotPasswordOtp);
+
+user.post('/forgotPasswordOtp',forgotPasswordController.forgotPasswordOtpPost);
+
+user.post('/resetPassword',forgotPasswordController.resetPasswordPost);
+
+user.get('/forgotpassword-resendotp',forgotPasswordController.forgotResend)
+
 // --------------------- home -----------------------------
 
-user.get('/home',auth.isCheck,userController.home);
+user.get('/home',userController.home);
+
+// ------------------- profile ---------------------------- 
+
+user.get('/profile',auth.isCheck,profileController.profile);
+
+user.post('/updateProfile',profileController.updateProfile);
+
+user.post('/add-address',profileController.addAddress);
+
+user.get('/remove-address/:index', profileController.removeAddress);
+
+user.post('/updateaddress/:index',profileController.updateAddress);
+
+user.post('/reset-password',profileController.resetPassword);
+
+
+
+
 
 // ------------------- category -----------------------
 

@@ -1,0 +1,665 @@
+
+<%- include('navbar') %>
+<%- include ('alert') %>
+<!-- -----------------------User Profile------------------------------- -->
+
+<div class="container mx-auto mt-10 px-4">
+    <!-- Profile Sidebar and Content Wrapper -->
+    <div class="flex flex-wrap lg:flex-nowrap gap-8 m-10">
+        <!-- Sidebar -->
+        <aside class="w-full lg:w-1/4">
+            <div class="bg-gradient-to-r from-[#A79277] to-[#d2b69b] shadow-lg rounded-lg p-6">
+                <h2 class="text-xl font-bold text-white mb-6">Menu</h2>
+                <ul class="space-y-4">
+                    <li>
+                        <a href="/profile" class="block bg-white rounded-lg px-4 py-3 text-gray-800 shadow-md hover:bg-gray-100 transition">Profile</a>
+                    </li>
+                    <li>
+                        <a href="/orders" class="block bg-white rounded-lg px-4 py-3 text-gray-800 shadow-md hover:bg-gray-100 transition">My Orders</a>
+                    </li>
+                    <li>
+                        <a href="/wallet" class="block bg-white rounded-lg px-4 py-3 text-gray-800 shadow-md hover:bg-gray-100 transition">Wallet</a>
+                    </li>
+                    <li>
+                        <a href="/resetprofile-password" class="block bg-white rounded-lg px-4 py-3 text-gray-800 shadow-md hover:bg-gray-100 transition">Reset Password</a>
+                    </li>
+                    <li>
+                        <a href="/logout" class="block bg-white rounded-lg px-4 py-3 text-gray-800 shadow-md hover:bg-gray-100 transition">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Profile Content -->
+        <section class="w-full lg:w-3/4">
+            <div class="bg-gradient-to-r from-[#A79277] to-[#d2b69b] shadow-lg rounded-lg p-8">
+                <div class="flex items-center gap-6 mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM5.216 14A2.238 2.238 0 0 1 4 12.765C4 11.544 5.75 11 8 11s4 .544 4 1.765A2.238 2.238 0 0 1 10.784 14H5.216z" />
+                    </svg>
+                    <h2 class="text-2xl font-bold text-white">Your Profile</h2>
+                </div>
+                <form action="/updateProfile" method="post" class="space-y-6">
+                    <div>
+                        <label for="userName" class="block text-sm font-medium text-white mb-2">Name</label>
+                        <input type="text" id="userName" name="userName" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500" value="<%= userDetail.name %>">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-white mb-2">Email Address</label>
+                        <input type="email" id="email" name="email" readonly required class="w-full border border-gray-300 rounded-lg px-4 py-2 bg-gray-100 cursor-not-allowed" value="<%= userDetail.email %>">
+                    </div>
+                    <div>
+                        <label for="phoneNumber" class="block text-sm font-medium text-white mb-2">Phone Number</label>
+                        <input type="text" id="phoneNumber" name="phoneNumber" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500" value="<%= userDetail.phone %>">
+                    </div>
+                    <button type="submit" class="w-full bg-red-500 text-white font-bold py-3 rounded-lg hover:bg-red-600 transition">Update</button>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <!-- Address Section -->
+    <section class="m-10 ">
+        <div class="bg-gradient-to-r from-[#A79277] to-[#d2b69b] shadow-lg rounded-lg p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-white">Your Address</h2>
+                <% if (userDetail.address.length < 4) { %>
+                <a href="#" onclick="toggleModal()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">Add Address</a>
+                <% } else { %>
+                <span class="text-white">Maximum 4 addresses reached</span>
+                <% } %>
+            </div>
+            <div class="space-y-6">
+                <% if (!userDetail.address || userDetail.address.length === 0) { %>
+                <p class="text-white">No Address Found. Please add an Address.</p>
+                <% } else { %>
+                <% userDetail.address.forEach((address, index) => { %>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-gray-800"><%= address.building %>, <%= address.street %></h3>
+                        <div class="flex space-x-3">
+                            <a href="#" onclick="editModal('<%= index %>', this)" title="Edit Address" class="text-blue-500 hover:text-blue-700" data-address='<%= JSON.stringify(address) %>'>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-6 h-6" viewBox="0 0 24 24">
+                                    <path d="M3 21v-3.5l13-13 3.5 3.5-13 13H3zm15.5-16.5L14 2l-1.5 1.5 4.5 4.5L21 6l-2.5-2.5z"></path>
+                                </svg>
+                            </a>
+                            <a href="#" class="delete-address text-red-500 hover:text-red-700" title="Delete Address" data-address-index="<%= index %>">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-6 h-6" viewBox="0 0 16 16">
+                                    <path d="M5.5 1a1 1 0 0 0-1 1H2a1 1 0 1 0 0 2h12a1 1 0 1 0 0-2h-2.5a1 1 0 0 0-1-1h-4zM3.5 4h9l-.5 10a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1L3.5 4zm2.5 3a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V7zm3 0a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V7zm3 0a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V7z"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                    <p class="text-gray-600">
+                        <%= address.city %>, <%= address.state %>, <%= address.country %><br>
+                        <strong>Pincode:</strong> <%= address.pincode %><br>
+                        <strong>Phone:</strong> <%= address.phoneNumber %>
+                    </p>
+                </div>
+                <% }) %>
+                <% } %>
+            </div>
+        </div>
+    </section>
+</div>
+
+
+
+
+<%- include('footer') %>
+
+<!-- --------------------------------Address modal------------------------------------- -->
+
+<div class="fixed inset-0 z-50 flex  justify-center items-center bg-black bg-opacity-50 hidden" id="addressModal">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg">
+      <div class="border-b px-6 py-4 flex justify-between items-center">
+        <h5 class="text-lg font-semibold">Add New Address</h5>
+        <button type="button" class="text-gray-500 hover:text-black" onclick="closeModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="px-6 py-4">
+        <form id="addressForm" method="post" action="/add-address">
+          <div class="mb-4">
+            <label for="building" class="block text-sm font-medium text-gray-700 mb-1">Flat, House no., Building, Company, Apartment</label>
+            <input type="text" id="building" name="building" class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-500" placeholder="Enter your address" >
+          </div>
+          <div class="mb-4">
+            <label for="street" class="block text-sm font-medium text-gray-700 mb-1">Area, Street, Sector, Village</label>
+            <input type="text" id="street" name="street" class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-500" placeholder="Enter your area" >
+          </div>
+          <div class="mb-4">
+            <label for="city" class="block text-sm font-medium text-gray-700 mb-1">Town/City</label>
+            <input type="text" id="city" name="city" class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-500" placeholder="Enter your city" >
+          </div>
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label for="phonenumber" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+              <input type="tel" id="phonenumber" name="phonenumber" class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-500" placeholder="Contact number" >
+            </div>
+            <div>
+              <label for="pincode" class="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
+              <input type="text" id="pincode" name="pincode" class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-500" placeholder="Enter your pincode" >
+            </div>
+          </div>
+          <div class="mb-4">
+            <label for="landmark" class="block text-sm font-medium text-gray-700 mb-1">Landmark</label>
+            <input type="text" id="landmark" name="landmark" class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-500" placeholder="Enter nearest landmark" >
+          </div>
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label for="state" class="block text-sm font-medium text-gray-700 mb-1">State</label>
+              <input type="text" id="state" name="state" class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-500" placeholder="Enter your state" >
+            </div>
+            <div>
+              <label for="country" class="block text-sm font-medium text-gray-700 mb-1">Country</label>
+              <input type="text" id="country" name="country" class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-500" placeholder="Enter your country" >
+            </div>
+          </div>
+          <div class="flex justify-end space-x-4">
+            <button type="button" class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400" onclick="closeModal()">Close</button>
+            <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Edit Address Modal -->
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden" id="editAddressModal">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg">
+        <div class="border-b px-6 py-4 flex justify-between items-center">
+            <h5 class="text-lg font-semibold">Edit Address</h5>
+            <button type="button" class="text-gray-500 hover:text-black" onclick="closeEditModal()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div class="px-6 py-4">
+            <form id="editAddressForm" method="post">
+                <input type="hidden" id="addressIndex" name="addressIndex">
+                <div class="mb-4">
+                    <label for="editBuilding" class="block text-sm font-medium text-gray-700 mb-1">Flat, House no., Building, Company, Apartment</label>
+                    <input type="text" id="editBuilding" name="building" class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label for="editStreet" class="block text-sm font-medium text-gray-700 mb-1">Area, Street, Sector, Village</label>
+                    <input type="text" id="editStreet" name="street" class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label for="editCity" class="block text-sm font-medium text-gray-700 mb-1">Town/City</label>
+                    <input type="text" id="editCity" name="city" class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-500">
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="editPhoneNumber" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                        <input type="tel" id="editPhoneNumber" name="phoneNumber" class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="editPincode" class="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
+                        <input type="text" id="editPincode" name="pincode" class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-500">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label for="editLandmark" class="block text-sm font-medium text-gray-700 mb-1">Landmark</label>
+                    <input type="text" id="editLandmark" name="landmark" class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-500">
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="editState" class="block text-sm font-medium text-gray-700 mb-1">State</label>
+                        <input type="text" id="editState" name="state" class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="editCountry" class="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                        <input type="text" id="editCountry" name="country" class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-500">
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400" onclick="closeEditModal()">Close</button>
+                    <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Update Address</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Reset Password Modal -->
+<div id="resetPasswordModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 transform transition-all">
+        <!-- Modal Header -->
+        <div class="border-b px-6 py-4 flex items-center justify-between">
+            <h3 class="text-xl font-semibold text-gray-900">Reset Password</h3>
+            <button onclick="closeResetModal()" class="text-gray-400 hover:text-gray-500">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="px-6 py-4">
+            <form id="resetPasswordForm" method="POST" action="/reset-password" onsubmit="return validateResetForm()">
+                <!-- Current Password -->
+                <div class="mb-4">
+                    <label for="currentPassword" class="block text-sm font-medium text-gray-700 mb-2">
+                        Current Password
+                    </label>
+                    <div class="relative">
+                        <input type="password" 
+                            id="currentPassword" 
+                            name="currentPassword"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                            placeholder="Enter current password"
+                            required
+                        >
+                        <button type="button" 
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
+                            onclick="togglePassword('currentPassword')">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- New Password -->
+                <div class="mb-4">
+                    <label for="newPassword" class="block text-sm font-medium text-gray-700 mb-2">
+                        New Password
+                    </label>
+                    <div class="relative">
+                        <input type="password" 
+                            id="newPassword" 
+                            name="newPassword"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                            placeholder="Enter new password"
+                            required
+                        >
+                        <button type="button" 
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
+                            onclick="togglePassword('newPassword')">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="mb-6">
+                    <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-2">
+                        Confirm New Password
+                    </label>
+                    <div class="relative">
+                        <input type="password" 
+                            id="confirmPassword" 
+                            name="confirmPassword"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                            placeholder="Confirm new password"
+                            required
+                        >
+                        <button type="button" 
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
+                            onclick="togglePassword('confirmPassword')">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="flex justify-end space-x-3">
+                    <button type="button" 
+                        onclick="closeResetModal()"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400">
+                        Cancel
+                    </button>
+                    <button type="submit" 
+                        class="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500">
+                        Reset Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Show/Hide Modal
+    function showResetModal() {
+        document.getElementById('resetPasswordModal').classList.remove('hidden');
+    }
+
+    function closeResetModal() {
+        document.getElementById('resetPasswordModal').classList.add('hidden');
+        document.getElementById('resetPasswordForm').reset();
+    }
+
+    // Toggle Password Visibility
+    function togglePassword(inputId) {
+        const input = document.getElementById(inputId);
+        input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    // Form Validation
+    function validateResetForm() {
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        // Password strength validation
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        
+        if (!passwordRegex.test(newPassword)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Password',
+                text: 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character'
+            });
+            return false;
+        }
+
+        // Password match validation
+        if (newPassword !== confirmPassword) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Password Mismatch',
+                text: 'New password and confirm password do not match'
+            });
+            return false;
+        }
+
+        return true;
+    }
+
+    // Update click handler for reset password link
+    document.querySelector('a[href="/ressetprofile-password"]').addEventListener('click', function(e) {
+        e.preventDefault();
+        showResetModal();
+    });
+</script>
+
+
+  
+  <script>
+
+    // add modal
+    function toggleModal() {
+        const modal = document.getElementById('addressModal');
+        modal.classList.toggle('hidden');
+        modal.classList.add('flex');
+    }
+
+function closeModal() {
+    const modal = document.getElementById('addressModal');
+    modal.classList.add('hidden');
+}
+
+// edite modal
+function editModal(index, element) {
+    const modal = document.getElementById('editAddressModal');
+    
+    // Extract the address data from the 'data-address' attribute
+    const address = JSON.parse(element.getAttribute('data-address'));
+
+
+    // Update form action with the index
+    const form = document.getElementById('editAddressForm');
+    form.action = `/updateaddress/${index}`;
+    
+    // Populate the form fields with the existing address data
+    document.getElementById('addressIndex').value = index;
+    document.getElementById('editBuilding').value = address.building;
+    document.getElementById('editStreet').value = address.street;
+    document.getElementById('editCity').value = address.city;
+    document.getElementById('editPhoneNumber').value = address.phoneNumber;
+    document.getElementById('editPincode').value = address.pincode;
+    document.getElementById('editLandmark').value = address.landmark;
+    document.getElementById('editState').value = address.state;
+    document.getElementById('editCountry').value = address.country;
+
+    // Show the modal
+    modal.classList.remove('hidden');
+}
+
+
+function closeEditModal() {
+    const modal = document.getElementById('editAddressModal');
+    modal.classList.add('hidden');
+}
+
+// Form validation
+document.getElementById('editAddressForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Get form values
+    const building = document.getElementById('editBuilding').value.trim();
+    const street = document.getElementById('editStreet').value.trim();
+    const city = document.getElementById('editCity').value.trim();
+    const phoneNumber = document.getElementById('editPhoneNumber').value.trim();
+    const pincode = document.getElementById('editPincode').value.trim();
+    
+    // Validation rules
+    if (!building || building.length < 3) {
+        Swal.fire({
+            title: "Error",
+            text: "Building/House No. must be at least 3 characters long",
+            icon: "error"
+        });
+        return;
+    }
+    
+    if (!street || street.length < 3) {
+        Swal.fire({
+            title: "Error",
+            text: "Street address must be at least 3 characters long",
+            icon: "error"
+        });
+        return;
+    }
+    
+    if (!city || city.length < 2) {
+        Swal.fire({
+            title: "Error",
+            text: "City name must be at least 2 characters long",
+            icon: "error"
+        });
+        return;
+    }
+    
+    if (!/^\d{10}$/.test(phoneNumber)) {
+        Swal.fire({
+            title: "Error",
+            text: "Please enter a valid 10-digit phone number",
+            icon: "error"
+        });
+        return;
+    }
+    
+    if (!/^\d{6}$/.test(pincode)) {
+        Swal.fire({
+            title: "Error",
+            text: "Please enter a valid 6-digit pincode",
+            icon: "error"
+        });
+        return;
+    }
+    
+    // If validation passes, submit the form
+    this.submit();
+});
+
+
+
+
+    //---------------------------Alert for deleting  address--------------------------
+
+    document.addEventListener('DOMContentLoaded', function () {
+                const deleteButtons = document.querySelectorAll('.delete-address');
+
+                deleteButtons.forEach(button => {
+                    button.addEventListener('click', function (event) {
+                        event.preventDefault();
+                        const addressIndex = parseInt(this.getAttribute('data-address-index'));
+                        if (!isNaN(addressIndex) && addressIndex >= 0) {
+                            Swal.fire({
+                                title: 'Are you sure?',
+                                text: "You won't be able to revert this!",
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'Yes, delete it!'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = "/remove-address/" + addressIndex;
+                                }
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Invalid Address Index',
+                                text: 'The address index is invalid. Please try again.'
+                            });
+                        }
+                    });
+                });
+            });
+
+        //---------------------------VAlidation for Profile----------------------------
+
+            document.getElementById('profile-form').addEventListener('submit', function (event) {
+                // Get form input values
+                const userName = document.getElementById('userName').value.trim();
+                const phoneNumber = document.getElementById('phoneNumber').value.trim();
+
+                // Regular expressions for validation
+                const namePattern = /^[a-zA-Z\s]+$/;
+                const phonePattern = /^\d{10}$/;
+
+                // Validate name
+                if (!namePattern.test(userName)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Invalid Name',
+                        text: 'Please enter a valid name. Only letters and spaces are allowed.'
+                    });
+                    event.preventDefault();
+                    return;
+                }
+
+                // Validate phone number
+                if (!phonePattern.test(phoneNumber)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Invalid Phone Number',
+                        text: 'Please enter a valid phone number. It should be 10 digits.'
+                    });
+                    event.preventDefault();
+                    return;
+                }
+            });
+
+        //------------------- validation for modal --------------------
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+                const addressForm = document.getElementById('addressForm');
+                const building = document.getElementsByName('building')[0];
+                const street = document.getElementsByName('street')[0];
+                const city = document.getElementsByName('city')[0];
+                const phone = document.getElementsByName('phonenumber')[0];
+                const pincode = document.getElementsByName('pincode')[0];
+                const landmark = document.getElementsByName('landmark')[0];
+                const state = document.getElementsByName('state')[0];
+                const country = document.getElementsByName('country')[0];
+
+                function validatePhone(phone) {
+                    const phoneRe = /^\d{10}$/;
+                    return phoneRe.test(phone);
+                }
+                function validatePincode(pincode) {
+                    const pincodeRe = /^\d{6}$/;
+                    return pincodeRe.test(pincode);
+                }
+                addressForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    if (building.value.trim() === "" || !isNaN(building.value)) {
+                        Swal.fire({
+                            title: "Error",
+                            text: "Building field must not be empty and Not a Number.",
+                            icon: "error"
+                        });
+                    } else if (building.value.length > 50 || building.value.length < 4) {
+                        Swal.fire({
+                            title: "Error",
+                            text: "Building field must be Greater than 4 letters and less than 50 letters.",
+                            icon: "error"
+                        });
+                    } else if (street.value.trim() === "" || !isNaN(street.value)) {
+                        Swal.fire({
+                            title: "Error",
+                            text: "Street field must not be empty and Not a Number.",
+                            icon: "error"
+                        });
+                    } else if (street.value.length > 50 || street.value.length < 4) {
+                        Swal.fire({
+                            title: "Error",
+                            text: "Street Field Must be Greater than 4 Letters and less than 50 letters.",
+                            icon: "error"
+                        });
+                    } else if (city.value.trim() === "" || !isNaN(city.value)) {
+                        Swal.fire({
+                            title: "Error",
+                            text: "City field must not be empty and Not a Number.",
+                            icon: "error"
+                        });
+                    } else if (city.value.length > 25 || city.value.length < 4) {
+                        Swal.fire({
+                            title: "Error",
+                            text: "City field must be Greater than 4 Words and less than 25 Words.",
+                            icon: "error"
+                        });
+                    } else if (!validatePhone(phone.value)) {
+                        Swal.fire({
+                            title: "Error",
+                            text: "Phone number must be 10 digits.",
+                            icon: "error"
+                        });
+                    } else if (!validatePincode(pincode.value)) {
+                        Swal.fire({
+                            title: "Error",
+                            text: "Pincode must be 6 digits.",
+                            icon: "error"
+                        });
+                    } else if (landmark.value.trim() === "" || !isNaN(landmark.value)) {
+                        Swal.fire({
+                            title: "Error",
+                            text: "Landmark field must not be empty.",
+                            icon: "error"
+                        });
+                    } else if (state.value.trim() === "" || !isNaN(state.value)) {
+                        Swal.fire({
+                            title: "Error",
+                            text: "State field must not be empty.",
+                            icon: "error"
+                        });
+                    } else if (country.value.trim() === "" || !isNaN(country.value)) {
+                        Swal.fire({
+                            title: "Error",
+                            text: "Country field must not be empty.",
+                            icon: "error"
+                        });
+                    } else {
+                        addressForm.submit();
+                    }
+                });
+            });
+  </script>
+  
