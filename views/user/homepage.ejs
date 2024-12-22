@@ -84,35 +84,37 @@
   </section>
 
   <!-- New Launches -->
-  <section class="bg-white py-16">
+<section class="bg-white py-16">
     <div class="container mx-auto px-6">
         <h2 class="text-3xl text-center font-bold text-gray-800 mb-12">New Launches</h2>
-        
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-              <% product.slice(0, 4).forEach((product) => { %>
-                  <div class="bg-white shadow-lg rounded-lg overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl">
-                      <div class="relative">
-                          <img src="<%= product.productImage[0] %>" alt="<%= product.productName %>" class="w-full h-48 object-cover object-center rounded-t-lg">
-                          <div class="absolute inset-0 bg-gradient-to-t from-black opacity-40 rounded-t-lg"></div>
-                      </div>
-                      <div class="p-6">
-                          <h3 class="text-2xl text-center font-semibold text-gray-800 mb-4">
-                              <%= product.productName  %>
-                          </h3>
-                          <h3 class="text-xl text-center text-gray-600 mb-4">
-                              ₹<% product.productVariants.forEach(variant => { %>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            <!-- Loop through newLaunches instead of product -->
+            <% newLaunches.slice(0, 4).forEach((product) => { %>
+                <div class="bg-white shadow-lg rounded-lg overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl">
+                    <div class="relative">
+                        <img src="<%= product.productImage[0] %>" alt="<%= product.productName %>" class="w-full h-48 object-cover object-center rounded-t-lg">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black opacity-40 rounded-t-lg"></div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl text-center font-semibold text-gray-800 mb-4">
+                            <%= product.productName %>
+                        </h3>
+                        <h3 class="text-xl text-center text-gray-600 mb-4">
+                            ₹<% product.productVariants.forEach(variant => { %>
                                 <span><%= variant.price %></span>
-                              <% }) %>
-                          </h3>
-                          <a href="/productDetail/<%- product.id %>" class="block text-center text-yellow-500 font-medium hover:text-yellow-600 transition duration-300">
-                              Explore <i class="fa fa-arrow-right"></i>
-                          </a>
-                      </div>
-                  </div>
-              <% }) %>
-          </div>
+                            <% }) %>
+                        </h3>
+                        <a href="/productDetail/<%- product.id %>" class="block text-center text-yellow-500 font-medium hover:text-yellow-600 transition duration-300">
+                            Explore <i class="fa fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
     </div>
-  </section>
+</section>
+
 
   <!-- Footer -->
   <%- include('footer') %>

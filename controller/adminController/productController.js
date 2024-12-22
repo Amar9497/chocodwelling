@@ -8,24 +8,27 @@ const cloudinary = require('cloudinary').v2;
 
 const loadProduct = async (req, res) => {
     const page = Math.max(parseInt(req.query.page) || 1, 1); // Ensure page is at least 1
-    const itemsPerPage = 10;
-    const search = req.query.search || '';
+    const itemsPerPage = 10; // Number of items per page
+    const search = req.query.search || ''; // Search term, if any
 
     try {
-         // search 
-         const filter = search
+        // Apply search filter if a search term is provided
+        const filter = search
             ? { productName: { $regex: search, $options: 'i' } } 
             : {};
 
-        const totalProduct = await productSchema.countDocuments();
-        const totalPages = Math.max(Math.ceil(totalProduct / itemsPerPage), 1);
-        const currentPage = Math.min(page, totalPages); // Prevent exceeding totalPages
+        // Get the total number of products based on the search filter
+        const totalProduct = await productSchema.countDocuments(filter); // Use the same filter here
+        const totalPages = Math.max(Math.ceil(totalProduct / itemsPerPage), 1); // Total pages
+        const currentPage = Math.min(page, totalPages); // Ensure current page is not higher than total pages
 
-        // Adjust skip calculation
+        // Calculate the number of products to skip based on the current page
         const skip = Math.max((currentPage - 1) * itemsPerPage, 0);
 
+        // Fetch the products and populate the category name
         const products = await productSchema.find(filter)
-            .skip(skip) // Skip cannot be negative
+            .populate('productCategory', 'categoryName') // Populate categoryName field
+            .skip(skip)
             .limit(itemsPerPage);
 
         res.render('admin/products', {
@@ -33,9 +36,10 @@ const loadProduct = async (req, res) => {
             products,
             currentPage,
             totalPages,
+            search, // Pass the search term to preserve search on pagination
         });
     } catch (error) {
-        console.error(error);
+        console.error(`Error in loadProduct: ${error}`);
         req.flash('error', 'Failed to load products.');
         res.status(500).render('admin/products', {
             title: 'Products',
@@ -46,6 +50,8 @@ const loadProduct = async (req, res) => {
         });
     }
 };
+
+
 
 
 
@@ -94,10 +100,20 @@ const addProductPost = async (req, res) => {
             }
         }
 
+        // Fetch the category and brand 
+        const category = await categorySchema.findOne({ categoryName: req.body.category });
+        const brand = await brandSchema.findOne({ brandName: req.body.brand });
+
+
+        if (!category) {
+            req.flash('error', 'Category does not exist!');
+            return res.redirect('/admin/addproduct');
+        }
+
         const product = {
             productName: req.body.name,
-            productBrand: req.body.brand,
-            productCategory: req.body.category,
+            productBrand: brand._id,
+            productCategory: category._id,  
             productDescription: req.body.description,
             productVariants: [
                 {
@@ -139,35 +155,39 @@ const addProductPost = async (req, res) => {
 };
 
 
+
 // -------------------- edit product page redering----------------
-const loadEditProduct = async(req,res)=>{
-    //console.log(req.params.id)
+const loadEditProduct = async (req, res) => {
     try {
         const id = req.params.id;
-        //console.log(id);
-        
-        const products = await productSchema.findById(id)
-        //console.log(products);
-        const category = await categorySchema.find()
-        const brand = await brandSchema.find()
-        
-        
-        if(products) {
-            res.render('admin/editproduct',{
-                title:'Edit Product',
+
+        // Fetch the product and populate both productCategory and productBrand fields
+        const products = await productSchema
+            .findById(id)
+            .populate('productCategory')
+            .populate('productBrand'); // Ensure productBrand is populated as well
+
+        const category = await categorySchema.find();
+        const brand = await brandSchema.find();
+
+        if (products) {
+            res.render('admin/editproduct', {
+                title: 'Edit Product',
                 products,
                 category,
-                brand
-            })
+                brand,
+            });
         } else {
-            req.flash('error','Unable to edit product')
-            res.redirect('/admin/products')
+            req.flash('error', 'Unable to edit product');
+            res.redirect('/admin/products');
         }
     } catch (error) {
-        console.log(`error in rendering edit product page ${error}`);
+        console.log(`Error in rendering edit product page: ${error}`);
+        req.flash('error', 'Something went wrong.');
+        res.redirect('/admin/products');
     }
+};
 
-}
 
 // ---------------------- edit product --------------------
 
@@ -181,6 +201,30 @@ const editProductPost = async (req, res) => {
             price: req.body.price,
             stock: req.body.stock
         }];
+
+        // Debug: Log input data for category and brand
+        // console.log(`Category Input: ${req.body.category}`);
+        // console.log(`Brand Input: ${req.body.brand}`);
+
+        // Fetch the category ID (use the category name or ID passed in req.body)
+        const category = await categorySchema.findById(req.body.category);
+        const brand = await brandSchema.findById(req.body.brand);
+
+        if (!category) {
+            console.log(`Category not found: ${req.body.category}`);
+            req.flash('error', 'Category does not exist!');
+            return res.redirect(`/admin/editproduct/${id}`);
+        }
+
+        if (!brand) {
+            console.log(`Brand not found: ${req.body.brand}`);
+            req.flash('error', 'Brand does not exist!');
+            return res.redirect(`/admin/editproduct/${id}`);
+        }
+
+        // Debug: Log category and brand IDs
+        // console.log(`Category ID: ${category._id}`);
+        // console.log(`Brand ID: ${brand._id}`);
 
         // Delete the images from Cloudinary
         for (const img of imageToDelete) {
@@ -203,14 +247,20 @@ const editProductPost = async (req, res) => {
         const savedCroppedImages = [];
         for (const img of croppedImages) {
             try {
-                const cloudinarImageUrl = await uploadBase64ImageToCloudinary(img);
-                savedCroppedImages.push(cloudinarImageUrl);
+                const cloudinaryImageUrl = await uploadBase64ImageToCloudinary(img);
+                savedCroppedImages.push(cloudinaryImageUrl);
             } catch (error) {
                 console.log(`Error in uploading cropped images to Cloudinary: ${error}`);
+                req.flash('error', 'Error uploading cropped images.');
+                return res.redirect(`/admin/editproduct/${id}`);
             }
         }
 
         const product = await productSchema.findById(id);
+        if (!product) {
+            req.flash('error', 'Product not found!');
+            return res.redirect('/admin/products');
+        }
 
         // Combine old and new images
         const newImages = [...product.productImage, ...savedCroppedImages];
@@ -218,8 +268,8 @@ const editProductPost = async (req, res) => {
         // Update the product in the database
         await productSchema.findByIdAndUpdate(id, {
             productName: req.body.name,
-            productBrand: req.body.brand,
-            productCategory: req.body.category,
+            productBrand: brand._id,
+            productCategory: category._id,
             productDescription: req.body.productDescription,
             productPrice: req.body.productPrice,
             productImage: newImages,
@@ -230,16 +280,17 @@ const editProductPost = async (req, res) => {
         res.redirect('/admin/products');
     } catch (error) {
         console.log(`Error in edit product post method: ${error}`);
-
         req.flash('error', 'Could not edit the product. Please try again.');
-        res.redirect('/admin/products');
+        res.redirect(`/admin/editproduct/${req.params.id}`);
     }
 };
 
 
+
+
 // ----------------  status product -------------------
 const status= async(req,res)=>{
-    console.log(req.params.id);
+    //console.log(req.params.id);
     const { id } = req.params; 
     try {
         const product = await productSchema.findById(id);

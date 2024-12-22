@@ -63,6 +63,9 @@
         <main class="flex-1 p-6 bg-white">
             <div class="flex justify-between items-center mb-6 flex-wrap gap-4">
                 <h2 class="text-2xl font-bold">Products</h2>
+                <a href="/admin/addproduct">
+                    <button class="bg-[#A79277] text-white px-4 py-2 rounded-lg shadow-md hover:bg-[#E5E7EB] hover:text-black">Add Product</button>
+                </a>
                 <form action="/admin/products" method="get" class="flex items-center gap-2">
                     <input type="text" name="search" placeholder="Search" class="border border-gray-300 rounded-lg px-4 py-2">
                     <input type="submit" value="Search" class="bg-[#A79277] text-white px-4 py-2 rounded-lg cursor-pointer">
@@ -99,7 +102,7 @@
                     <p><%= variant.stock %></p> <!-- Display the price from the variants array -->
                 <% }) %>
             </td>
-            <td class="border border-gray-300 px-4 py-2 text-center"><%= product.productCategory %></td>
+            <td class="border border-gray-300 px-4 py-2 text-center"><%=  product.productCategory.categoryName  %></td>
             <td class="border border-gray-300 px-4 py-2 text-center">
                 <%= product.isActive ? 'Active' : 'Inactive' %>
             </td>
@@ -132,12 +135,11 @@
             </div>
 
             <!-- Pagination -->
-           
             <div class="flex justify-center mt-6">
                 <div class="flex space-x-2">
                     <!-- Previous Page Button -->
                     <% if (currentPage > 1) { %>
-                        <a href="/admin/product?page=<%= currentPage - 1 %>" 
+                        <a href="/admin/products?page=<%= currentPage - 1 %>&search=<%= search %>" 
                            class="px-3 py-1 bg-gray-200 rounded-md text-sm text-gray-600 hover:bg-gray-300">
                             Prev
                         </a>
@@ -149,7 +151,7 @@
             
                     <!-- Page Numbers -->
                     <% for (let i = 1; i <= totalPages; i++) { %>
-                        <a href="/admin/product?page=<%= i %>" 
+                        <a href="/admin/products?page=<%= i %>&search=<%= search %>" 
                            class="px-3 py-1 rounded-md text-sm <%= i === currentPage ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600 hover:bg-blue-600 hover:text-white' %>">
                             <%= i %>
                         </a>
@@ -157,7 +159,7 @@
             
                     <!-- Next Page Button -->
                     <% if (currentPage < totalPages) { %>
-                        <a href="/admin/product?page=<%= currentPage + 1 %>" 
+                        <a href="/admin/products?page=<%= currentPage + 1 %>&search=<%= search %>" 
                            class="px-3 py-1 bg-gray-200 rounded-md text-sm text-gray-600 hover:bg-gray-300">
                             Next
                         </a>
@@ -169,7 +171,6 @@
                 </div>
             </div>
             
-
         </main>
     </div>
     <!-- Footer -->

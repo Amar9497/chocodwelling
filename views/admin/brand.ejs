@@ -57,6 +57,7 @@
         <main class="flex-1 p-6 bg-white">
           <div class="flex justify-between items-center mb-6 flex-wrap gap-4">
             <h2 class="text-2xl font-bold">Brands</h2>
+            <button class="bg-[#A79277] text-white px-4 py-2 rounded-lg shadow-md hover:bg-[#E5E7EB] hover:text-black" onclick="toggleModal(true)">Add Brand</button>
             <form action="/admin/brand" method="get" class="flex items-center gap-2">
                 <input type="text" name="search" placeholder="Search" class="border border-gray-300 rounded-lg px-4 py-2">
                 <input type="submit" value="Search" class="bg-[#A79277] text-white px-4 py-2 rounded-lg cursor-pointer">
@@ -315,12 +316,8 @@
   </div>
 </div>
 
+</body>
 
-
-    
-
-    
-    
     
     <!-- Footer -->
     <%- include('footer') %>
@@ -460,18 +457,6 @@ function toggleBrandStatus(event, button, brandId) {
         }
     });
 }
-
-
-
-
-
-
-
-    
    
-    </script>
+</script>
     
-
-</body>
-
-</html>

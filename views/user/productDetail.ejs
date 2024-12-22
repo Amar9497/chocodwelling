@@ -114,11 +114,42 @@
 
     <!-- Stock Information -->
     <div class="product-description">
-      <% if (product.productQuantity === 0) { %>
-        <h4 class="text-red-600 font-semibold">Out of Stock</h4>
-      <% } else if (product.productQuantity < 10) { %>
-        <h4 class="text-red-500">Only <%= product.productQuantity %> left in stock</h4>
-      <% } %>
+
+      <P class="text-2xl font-bold text-gray-800">
+        Weight. 
+        <% product.productVariants.forEach(variant => { %>
+          <span><%= variant.weight %></span> <!-- Display the original price -->
+        <% }) %>
+        </P>
+
+        
+
+
+  <% 
+  // Calculate the total stock from all variants
+  let totalStock = 0;
+    product.productVariants.forEach(variant => {
+      totalStock += variant.stock;
+    });
+    %>
+
+<% if (totalStock === 0) { %>
+  <!-- Out of Stock -->
+  <h4 class="text-red-600 font-semibold">
+    Out of Stock
+  </h4>
+<% } else if (totalStock < 10) { %>
+  <!-- Limited Stock -->
+  <h4 class="text-red-500">
+    Only <%= totalStock %> left in stock
+  </h4>
+<% } else if (totalStock >= 10){ %>
+  <!-- Stock -->
+  <h4 class="text-green-500">
+    Stock <%= totalStock %> 
+  </h4>
+  <% } %>
+
     </div>
 
     <!-- Add to Cart and Buy Now Buttons -->

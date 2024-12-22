@@ -6,13 +6,15 @@ const productSchema = new mongoose.Schema({
         required:true
     },
     productBrand:{
-        type:String,
-        required:true
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Brand",
+      required:true,
     },
-    productCategory:{
-        type:String,
-        required:true
-    },
+    productCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      required:true,
+    },    
     productDescription:{
         type:String,
         required:true

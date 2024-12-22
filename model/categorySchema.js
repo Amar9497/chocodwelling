@@ -11,4 +11,4 @@ const categorySchema = new mongoose.Schema({
     },
 }, { timestamps: true }); // Corrected option name here
 
-module.exports = mongoose.model('Category', categorySchema); // Optional: model name should be capitalized (recommended by convention)
+module.exports = mongoose.model('Category', categorySchema); // 

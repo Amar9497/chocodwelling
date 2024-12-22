@@ -1,7 +1,7 @@
 //--------------check admin is there-------------
 
 function isAdmin(req,res,next){
-  if(req.session.isAuthenticated){
+  if(req.session && req.session.isAuthenticated){
       next();
   }
   else {

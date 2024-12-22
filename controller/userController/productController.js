@@ -1,41 +1,67 @@
 const productSchema= require('../../model/productSchema');
 const categorySchema= require('../../model/categorySchema');
+const brandSchema = require('../../model/brandSchema');
 const mongoose = require('mongoose');
 
 // --------------- list all product -------------
-const allProduct = async(req,res)=>{
-    try{
+const allProduct = async (req, res) => {
+    try {
         const search = req.query.search || "";
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 12;
 
-        const category = await categorySchema.find({isActive:true});
-        const product = await productSchema.find({isActive:true});
+        // Fetch only active categories
+        const activeCategories = await categorySchema.find({ isActive: true }).select('_id');
 
-    
-        
-        // const product = await productSchema.find(productFilter)
-        //     .skip((page-1) *limit)
-        //     .limit(limit);
-        
-        const count = await productSchema.countDocuments({product})
-        
-        res.render('user/allproduct',{
-            title:"All products",
-            user:req.session.user,
-            product,
-            category,
+        // Fetch only active brands
+        const activeBrands = await brandSchema.find({ isActive: true }).select('_id');
+
+        // Extract the category IDs and brand IDs
+        const activeCategoryIds = activeCategories.map(category => category._id);
+        const activeBrandIds = activeBrands.map(brand => brand._id);
+
+        // Filter products: Active products with active categories and brands
+        const productFilter = {
+            isActive: true,
+            productCategory: { $in: activeCategoryIds },  // Only include products in active categories
+            productBrand: { $in: activeBrandIds },        // Only include products in active brands
+            productName: { $regex: search, $options: "i" }, // Case-insensitive search
+        };
+
+        // Fetch the filtered products with pagination
+        const products = await productSchema
+            .find(productFilter)
+            .skip((page - 1) * limit)
+            .limit(limit);
+
+        // Count the total products matching the filter
+        const count = await productSchema.countDocuments(productFilter);
+
+        // Fetch active categories for rendering
+        const categories = await categorySchema.find({ isActive: true });
+
+        // Fetch active brands for rendering
+        const brands = await brandSchema.find({ isActive: true });
+
+        // Render the product page
+        res.render('user/allproduct', {
+            title: "All Products",
+            user: req.session.user,
+            product: products,
+            category: categories,
+            brand: brands,
             search,
             totalPages: Math.ceil(count / limit),
-            currentPage:page,
+            currentPage: page,
             page,
             limit
-        })
+        });
+    } catch (error) {
+        console.log(`Error in all products rendering: ${error}`);
+        res.status(500).send('Internal Server Error');
     }
-    catch(error){
-        console.log(`error in all products rendering ${error}`);
-    }
-}
+};
+
 
 // ---------------- render product details ------------------
 

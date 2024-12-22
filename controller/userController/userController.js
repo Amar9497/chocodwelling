@@ -175,6 +175,7 @@ const otp = (req,res)=>{
 // -------------------- geting otp from user ---------------------------
 
 const otpPost = async (req, res) => {
+    console.log(`Session OTP: ${req.session.otp}`);
     try {
         const details = {
             name: req.session.name,
@@ -192,8 +193,13 @@ const otpPost = async (req, res) => {
 
         if (req.session.otp.toString() === otpEntered.toString()) {
             console.log('OTP verified');
-            await userSchema.insertMany(details);
-            console.log('New user registered successfully');
+            req.flash('success', 'OTP Verified');
+
+             // Create a new user and store the returned document
+            const user = await userSchema.create(details);
+            console.log('New user registered successfully:', user);
+
+            req.flash('success', 'New user registered successfully');
             
             // Clear session data after success
             req.session.otp = null;
@@ -203,7 +209,8 @@ const otpPost = async (req, res) => {
             req.session.password = null;
             req.session.phone = null;
 
-            res.redirect('/login');
+            req.session.user = user.id;
+            res.redirect('/home');
         } else {
             req.flash('error', 'Invalid OTP. Please try again.');
             res.redirect('/otp');
@@ -237,17 +244,49 @@ const otpResend = (req,res)=>{
 
 // ------------ home -----------------
 
-const home = async(req,res)=>{
-    const brand = await brandSchema.find({});
-    const product = await productSchema.find({});
-    //console.log(product);
-    res.render('user/homepage',{
-        title: 'Home Page',
-        user:req.session.user,
-        brand,
-        product
-    });
-}
+const home = async (req, res) => {
+    try {
+        // Fetch only active and not blocked brands
+        const brand = await brandSchema.find({ isActive: true, isBlocked: { $ne: true } });
+
+        // Fetch only active and not blocked categories
+        const activeCategories = await categorySchema.find({ isActive: true, isBlocked: { $ne: true } }).select('_id');
+
+        // Extract the IDs of active categories
+        const activeCategoryIds = activeCategories.map(category => category._id);
+
+        // Fetch active products that belong to active categories, are not blocked, and are recently launched (e.g., added in the last 30 days)
+        const newLaunches = await productSchema.find({
+            isActive: true,  // Only include active products
+            isBlocked: { $ne: true },  // Exclude blocked products
+            productCategory: { $in: activeCategoryIds }, // Filter products by active category IDs
+            productBrand: { $nin: brand.filter(b => b.isBlocked).map(b => b._id) } // Exclude products with blocked brands
+        })
+        .sort({ createdAt: -1 })  // Sort by creation date in descending order (most recent first)
+        .limit(5); // Limit to the 5 most recent products (you can change this number)
+
+        // Fetch other products for the main display (non-new launches)
+        const product = await productSchema.find({
+            isActive: true,  // Only include active products
+            isBlocked: { $ne: true },  // Exclude blocked products
+            productCategory: { $in: activeCategoryIds } // Filter products by active category IDs
+        });
+
+        res.render('user/homepage', {
+            title: 'Home Page',
+            user: req.session.user,
+            brand,
+            product,
+            newLaunches // Pass the new launches to the view
+        });
+    } catch (error) {
+        console.log(`Error in home function: ${error}`);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
+
+
 
 // ---------------- logout ----------------
 

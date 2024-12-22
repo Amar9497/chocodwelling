@@ -53,20 +53,28 @@
           <div>
             <label for="brand" class="block text-sm font-medium text-gray-700 mb-2">Product Brand*</label>
             <select name="brand" id="brand" class="block w-full border border-gray-300 rounded-md p-2 mt-1 focus:ring-blue-500 focus:border-blue-500">
-              <option value="" disabled selected>Select a brand</option>
-              <% brand.forEach((brand) => { %>
-                <option value="<%= brand.brandName %>" <% if (brand.brandName === products.productBrand) { %> selected <% } %>><%= brand.brandName %></option>
+              <option value="" disabled>Select a brand</option>
+              <% brand.forEach((b) => { %>
+                  <option value="<%= b._id %>" 
+                    <% if (products.productBrand && String(b._id) === String(products.productBrand._id)) { %> 
+                      selected 
+                    <% } %>>
+                    <%= b.brandName %>
+                  </option>
               <% }) %>
-            </select>
+          </select>
+          
           </div>
           <div>
             <label for="category" class="block text-sm font-medium text-gray-700 mb-2">Category*</label>
             <select name="category" id="category" class="block w-full border border-gray-300 rounded-md p-2 mt-1 focus:ring-blue-500 focus:border-blue-500">
-              <option value="" disabled selected>Select a category</option>
-              <% category.forEach((category) => { %>
-                <option value="<%= category.categoryName %>" <% if (category.categoryName === products.productCategory) { %> selected <% } %>><%= category.categoryName %></option>
+              <option value="" disabled>Select a category</option>
+              <% category.forEach((cat) => { %>
+                  <option value="<%= cat._id %>" <% if (String(cat._id) === String(products.productCategory._id)) { %> selected <% } %>>
+                      <%= cat.categoryName %>
+                  </option>
               <% }) %>
-            </select>
+          </select>          
           </div>
         </div>
       

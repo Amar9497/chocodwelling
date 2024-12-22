@@ -143,7 +143,7 @@ const addBrand = async (req, res) => {
 
   //  --------------- brand status ----------
   const statusBrand = async (req,res)=>{
-    console.log(req.params)
+    //console.log(req.params)
     const { id } = req.params;
     try {
       // find the brand by id

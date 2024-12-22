@@ -6,7 +6,7 @@ const brandSchema = require('../../model/brandSchema');
 const categoryget = async(req,res)=>{
     try {
         const category = await categorySchema.find({isActive: true});
-        const brand = await brandSchema.find({});
+        const brand = await brandSchema.find({isActive: true});
         //console.log(brand);
         
         res.render('user/category',{
