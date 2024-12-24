@@ -1,33 +1,45 @@
 <div class="w-full bg-white py-8">
-  <h2 class="text-2xl text-center font-semibold mb-6 text-gray-800">Similar Products</h2>
-  
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-6 lg:px-16">
-    <% for (let i = 0; i < similarProduct.length && i < 4; i++) { %>
-      <div class="product-box bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-        
-        <!-- Product Image -->
-        <div class="product-image-box">
-          <a href="/productDetail/<%= similarProduct[i].id %>" class="product-name-link">
-            <img src="<%= similarProduct[i].productImage[0] %>" alt="<%= similarProduct[i].productName %>" class="w-full h-48 object-cover transition-transform transform hover:scale-105 duration-300">
-          </a>
-        </div>
+  <h2 class="text-2xl text-center font-semibold mb-6 text-gray-800">
+    Similar Products
+  </h2>
 
-        <!-- Product Details -->
-        <div class="product-name-box p-4">
-          <h6 class="product-text-row text-lg font-medium text-gray-700 truncate">
-            <%= similarProduct[i].productName %>
-          </h6>
-          
-          <h5 class="product-price text-lg text-gray-900 mt-2 flex items-center">
-            <i class="fa-solid fa-indian-rupee-sign mr-1"></i>
-            <% similarProduct[i].productVariants.forEach(variant => { %>
-              <p class="text-gray-700">Price: 
-                <%= variant.price.toLocaleString() %>
-              </p>
-            <% }) %>
-          </h5>
-        </div>
+  <div
+    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-6 lg:px-16"
+  >
+    <% for (let i = 0; i < similarProduct.length && i < 4; i++) { %>
+    <div
+      class="product-box bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+    >
+      <!-- Product Image -->
+      <div class="product-image-box">
+        <a
+          href="/productDetail/<%= similarProduct[i].id %>"
+          class="product-name-link"
+        >
+          <img
+            src="<%= similarProduct[i].productImage[0] %>"
+            alt="<%= similarProduct[i].productName %>"
+            class="w-full h-48 object-cover transition-transform transform hover:scale-105 duration-300"
+          />
+        </a>
       </div>
+
+      <!-- Product Details -->
+      <div class="product-name-box p-4">
+        <h6 class="product-text-row text-lg font-medium text-gray-700 truncate">
+          <%= similarProduct[i].productName %>
+        </h6>
+
+        <h5 class="product-price text-lg text-gray-900 mt-2 flex items-center">
+          <i class="fa-solid fa-indian-rupee-sign mr-1"></i>
+          <% similarProduct[i].productVariants.forEach(variant => { %>
+          <p class="text-gray-700">
+            Price: <%= variant.price.toLocaleString() %>
+          </p>
+          <% }) %>
+        </h5>
+      </div>
+    </div>
     <% } %>
   </div>
 </div>

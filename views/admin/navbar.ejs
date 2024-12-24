@@ -1,16 +1,13 @@
-
 <nav class="text-black p-4 flex justify-between items-center bg-[#A79277]">
   <div class="flex items-center space-x-4">
-      <img src="/public/assets/chocodwellin-logo.png" alt="logo" class="h-10">
+    <img src="/public/assets/chocodwellin-logo.png" alt="logo" class="h-10" />
   </div>
-  <% if (title !== 'Admin Login') { %> <!-- Show the logout button unless the title is "Admin" -->
+  <% if (title !== 'Admin Login') { %>
+  <!-- Show the logout button unless the title is "Admin" -->
   <a href="/admin/logout">
     <button class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
       Logout
     </button>
-  </a>  
+  </a>
   <% } %>
 </nav>
-
-
-

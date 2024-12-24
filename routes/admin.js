@@ -5,23 +5,24 @@ const adminController = require('../controller/adminController/adminController')
 const productController = require('../controller/adminController/productController');
 const categoryController = require('../controller/adminController/categoryController');
 const brandController = require('../controller/adminController/brandController');
-const userController = require('../controller/adminController/userController')
-const { upload } = require('../service/cloudinary')
+const userController = require('../controller/adminController/userController');
+const orderController = require('../controller/adminController/orderController');
+const { upload } = require('../service/cloudinary');
 const auth = require('../middleware/adminSession');
 
 
 
-// ------------ admin login ----------------
+// -------------------- admin login --------------------
 
 admin.get('/login',auth.isLogin,adminController.loadLogin);
 
 admin.post('/login',adminController.loadLoginPost)
 
-// ------------ admin dashboard ----------------
+// -------------------- admin dashboard -----------------
 
 admin.get('/home',auth.isAdmin,adminController.loadHome);
 
-// -------------- admin products -------------------
+// -------------------- admin products -------------------
 
 admin.get('/products',auth.isAdmin,productController.loadProduct);
 
@@ -36,7 +37,7 @@ admin.post('/editproduct/:id',auth.isAdmin,upload.array("images", 4),productCont
 admin.post('/statusproduct/:id',auth.isAdmin,productController.status);
 
 
-// ----------- admin category ----------------
+// --------------------- admin category -----------------
 
 admin.get('/category',auth.isAdmin,categoryController.loadCategory);
 
@@ -46,7 +47,7 @@ admin.post('/editcategory',auth.isAdmin,categoryController.editCategory);
 
 admin.post('/status/:id/',auth.isAdmin,categoryController.status);
 
-// ----------- admin brand --------------
+// --------------------- admin brand ---------------------
 
 admin.get('/brand',auth.isAdmin,brandController.loadBrand);
 
@@ -56,11 +57,20 @@ admin.post('/editbrand',auth.isAdmin,upload.single('brandImage'),brandController
 
 admin.post('/statusbrand/:id',auth.isAdmin,brandController.statusBrand);
 
-// ------------- admin customer ----------
+// --------------------- admin customer -------------------
 
 admin.get('/customers',auth.isAdmin,userController.loadCustomers);
 
 admin.get('/customerstatus',auth.isAdmin,userController.status);
+
+
+// ----------------------- orders ------------------------
+
+admin.get('/orders',orderController.orderPage);
+
+admin.post('/order/:orderId/status',orderController.orderStatus);
+
+admin.get('/order-view/:id',orderController.orderView);
 
 
 

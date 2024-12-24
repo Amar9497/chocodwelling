@@ -6,6 +6,9 @@ const categoryController=require('../controller/userController/categoryControlle
 const productController= require('../controller/userController/productController');
 const forgotPasswordController = require('../controller/userController/forgotPassworController');
 const profileController = require('../controller/userController/profileController');
+const cartController = require('../controller/userController/cartController');
+const checkOutSchema = require('../controller/userController/checkOutController');
+const orderController = require('../controller/userController/orderController');
 const auth = require('../middleware/userSession');
 
 // -------------------- login --------------------
@@ -65,21 +68,43 @@ user.post('/updateaddress/:index',profileController.updateAddress);
 
 user.post('/reset-password',profileController.resetPassword);
 
+// ------------------------ cart ---------------------------------
 
+user.get('/cart',cartController.cart);
 
+user.post('/addToCart',cartController.addToCart);
 
+user.post('/updateCart',cartController.updateCart);
 
-// ------------------- category -----------------------
+user.post('/removeFromCart',cartController.removeFromCart);
+
+// ------------------------- check out -----------------------------
+
+user.get('/checkout',checkOutSchema.checkout);
+
+user.post('/checkout-address',checkOutSchema.addAddress);
+
+user.post('/place-order',checkOutSchema.placeOrder);
+
+// ------------------------- order ---------------------------------
+
+user.get('/orders',orderController.orderPage);
+
+user.post('/cancelOrder/:orderId', orderController.cancelOrder);
+
+user.get('/orderDetail/:id', orderController.orderDetails);
+
+// ------------------------ category -------------------------------
 
 user.get('/category',auth.isCheck,categoryController.categoryget);
 
-// --------------------- product -------------------------
+// ------------------------- product -------------------------------
 
 user.get('/allproduct',auth.isCheck,productController.allProduct);
 
 user.get('/productDetail/:id',auth.isCheck,productController.productDetail);
 
-// --------------------- logout --------------------
+// ------------------------- logout --------------------------------
 
 user.get('/logout',auth.isCheck,userController.logout);
 

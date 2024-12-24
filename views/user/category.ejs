@@ -1,21 +1,30 @@
 <div class="bg-gray-100">
   <!-- Navbar -->
-  <%- include('Navbar') %>
-  <%- include('alert') %>
+  <%- include('Navbar') %> <%- include('alert') %>
 
   <!-- Categories Section -->
-  <section class="bg-white py-10 ">
+  <section class="bg-white py-10">
     <div class="container mx-auto px-6">
-      <h2 class="kurale-regular text-3xl text-center font-bold text-gray-800 mb-8">Categories</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <h2
+        class="kurale-regular text-3xl text-center font-bold text-gray-800 mb-8"
+      >
+        Categories
+      </h2>
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+      >
         <% category.forEach((category) => { %>
-          <div class="bg-white shadow-md rounded-lg overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl">
-            <div class="p-6">
-              <h3 class="kurale-regular text-2xl text-center font-semibold text-gray-800">
-                <%= category.categoryName %>
-              </h3>
-            </div>
+        <div
+          class="bg-white shadow-md rounded-lg overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl"
+        >
+          <div class="p-6">
+            <h3
+              class="kurale-regular text-2xl text-center font-semibold text-gray-800"
+            >
+              <%= category.categoryName %>
+            </h3>
           </div>
+        </div>
         <% }) %>
       </div>
     </div>
@@ -24,33 +33,53 @@
   <!-- Brand Section -->
   <section class="bg-white py-10">
     <div class="container mx-auto px-6">
-        <h2 class="kurale-regular text-3xl text-center font-bold text-gray-800 mb-8">Brand</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            <% brand.forEach((brand) => { %>
-                <div class="bg-white shadow-lg rounded-lg overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl">
-                    <div class="relative">
-                        <!-- Category Image -->
-                        <img src="<%= brand.brandImage %>" alt="<%= brand.brandName %>" class="w-full h-48 object-cover object-center rounded-t-lg">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black opacity-40 rounded-t-lg"></div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="kurale-regular text-2xl text-center font-semibold text-gray-800 mb-4">
-                            <%= brand.brandName  %>
-                        </h3>
-                        <a href="#" class="block text-center text-yellow-500 font-medium hover:text-yellow-600 transition duration-300">
-                            Explore <i class="fa fa-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
-            <% }) %>
+      <h2
+        class="kurale-regular text-3xl text-center font-bold text-gray-800 mb-8"
+      >
+        Brand
+      </h2>
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+      >
+        <% brand.forEach((brand) => { %>
+        <div
+          class="bg-white shadow-lg rounded-lg overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl"
+        >
+          <div class="relative">
+            <!-- Category Image -->
+            <img
+              src="<%= brand.brandImage %>"
+              alt="<%= brand.brandName %>"
+              class="w-full h-48 object-cover object-center rounded-t-lg"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black opacity-40 rounded-t-lg"
+            ></div>
+          </div>
+          <div class="p-6">
+            <h3
+              class="kurale-regular text-2xl text-center font-semibold text-gray-800 mb-4"
+            >
+              <%= brand.brandName %>
+            </h3>
+            <a
+              href="#"
+              class="block text-center text-yellow-500 font-medium hover:text-yellow-600 transition duration-300"
+            >
+              Explore <i class="fa fa-arrow-right"></i>
+            </a>
+          </div>
         </div>
+        <% }) %>
+      </div>
     </div>
-</section>
-
+  </section>
 
   <!-- Show All Products Button -->
   <a href="/allproduct">
-    <button class="absolute top-20 right-10 bg-blue-500 text-white text-sm font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-blue-700 transition-colors transform hover:scale-105">
+    <button
+      class="absolute top-20 right-10 bg-blue-500 text-white text-sm font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-blue-700 transition-colors transform hover:scale-105"
+    >
       Show All Products
     </button>
   </a>

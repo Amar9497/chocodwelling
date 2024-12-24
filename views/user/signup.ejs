@@ -1,115 +1,135 @@
 <body class="bg-gray-100 text-gray-800">
-
   <!-- Navbar -->
   <%- include('navbar') %>
 
   <!-- alert -->
-   <%- include('alert') %>
+  <%- include('alert') %>
 
   <!-- Sign Up Form -->
   <main class="flex items-center justify-center min-h-screen bg-gray-50">
     <div class="bg-white shadow-lg rounded-lg p-6 md:p-8 w-full max-w-md">
       <!-- Heading -->
-      <h2 class="text-3xl font-bold text-center text-[#A79277] mb-4">Create an Account</h2>
+      <h2 class="text-3xl font-bold text-center text-[#A79277] mb-4">
+        Create an Account
+      </h2>
       <p class="text-center text-gray-600 mb-6">
         Join us for exclusive offers and sweet surprises!
       </p>
-  
+
       <!-- Signup Form -->
       <form id="register-form" action="/signup" method="POST" class="space-y-4">
         <!-- Full Name -->
         <div>
-          <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-          <input 
-            type="text" 
-            id="name" 
-            name="name" 
-            placeholder="Enter your full name" 
+          <label for="name" class="block text-sm font-medium text-gray-700 mb-1"
+            >Full Name</label
+          >
+          <input
+            type="text"
+            id="name"
+            name="name"
+            placeholder="Enter your full name"
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4A799]"
           />
         </div>
-  
+
         <!-- Email -->
         <div>
-          <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-          <input 
-            type="email" 
-            id="email" 
-            name="email" 
-            placeholder="Enter your email" 
+          <label
+            for="email"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Email Address</label
+          >
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Enter your email"
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4A799]"
           />
         </div>
-  
+
         <!-- Phone Number -->
         <div>
-          <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-          <input 
-            type="tel" 
-            id="phone" 
-            name="phone" 
-            placeholder="Enter your phone number" 
+          <label
+            for="phone"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Phone Number</label
+          >
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            placeholder="Enter your phone number"
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4A799]"
           />
         </div>
-  
+
         <!-- Password -->
         <div>
-          <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-          <input 
-            type="password" 
-            id="password" 
-            name="password" 
-            placeholder="Create a password" 
+          <label
+            for="password"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Password</label
+          >
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Create a password"
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4A799]"
           />
         </div>
-  
+
         <!-- Confirm Password -->
         <div>
-          <label for="confirm" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-          <input 
-            type="password" 
-            id="confirm" 
-            name="confirm" 
-            placeholder="Confirm your password" 
+          <label
+            for="confirm"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Confirm Password</label
+          >
+          <input
+            type="password"
+            id="confirm"
+            name="confirm"
+            placeholder="Confirm your password"
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4A799]"
           />
         </div>
-  
+
         <!-- Submit Button -->
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           class="w-full bg-[#A79277] text-white font-semibold py-3 rounded-lg hover:bg-[#C09A74] transition duration-200"
         >
           Sign Up
         </button>
       </form>
-  
+
       <!-- Login Link -->
       <p class="text-center text-gray-600 mt-6">
-        Already have an account? 
-        <a href="/login" class="text-[#A79277] font-semibold hover:underline">Log In</a>
+        Already have an account?
+        <a href="/login" class="text-[#A79277] font-semibold hover:underline"
+          >Log In</a
+        >
       </p>
     </div>
   </main>
-  
 
   <%- include('footer') %>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script>
-    const registerForm = document.getElementById('register-form');
-    const name = document.getElementById('name');
-    const email = document.getElementById('email');
-    const mobileNumber = document.getElementById('phone'); // Corrected from mobile-number to phone
-    const password = document.getElementById('password');
-    const confirmPassword = document.getElementById('confirm');
+    const registerForm = document.getElementById("register-form");
+    const name = document.getElementById("name");
+    const email = document.getElementById("email");
+    const mobileNumber = document.getElementById("phone"); // Corrected from mobile-number to phone
+    const password = document.getElementById("password");
+    const confirmPassword = document.getElementById("confirm");
 
     // Email validation
     function checkEmail(email) {
-      const re = /^\S+@\S+\.\S+$/;  // Updated regex for email
+      const re = /^\S+@\S+\.\S+$/; // Updated regex for email
       return re.test(email);
     }
 
@@ -135,48 +155,59 @@
 
     // Phone number validation
     function validatePhone(mobileNumber) {
-      const phoneRe = /^\d{10}$/;  // Ensure it's exactly 10 digits
+      const phoneRe = /^\d{10}$/; // Ensure it's exactly 10 digits
       return phoneRe.test(mobileNumber);
     }
 
-    registerForm.addEventListener('submit', (e) => {
+    registerForm.addEventListener("submit", (e) => {
       e.preventDefault(); // Prevent the form from submitting before validation
-      
-      if (name.value.trim() === "" || mobileNumber.value === "" || email.value === "" || password.value === "" || confirmPassword.value === "") {
+
+      if (
+        name.value.trim() === "" ||
+        mobileNumber.value === "" ||
+        email.value === "" ||
+        password.value === "" ||
+        confirmPassword.value === ""
+      ) {
         Swal.fire({
           title: "Error",
           text: "All fields are required",
-          icon: "error"
+          icon: "error",
         });
-      } else if (name.value.length > 25 || name.value.length < 5 || !isNaN(name.value)) {
+      } else if (
+        name.value.length > 25 ||
+        name.value.length < 5 ||
+        !isNaN(name.value)
+      ) {
         Swal.fire({
           title: "Error",
           text: "Name must be between 6 to 25 characters and should not contain numbers",
-          icon: "error"
+          icon: "error",
         });
       } else if (!validatePhone(mobileNumber.value)) {
         Swal.fire({
           title: "Error",
           text: "Phone number must be exactly 10 digits",
-          icon: "error"
+          icon: "error",
         });
-      } else if (!checkEmail(email.value)) {  // Fixed email validation
+      } else if (!checkEmail(email.value)) {
+        // Fixed email validation
         Swal.fire({
           title: "Error",
           text: "Email must be valid",
-          icon: "error"
+          icon: "error",
         });
       } else if (!validatePassword(password.value)) {
         Swal.fire({
           title: "Error",
           text: "Password must be at least 8 characters long, contain uppercase and lowercase letters, digits, and special characters",
-          icon: "error"
+          icon: "error",
         });
       } else if (password.value !== confirmPassword.value) {
         Swal.fire({
           title: "Error",
           text: "Password and Confirm Password must match",
-          icon: "error"
+          icon: "error",
         });
       } else {
         // If all checks pass, submit the form

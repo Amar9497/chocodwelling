@@ -1,0 +1,222 @@
+<div class="bg-[#D6B8AE] min-h-screen flex flex-col">
+  <!-- navbar -->
+  <%- include('navbar') %>
+  <!-- alert -->
+  <%- include('alert') %>
+  <!-- Main Content -->
+  <div class="flex flex-grow">
+    <!-- Sidebar -->
+    <aside
+      class="bg-gradient-to-r from-[#E5E7EB] to-[#d2b69b] text-black w-64 py-6 px-4 hidden lg:block"
+    >
+      <nav class="space-y-6">
+        <a
+          href="/admin/home"
+          class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg"
+        >
+          <span>Dashboard</span>
+        </a>
+        <a
+          href="/admin/products"
+          class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg"
+        >
+          <span>Products</span>
+        </a>
+        <a
+          href="/admin/category"
+          class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg"
+        >
+          <span>Category</span>
+        </a>
+        <a
+          href="/admin/brand"
+          class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg"
+        >
+          <span>Brand</span>
+        </a>
+        <a
+          href="/admin/customers"
+          class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg"
+        >
+          <span>Customers</span>
+        </a>
+        <a
+          href="/admin/orders"
+          class="flex items-center space-x-4 py-2 px-3 bg-white text-black rounded-lg shadow-md"
+        >
+          <span class="poppins-semibold">Orders</span>
+        </a>
+        <a
+          href="#"
+          class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg"
+        >
+          <span>Coupons</span>
+        </a>
+        <a
+          href="#"
+          class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg"
+        >
+          <span>Offers</span>
+        </a>
+        <a
+          href="#"
+          class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg"
+        >
+          <span>Banner</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Orders Section -->
+    <main class="flex-1 p-6 bg-white">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-semibold">Orders</h2>
+        <form
+          action="/admin/orders"
+          method="get"
+          class="flex items-center gap-2"
+        >
+          <input
+            type="text"
+            name="search"
+            placeholder="Search"
+            class="border border-gray-300 rounded-lg px-4 py-2"
+          />
+          <input
+            type="submit"
+            value="Search"
+            class="bg-[#A79277] text-white px-4 py-2 rounded-lg cursor-pointer"
+          />
+        </form>
+      </div>
+
+      <!-- Orders Table -->
+      <div class="rounded-lg shadow-lg overflow-hidden">
+        <table class="w-full text-left text-base">
+          <!-- Increased text size to "text-base" -->
+          <thead class="bg-[#A79277] text-white">
+            <tr>
+              <th class="py-4 px-5">SL.No</th>
+              <th class="py-4 px-5">OrderID</th>
+              <!-- Increased padding -->
+              <th class="py-4 px-5">Date</th>
+              <th class="py-4 px-5">Amount</th>
+              <th class="py-4 px-5">Payment</th>
+              <th class="py-4 px-5">Status</th>
+              <th class="py-4 px-5">Action</th>
+              <th class="py-4 px-5">Details</th>
+            </tr>
+          </thead>
+          <tbody class="">
+            <% let slNo=(currentPage - 1) * limit + 1; %> <%
+            orders.forEach((order, index) => { %>
+            <tr class="border-b hover:bg-gray-100">
+              <!-- Serial Number -->
+              <td class="px-5 py-3 text-center">
+                <!-- Increased padding and text size -->
+                <%= slNo %>
+              </td>
+              <!-- Order ID -->
+              <td class="px-5 py-3"><%= order._id.toString().slice(-6) %></td>
+              <!-- Date -->
+              <td class="px-5 py-3"><%= order.createdAt.toDateString() %></td>
+              <!-- Price -->
+              <td class="px-5 py-3"><%= order.totalAmount %></td>
+              <!-- PaymentMethod -->
+              <td class="px-5 py-3"><%= order.paymentMethod %></td>
+              <!-- OrdrStatus -->
+              <td class="px-5 py-3"><%= order.orderStatus %></td>
+              <!-- Action -->
+              <td class="px-5 py-3 border-b border-gray-200 text-sm">
+                <% if (order.orderStatus !== 'Cancelled' && order.orderStatus
+                !== 'Returned') { %>
+                <select
+                  class="status-dropdown block w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                  onchange="updateOrderStatus('<%= order._id %>', this.value)"
+                >
+                  <option value="Confirmed">Confirmed</option>
+                  <option value="Shipped">Shipped</option>
+                  <option value="Delivered">Delivered</option>
+                  <option value="Cancelled">Cancelled</option>
+                  <option value="Returned">Returned</option>
+                </select>
+                <% } %>
+              </td>
+
+              <!-- Action -->
+              <td class="px-5 py-3 text-center text-lg">
+                <a href="/admin/order-view/<%= order._id %>"> 📝 </a>
+              </td>
+            </tr>
+            <% slNo++; %> <% }) %>
+          </tbody>
+        </table>
+      </div>
+      <!------------------------------- Pagination ---------------------->
+      <div class="pagination-controls flex mt-3 justify-center">
+        <ul class="flex items-center space-x-2">
+          <% if (currentPage > 1) { %>
+          <li>
+            <a
+              href="/admin/orders?page=<%= currentPage - 1 %>&limit=<%= limit %>&search=<%= search %>"
+              class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+            >
+              <<
+            </a>
+          </li>
+          <% } %> <% for (let i = 1; i <= totalPages; i++) { %>
+          <li>
+            <a
+              href="/admin/orders?page=<%= i %>&limit=<%= limit %>&search=<%= search %>"
+              class="px-4 py-2 rounded <%= currentPage == i ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %>"
+            >
+              <%= i %>
+            </a>
+          </li>
+          <% } %> <% if (currentPage < totalPages) { %>
+          <li>
+            <a
+              href="/admin/orders?page=<%= currentPage + 1 %>&limit=<%= limit %>&search=<%= search %>"
+              class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+            >
+              >>
+            </a>
+          </li>
+          <% } %>
+        </ul>
+      </div>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <%- include('footer') %>
+</div>
+
+<script>
+  function updateOrderStatus(orderId, newStatus) {
+    fetch(`/admin/order/${orderId}/status`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status: newStatus }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          Swal.fire({
+            position: "top-end",
+            icon: "success",
+            title: "Status Changes",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          setTimeout(() => {
+            location.reload();
+          }, 1700);
+        } else {
+          response.text().then((text) => alert(text));
+        }
+      })
+      .catch((error) => console.error("Error:", error));
+  }
+</script>

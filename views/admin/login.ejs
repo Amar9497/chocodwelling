@@ -1,25 +1,26 @@
-
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-    }
-    .custom-font {
-      font-family: 'Italianno', cursive;
-    }
-  </style>
+<style>
+  body {
+    font-family: "Inter", sans-serif;
+  }
+  .custom-font {
+    font-family: "Italianno", cursive;
+  }
+</style>
 
 <div class="bg-[#FFFFFF] min-h-screen flex flex-col justify-between">
   <!-- Header -->
   <%- include ('navbar') %>
 
   <!-- alert -->
-   <%- include('alert') %>
+  <%- include('alert') %>
 
   <!-- Login Form -->
   <main class="flex flex-col items-center justify-center flex-grow">
     <div class="p-8 rounded-lg shadow-lg w-[90%] max-w-sm bg-[#A79277]">
-      <h2 class="text-center text-2xl font-semibold text-white mb-6">ADMIN LOGIN</h2>
-      
+      <h2 class="text-center text-2xl font-semibold text-white mb-6">
+        ADMIN LOGIN
+      </h2>
+
       <form action="/admin/login" method="POST" class="space-y-4">
         <div>
           <label for="email" class="sr-only">Email Address</label>
@@ -42,10 +43,10 @@
           />
         </div>
         <button
-        type="submit"
-        class="w-full py-2 bg-blue-500 text-white rounded-md text-center hover:bg-blue-600 transition"
+          type="submit"
+          class="w-full py-2 bg-blue-500 text-white rounded-md text-center hover:bg-blue-600 transition"
         >
-        Sign In
+          Sign In
         </button>
       </form>
     </div>
@@ -53,5 +54,4 @@
 
   <!-- Footer -->
   <%- include ('footer') %>
-
 </div>

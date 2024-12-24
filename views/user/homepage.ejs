@@ -3,140 +3,196 @@
 
   <!-- Hero Section -->
   <section class="relative">
-    <img src="/public/assets/slide1.png" alt="Chocolate" class="w-full object-cover h-[70vh] md:h-[80vh] rounded-lg shadow-lg">
-    <div class="absolute inset-0 bg-gradient-to-t from-black opacity-40 rounded-lg"></div>
+    <img
+      src="/public/assets/slide1.png"
+      alt="Chocolate"
+      class="w-full object-cover h-[70vh] md:h-[80vh] rounded-lg shadow-lg"
+    />
+    <div
+      class="absolute inset-0 bg-gradient-to-t from-black opacity-40 rounded-lg"
+    ></div>
   </section>
 
   <!-- Top Brands -->
   <section class="bg-white py-16">
     <div class="container mx-auto px-6">
-        <h2 class="text-3xl text-center font-bold text-gray-800 mb-12">Top Brands</h2>
-        
-        <!-- Brands Grid -->
-        <div id="brandGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            <% brand.slice(0, 4).forEach((brand) => { %>
-                <div class="bg-white shadow-lg rounded-lg overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl">
-                    <div class="relative">
-                        <img src="<%= brand.brandImage %>" alt="<%= brand.brandName %>" class="w-full h-48 object-cover object-center rounded-t-lg">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black opacity-40 rounded-t-lg"></div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-2xl text-center font-semibold text-gray-800 mb-4">
-                            <%= brand.brandName  %>
-                        </h3>
-                        <a href="#" class="block text-center text-yellow-500 font-medium hover:text-yellow-600 transition duration-300">
-                            Explore <i class="fa fa-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
-            <% }) %>
+      <h2 class="text-3xl text-center font-bold text-gray-800 mb-12">
+        Top Brands
+      </h2>
+
+      <!-- Brands Grid -->
+      <div
+        id="brandGrid"
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"
+      >
+        <% brand.slice(0, 4).forEach((brand) => { %>
+        <div
+          class="bg-white shadow-lg rounded-lg overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl"
+        >
+          <div class="relative">
+            <img
+              src="<%= brand.brandImage %>"
+              alt="<%= brand.brandName %>"
+              class="w-full h-48 object-cover object-center rounded-t-lg"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black opacity-40 rounded-t-lg"
+            ></div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-2xl text-center font-semibold text-gray-800 mb-4">
+              <%= brand.brandName %>
+            </h3>
+            <a
+              href="#"
+              class="block text-center text-yellow-500 font-medium hover:text-yellow-600 transition duration-300"
+            >
+              Explore <i class="fa fa-arrow-right"></i>
+            </a>
+          </div>
         </div>
+        <% }) %>
+      </div>
 
-        <!-- Load More Button -->
-        <% if (brand.length > 4) { %>
-            <div class="text-center mt-8">
-                <a href="/category" class="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 transition duration-300 inline-block">
-                    View All Brands
-                </a>
-            </div>
-        <% } %>
+      <!-- Load More Button -->
+      <% if (brand.length > 4) { %>
+      <div class="text-center mt-8">
+        <a
+          href="/category"
+          class="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 transition duration-300 inline-block"
+        >
+          View All Brands
+        </a>
+      </div>
+      <% } %>
     </div>
-</section>
-
+  </section>
 
   <!-- Best Sellers -->
   <section class="bg-white py-16">
     <div class="container mx-auto px-6">
-        <h2 class="text-3xl text-center font-bold text-gray-800 mb-12">Best Sellers</h2>
+      <h2 class="text-3xl text-center font-bold text-gray-800 mb-12">
+        Best Sellers
+      </h2>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-              <% product.slice(0, 4).forEach((product) => { %>
-                  <div class="bg-white shadow-lg rounded-lg overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl">
-                      <div class="relative">
-                          <img src="<%= product.productImage[0] %>" alt="<%= product.productName %>" class="w-full h-48 object-cover object-center rounded-t-lg">
-                          <div class="absolute inset-0 bg-gradient-to-t from-black opacity-40 rounded-t-lg"></div>
-                      </div>
-                      <div class="p-6">
-                          <h3 class="text-2xl text-center font-semibold text-gray-800 mb-4">
-                              <%= product.productName  %>
-                          </h3>
-                          <h3 class="text-xl text-center text-gray-600 mb-4">
-                              ₹<% product.productVariants.forEach(variant => { %>
-                                <span><%= variant.price %></span>
-                              <% }) %>
-                          </h3>
-                          <a href="/productDetail/<%- product.id %>" class="block text-center text-yellow-500 font-medium hover:text-yellow-600 transition duration-300">
-                              Explore <i class="fa fa-arrow-right"></i>
-                          </a>
-                      </div>
-                  </div>
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"
+      >
+        <% product.slice(0, 4).forEach((product) => { %>
+        <div
+          class="bg-white shadow-lg rounded-lg overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl"
+        >
+          <div class="relative">
+            <img
+              src="<%= product.productImage[0] %>"
+              alt="<%= product.productName %>"
+              class="w-full h-48 object-cover object-center rounded-t-lg"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black opacity-40 rounded-t-lg"
+            ></div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-2xl text-center font-semibold text-gray-800 mb-4">
+              <%= product.productName %>
+            </h3>
+            <h3 class="text-xl text-center text-gray-600 mb-4">
+              ₹<% product.productVariants.forEach(variant => { %>
+              <span><%= variant.price %></span>
               <% }) %>
+            </h3>
+            <a
+              href="/productDetail/<%- product.id %>"
+              class="block text-center text-yellow-500 font-medium hover:text-yellow-600 transition duration-300"
+            >
+              Explore <i class="fa fa-arrow-right"></i>
+            </a>
           </div>
-          <!-- Load More Button -->
-        <% if (product.length > 4) { %>
-          <div class="text-center mt-8">
-              <a href="/allProduct" class="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 transition duration-300 inline-block">
-                  View All Products
-              </a>
-          </div>
+        </div>
+        <% }) %>
+      </div>
+      <!-- Load More Button -->
+      <% if (product.length > 4) { %>
+      <div class="text-center mt-8">
+        <a
+          href="/allProduct"
+          class="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 transition duration-300 inline-block"
+        >
+          View All Products
+        </a>
+      </div>
       <% } %>
     </div>
   </section>
 
   <!-- New Launches -->
-<section class="bg-white py-16">
+  <section class="bg-white py-16">
     <div class="container mx-auto px-6">
-        <h2 class="text-3xl text-center font-bold text-gray-800 mb-12">New Launches</h2>
+      <h2 class="text-3xl text-center font-bold text-gray-800 mb-12">
+        New Launches
+      </h2>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            <!-- Loop through newLaunches instead of product -->
-            <% newLaunches.slice(0, 4).forEach((product) => { %>
-                <div class="bg-white shadow-lg rounded-lg overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl">
-                    <div class="relative">
-                        <img src="<%= product.productImage[0] %>" alt="<%= product.productName %>" class="w-full h-48 object-cover object-center rounded-t-lg">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black opacity-40 rounded-t-lg"></div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-2xl text-center font-semibold text-gray-800 mb-4">
-                            <%= product.productName %>
-                        </h3>
-                        <h3 class="text-xl text-center text-gray-600 mb-4">
-                            ₹<% product.productVariants.forEach(variant => { %>
-                                <span><%= variant.price %></span>
-                            <% }) %>
-                        </h3>
-                        <a href="/productDetail/<%- product.id %>" class="block text-center text-yellow-500 font-medium hover:text-yellow-600 transition duration-300">
-                            Explore <i class="fa fa-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
-            <% }) %>
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"
+      >
+        <!-- Loop through newLaunches instead of product -->
+        <% newLaunches.slice(0, 4).forEach((product) => { %>
+        <div
+          class="bg-white shadow-lg rounded-lg overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl"
+        >
+          <div class="relative">
+            <img
+              src="<%= product.productImage[0] %>"
+              alt="<%= product.productName %>"
+              class="w-full h-48 object-cover object-center rounded-t-lg"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black opacity-40 rounded-t-lg"
+            ></div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-2xl text-center font-semibold text-gray-800 mb-4">
+              <%= product.productName %>
+            </h3>
+            <h3 class="text-xl text-center text-gray-600 mb-4">
+              ₹<% product.productVariants.forEach(variant => { %>
+              <span><%= variant.price %></span>
+              <% }) %>
+            </h3>
+            <a
+              href="/productDetail/<%- product.id %>"
+              class="block text-center text-yellow-500 font-medium hover:text-yellow-600 transition duration-300"
+            >
+              Explore <i class="fa fa-arrow-right"></i>
+            </a>
+          </div>
         </div>
+        <% }) %>
+      </div>
     </div>
-</section>
-
+  </section>
 
   <!-- Footer -->
   <%- include('footer') %>
-
 </body>
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-      const loadMoreBtn = document.getElementById("loadMoreBtn");
-      const brandGrid = document.getElementById("brandGrid");
-      let displayedBrands = 4;
+    const loadMoreBtn = document.getElementById("loadMoreBtn");
+    const brandGrid = document.getElementById("brandGrid");
+    let displayedBrands = 4;
 
-      if (loadMoreBtn) {
-          loadMoreBtn.addEventListener("click", () => {
-              fetch('/api/more-brands') // Adjust the API endpoint as needed
-                  .then(response => response.json())
-                  .then(data => {
-                      const moreBrands = data.brands; // Assuming API returns { brands: [] }
-                      moreBrands.forEach(brand => {
-                          const brandCard = document.createElement('div');
-                          brandCard.className = "bg-white shadow-lg rounded-lg overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl";
-                          brandCard.innerHTML = `
+    if (loadMoreBtn) {
+      loadMoreBtn.addEventListener("click", () => {
+        fetch("/api/more-brands") // Adjust the API endpoint as needed
+          .then((response) => response.json())
+          .then((data) => {
+            const moreBrands = data.brands; // Assuming API returns { brands: [] }
+            moreBrands.forEach((brand) => {
+              const brandCard = document.createElement("div");
+              brandCard.className =
+                "bg-white shadow-lg rounded-lg overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl";
+              brandCard.innerHTML = `
                               <div class="relative">
                                   <img src="${brand.brandImage}" alt="${brand.brandName}" class="w-full h-48 object-cover object-center rounded-t-lg">
                                   <div class="absolute inset-0 bg-gradient-to-t from-black opacity-40 rounded-t-lg"></div>
@@ -148,16 +204,18 @@
                                   </a>
                               </div>
                           `;
-                          brandGrid.appendChild(brandCard);
-                      });
+              brandGrid.appendChild(brandCard);
+            });
 
-                      // Hide the button if no more brands are available
-                      if (moreBrands.length < 4) {
-                          loadMoreBtn.style.display = 'none';
-                      }
-                  })
-                  .catch(error => console.error('Error fetching more brands:', error));
-          });
-      }
+            // Hide the button if no more brands are available
+            if (moreBrands.length < 4) {
+              loadMoreBtn.style.display = "none";
+            }
+          })
+          .catch((error) =>
+            console.error("Error fetching more brands:", error)
+          );
+      });
+    }
   });
 </script>

@@ -1,0 +1,107 @@
+<!-- navbar -->
+<%- include('navbar') -%>
+
+<div class="container mx-auto px-4 py-8">
+  <div class="bg-white rounded-lg shadow-lg p-6 space-y-6">
+    <!-- Order Header -->
+    <div
+      class="flex flex-col sm:flex-row justify-between items-start sm:items-center sm:space-x-6 mb-6"
+    >
+      <div>
+        <h1 class="text-2xl font-bold">Order #<%= orderDetails.orderId %></h1>
+        <p class="text-gray-600">
+          Placed on <%= orderDetails.orderDate.toLocaleDateString() %>
+        </p>
+      </div>
+      <div class="text-left sm:text-right mt-4 sm:mt-0">
+        <p class="text-lg font-semibold">
+          Status:
+          <span
+            class="<%= orderDetails.orderStatus === 'Cancelled' ? 'text-red-500' : orderDetails.orderStatus === 'Delivered' ? 'text-green-500' : 'text-blue-500' %>"
+          >
+            <%= orderDetails.orderStatus %>
+          </span>
+        </p>
+        <p class="text-gray-600">
+          Payment: <%= orderDetails.paymentMethod %> (<%=
+          orderDetails.paymentStatus %>)
+        </p>
+      </div>
+    </div>
+
+    <!-- Customer Details -->
+    <div class="border-t border-gray-200 py-6">
+      <h2 class="text-xl font-semibold mb-4">Customer Information</h2>
+      <div class="text-gray-600">
+        <p><strong>Name:</strong> <%= orderDetails.customer.name %></p>
+        <p><strong>Email:</strong> <%= orderDetails.customer.email %></p>
+        <p><strong>Phone:</strong> <%= orderDetails.customer.phone %></p>
+      </div>
+    </div>
+
+    <!-- Products -->
+    <div class="border-t border-gray-200 py-6">
+      <h2 class="text-xl font-semibold mb-4">Order Items</h2>
+      <div class="space-y-4">
+        <% orderDetails.products.forEach(product => { %>
+        <div
+          class="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6 border-b pb-4"
+        >
+          <img
+            src="<%= product.image %>"
+            alt="<%= product.name %>"
+            class="w-20 h-20 object-cover rounded-lg"
+          />
+          <div class="flex-1">
+            <h3 class="font-medium text-lg"><%= product.name %></h3>
+            <p class="text-gray-600">
+              Quantity: <%= product.quantity %> × ₹<%= product.price %>
+            </p>
+            <p class="text-gray-600">Status: <%= product.status %></p>
+          </div>
+          <div class="text-right">
+            <p class="font-semibold">₹<%= product.subtotal %></p>
+          </div>
+        </div>
+        <% }); %>
+      </div>
+    </div>
+
+    <!-- Shipping Address -->
+    <div class="border-t border-gray-200 py-6">
+      <h2 class="text-xl font-semibold mb-4">Shipping Address</h2>
+      <div class="text-gray-600">
+        <p><%= orderDetails.shippingAddress.building %></p>
+        <p><%= orderDetails.shippingAddress.street %></p>
+        <p>
+          <%= orderDetails.shippingAddress.city %>, <%=
+          orderDetails.shippingAddress.state %>, <%=
+          orderDetails.shippingAddress.pincode %>
+        </p>
+        <p>Phone: <%= orderDetails.shippingAddress.phoneNumber %></p>
+      </div>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="border-t border-gray-200 py-6">
+      <h2 class="text-xl font-semibold mb-4">Order Summary</h2>
+      <div class="flex justify-between text-lg font-semibold">
+        <span>Total Amount</span>
+        <span>₹<%= orderDetails.totalAmount %></span>
+      </div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="mt-6">
+      <a
+        href="/admin/orders"
+        class="inline-block bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition"
+      >
+        Back to Orders
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- footer -->
+<%- include('footer') %>

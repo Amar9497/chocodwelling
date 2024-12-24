@@ -1,18 +1,32 @@
 <!-- navbar -->
 <%- include('navbar') %>
+
+<!-- alert -->
+<%- include('alert') %>
+
 <!-- -------------------Breadcrumbs----------------------- -->
 <nav class="breadcrumbs text-sm text-gray-600 py-4">
   <ul class="flex items-center space-x-2">
     <li>
-      <a href="/home" class="text-blue-500 hover:text-blue-700 font-medium">Home</a>
+      <a href="/home" class="text-blue-500 hover:text-blue-700 font-medium"
+        >Home</a
+      >
     </li>
     <span class="text-gray-400">/</span>
     <li>
-      <a href="/allproduct" class="text-blue-500 hover:text-blue-700 font-medium">All Products</a>
+      <a
+        href="/allproduct"
+        class="text-blue-500 hover:text-blue-700 font-medium"
+        >All Products</a
+      >
     </li>
     <span class="text-gray-400">/</span>
     <li>
-      <a href="/productDetail/:id" class="text-blue-500 hover:text-blue-700 transition duration-300"><%- product.productName %></a>
+      <a
+        href="/productDetail/:id"
+        class="text-blue-500 hover:text-blue-700 transition duration-300"
+        ><%- product.productName %></a
+      >
     </li>
   </ul>
 </nav>
@@ -23,17 +37,22 @@
     <!-- Thumbnails (Left Side) -->
     <div class="flex flex-col gap-4 mt-8">
       <% product.productImage.forEach((img, index) => { %>
-        <div class="product-image-min cursor-pointer border rounded-lg p-1 hover:shadow-lg hover:scale-105 transform transition duration-300" onclick="changeImage('<%= img %>')">
-          <img
-            src="<%= img %>"
-            alt="Thumbnail <%= index + 1 %>"
-            class="w-20 h-20 object-cover rounded-md"
-          />
-        </div>
+      <div
+        class="product-image-min cursor-pointer border rounded-lg p-1 hover:shadow-lg hover:scale-105 transform transition duration-300"
+        onclick="changeImage('<%= img %>')"
+      >
+        <img
+          src="<%= img %>"
+          alt="Thumbnail <%= index + 1 %>"
+          class="w-20 h-20 object-cover rounded-md"
+        />
+      </div>
       <% }) %>
     </div>
     <!-- Main Image (Right Side) -->
-    <div class="main-image border rounded-lg overflow-hidden flex-grow w-3/4 max-w-md mx-auto">
+    <div
+      class="main-image border rounded-lg overflow-hidden flex-grow w-3/4 max-w-md mx-auto"
+    >
       <img
         id="image-view"
         src="<%= product.productImage[0] %>"
@@ -51,52 +70,85 @@
     </h1>
     <!-- Product Description -->
     <div class="product-description text-gray-600">
-      <p>
-        <%= product.productDescription %>
-      </p>
+      <p><%= product.productDescription %></p>
     </div>
     <!-- Price Section -->
-<div class="detail-price-section">
-  <div class="flex items-center gap-4 mb-4">
-    <!-- Original Price -->
-    <p class="text-sm text-gray-500 line-through">
-      Rs. 
-      <% product.productVariants.forEach(variant => { %>
-        <span><%= (variant.price * 1.20).toFixed(2) %></span>
-      <% }) %>
-    </p>
-    <!-- Discount Label -->
-    <h4 class="text-lg text-red-500 font-semibold">20% Off</h4>
-  </div>
-  
-  <!-- New Price -->
-  <div class="flex items-center gap-2">
-    <h3 class="text-2xl font-bold text-gray-800">
-      Rs. 
-      <% product.productVariants.forEach(variant => { %>
-        <span><%= variant.price %></span> <!-- Display the original price -->
-      <% }) %>
-    </h3>
-  </div>
-</div>
+    <div class="detail-price-section">
+      <div class="flex items-center gap-4 mb-4">
+        <!-- Original Price -->
+        <p class="text-sm text-gray-500 line-through">
+          Rs. <% product.productVariants.forEach(variant => { %>
+          <span><%= (variant.price * 1.20).toFixed(2) %></span>
+          <% }) %>
+        </p>
+        <!-- Discount Label -->
+        <h4 class="text-lg text-red-500 font-semibold">20% Off</h4>
+      </div>
 
+      <!-- New Price -->
+      <div class="flex items-center gap-2">
+        <h3 class="text-2xl font-bold text-gray-800">
+          Rs. <% product.productVariants.forEach(variant => { %>
+          <span><%= variant.price %></span>
+          <!-- Display the original price -->
+          <% }) %>
+        </h3>
+      </div>
+    </div>
 
     <!-- Rating Section -->
     <div class="flex items-center gap-2 text-yellow-500">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="yellow" class="w-6 h-6">
-        <path d="M12 2l3.09 6.26L22 9.27l-5 4.91 1.18 6.91L12 17.77l-6.18 3.32L7 14.18 2 9.27l6.91-1.01L12 2z" />
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="yellow"
+        class="w-6 h-6"
+      >
+        <path
+          d="M12 2l3.09 6.26L22 9.27l-5 4.91 1.18 6.91L12 17.77l-6.18 3.32L7 14.18 2 9.27l6.91-1.01L12 2z"
+        />
       </svg>
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="yellow" class="w-6 h-6">
-        <path d="M12 2l3.09 6.26L22 9.27l-5 4.91 1.18 6.91L12 17.77l-6.18 3.32L7 14.18 2 9.27l6.91-1.01L12 2z" />
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="yellow"
+        class="w-6 h-6"
+      >
+        <path
+          d="M12 2l3.09 6.26L22 9.27l-5 4.91 1.18 6.91L12 17.77l-6.18 3.32L7 14.18 2 9.27l6.91-1.01L12 2z"
+        />
       </svg>
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="yellow" class="w-6 h-6">
-        <path d="M12 2l3.09 6.26L22 9.27l-5 4.91 1.18 6.91L12 17.77l-6.18 3.32L7 14.18 2 9.27l6.91-1.01L12 2z" />
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="yellow"
+        class="w-6 h-6"
+      >
+        <path
+          d="M12 2l3.09 6.26L22 9.27l-5 4.91 1.18 6.91L12 17.77l-6.18 3.32L7 14.18 2 9.27l6.91-1.01L12 2z"
+        />
       </svg>
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="yellow" class="w-6 h-6">
-        <path d="M12 2l3.09 6.26L22 9.27l-5 4.91 1.18 6.91L12 17.77l-6.18 3.32L7 14.18 2 9.27l6.91-1.01L12 2z" />
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="yellow"
+        class="w-6 h-6"
+      >
+        <path
+          d="M12 2l3.09 6.26L22 9.27l-5 4.91 1.18 6.91L12 17.77l-6.18 3.32L7 14.18 2 9.27l6.91-1.01L12 2z"
+        />
       </svg>
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="yellow" class="w-6 h-6">
-        <path fill-rule="evenodd" d="M11.998 2.25a.75.75 0 01.671.418l2.504 5.075 5.601.814a.75.75 0 01.416 1.279l-4.053 3.95.957 5.579a.75.75 0 01-1.088.791L12 17.963l-5.016 2.635a.75.75 0 01-1.088-.79l.957-5.58-4.053-3.95a.75.75 0 01.416-1.279l5.601-.814 2.504-5.075a.75.75 0 01.671-.418zm0 3.019L10.114 9.37a.75.75 0 01-.564.41l-4.573.665 3.31 3.228a.75.75 0 01.216.664l-.781 4.556 4.1-2.156a.75.75 0 01.698 0l4.1 2.156-.781-4.556a.75.75 0 01.216-.664l3.31-3.228-4.573-.665a.75.75 0 01-.564-.41L12 5.27z" clip-rule="evenodd" />
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="yellow"
+        class="w-6 h-6"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M11.998 2.25a.75.75 0 01.671.418l2.504 5.075 5.601.814a.75.75 0 01.416 1.279l-4.053 3.95.957 5.579a.75.75 0 01-1.088.791L12 17.963l-5.016 2.635a.75.75 0 01-1.088-.79l.957-5.58-4.053-3.95a.75.75 0 01.416-1.279l5.601-.814 2.504-5.075a.75.75 0 01.671-.418zm0 3.019L10.114 9.37a.75.75 0 01-.564.41l-4.573.665 3.31 3.228a.75.75 0 01.216.664l-.781 4.556 4.1-2.156a.75.75 0 01.698 0l4.1 2.156-.781-4.556a.75.75 0 01.216-.664l3.31-3.228-4.573-.665a.75.75 0 01-.564-.41L12 5.27z"
+          clip-rule="evenodd"
+        />
       </svg>
       <!-- Repeat for other stars -->
       <p class="text-blue-600">| 122 reviews</p>
@@ -106,57 +158,57 @@
     <div class="flex items-center mb-4">
       <span class="text-gray-600 mr-4">Quantity</span>
       <div class="flex items-center space-x-2">
-        <button class="bg-gray-200 text-gray-800 px-2 py-1 rounded-md transition duration-300 hover:bg-gray-300">-</button>
-        <span class="text-gray-800">1</span>
-        <button class="bg-gray-200 text-gray-800 px-2 py-1 rounded-md transition duration-300 hover:bg-gray-300">+</button>
+        <button
+          id="decrease"
+          class="bg-gray-200 text-gray-800 px-2 py-1 rounded-md transition duration-300 hover:bg-gray-300"
+        >
+          -
+        </button>
+        <span id="quantity" class="text-gray-800">1</span>
+        <button
+          id="increase"
+          class="bg-gray-200 text-gray-800 px-2 py-1 rounded-md transition duration-300 hover:bg-gray-300"
+        >
+          +
+        </button>
       </div>
+    </div>
+
+    <!-- Hidden Limit Exceeded Message -->
+    <div id="limit-exceeded" class="hidden text-red-600 mt-2 font-semibold">
+      Quantity limit exceeded. Maximum quantity is 4.
     </div>
 
     <!-- Stock Information -->
     <div class="product-description">
-
       <P class="text-2xl font-bold text-gray-800">
-        Weight. 
-        <% product.productVariants.forEach(variant => { %>
-          <span><%= variant.weight %></span> <!-- Display the original price -->
+        Weight. <% product.productVariants.forEach(variant => { %>
+        <span><%= variant.weight %></span>
+        <!-- Display the original price -->
         <% }) %>
-        </P>
+      </P>
 
-        
-
-
-  <% 
-  // Calculate the total stock from all variants
-  let totalStock = 0;
-    product.productVariants.forEach(variant => {
-      totalStock += variant.stock;
-    });
-    %>
-
-<% if (totalStock === 0) { %>
-  <!-- Out of Stock -->
-  <h4 class="text-red-600 font-semibold">
-    Out of Stock
-  </h4>
-<% } else if (totalStock < 10) { %>
-  <!-- Limited Stock -->
-  <h4 class="text-red-500">
-    Only <%= totalStock %> left in stock
-  </h4>
-<% } else if (totalStock >= 10){ %>
-  <!-- Stock -->
-  <h4 class="text-green-500">
-    Stock <%= totalStock %> 
-  </h4>
-  <% } %>
-
+      <% // Calculate the total stock from all variants let totalStock = 0;
+      product.productVariants.forEach(variant => { totalStock += variant.stock;
+      }); %> <% if (totalStock === 0) { %>
+      <!-- Out of Stock -->
+      <h4 class="text-red-600 font-semibold">Out of Stock</h4>
+      <% } else if (totalStock < 10) { %>
+      <!-- Limited Stock -->
+      <h4 class="text-red-500">Only <%= totalStock %> left in stock</h4>
+      <% } else if (totalStock >= 10){ %>
+      <!-- Stock -->
+      <h4 class="text-green-500">Stock <%= totalStock %></h4>
+      <% } %>
     </div>
 
     <!-- Add to Cart and Buy Now Buttons -->
     <div class="flex gap-4">
       <button
-        onclick="addToCart('<%= product.id %>', '<%= product.productPrice %>')"
+        data-add-to-cart
+        data-product-id="<%= product._id %>"
         class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center transition duration-300"
+        type="button"
       >
         <span>Add to Cart</span>
         <i class="ml-2 fas fa-shopping-cart"></i>
@@ -171,16 +223,15 @@
     </div>
 
     <!-- Delivery Information -->
-    <div class="product-delivery flex flex-col gap-6 border-t pt-6">
-    </div>
+    <div class="product-delivery flex flex-col gap-6 border-t pt-6"></div>
   </div>
 </div>
 
 <%- include('similarProducts') %>
 
 <script>
-  const imageContainer = document.getElementsByClassName('main-image')[0]
-  const productImg = document.getElementById('image-view')
+  const imageContainer = document.getElementsByClassName("main-image")[0];
+  const productImg = document.getElementById("image-view");
 
   imageContainer.addEventListener("mousemove", (e) => {
     const rect = e.target.getBoundingClientRect();
@@ -197,5 +248,138 @@
 
   async function changeImage(src) {
     productImg.src = `${src}`;
+  }
+
+  // Quantity Controls
+  document.getElementById("increase").addEventListener("click", function () {
+    const quantityElement = document.getElementById("quantity");
+    let quantity = parseInt(quantityElement.textContent);
+    const limitExceededMessage = document.getElementById("limit-exceeded");
+
+    // Limit quantity to 4
+    if (quantity < 4) {
+      quantityElement.textContent = quantity + 1;
+      limitExceededMessage.classList.add("hidden"); // Hide the limit message
+    } else {
+      // Show limit exceeded message
+      limitExceededMessage.classList.remove("hidden");
+    }
+  });
+
+  document.getElementById("decrease").addEventListener("click", function () {
+    const quantityElement = document.getElementById("quantity");
+    let quantity = parseInt(quantityElement.textContent);
+    const limitExceededMessage = document.getElementById("limit-exceeded");
+
+    // Decrease quantity only if it's greater than 1
+    if (quantity > 1) {
+      quantityElement.textContent = quantity - 1;
+      limitExceededMessage.classList.add("hidden"); // Hide the limit message when decreasing
+    }
+  });
+
+  // Add to Cart Function
+  async function addToCart(productId) {
+    const quantity = parseInt(document.getElementById("quantity").textContent);
+    console.log("Adding to cart:", { productId, quantity });
+
+    try {
+      const response = await fetch("/addToCart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productId: productId,
+          quantity: quantity,
+        }),
+      });
+
+      console.log("Response status:", response.status);
+
+      // If response redirects to login page
+      if (response.redirected) {
+        window.location.href = response.url;
+        return;
+      }
+
+      try {
+        const data = await response.json();
+        if (data.status) {
+          // Success message without redirect
+          Swal.fire({
+            icon: "success",
+            title: "Added to Cart!",
+            text: "Product added to cart successfully",
+            showConfirmButton: false,
+            timer: 1500,
+            position: "top-end", // Shows alert in top-right corner
+            toast: true, // Makes it more compact
+          });
+
+          // Optionally update cart count if you have one
+          if (typeof updateCartCount === "function") {
+            updateCartCount();
+          }
+        } else {
+          throw new Error(data.message || "Failed to add to cart");
+        }
+      } catch (jsonError) {
+        // Handle login requirement
+        if (response.status === 401 || response.status === 403) {
+          Swal.fire({
+            icon: "warning",
+            title: "Please Login",
+            text: "You need to login to add items to cart",
+            showCancelButton: true,
+            confirmButtonText: "Login",
+            cancelButtonText: "Cancel",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.location.href = "/login";
+            }
+          });
+        } else {
+          throw new Error("Invalid response from server");
+        }
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Something went wrong! Please try again later.",
+        position: "top-end",
+        toast: true,
+        timer: 3000,
+      });
+    }
+  }
+
+  // Add this to your productDetail.ejs
+  document.addEventListener("DOMContentLoaded", function () {
+    // Add click event listener to Add to Cart button
+    const addToCartBtn = document.querySelector("[data-add-to-cart]");
+    if (addToCartBtn) {
+      addToCartBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        const productId = this.dataset.productId;
+        addToCart(productId);
+      });
+    }
+  });
+
+  function updateCartCount() {
+    fetch("/cart/count")
+      .then((response) => response.json())
+      .then((data) => {
+        const cartCountElement = document.getElementById("cart-count");
+        if (cartCountElement) {
+          cartCountElement.textContent = data.count;
+          cartCountElement.classList.remove("hidden");
+        }
+      })
+      .catch((error) => console.error("Error updating cart count:", error));
   }
 </script>
