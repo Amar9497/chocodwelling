@@ -2,6 +2,28 @@
   <!-- Navbar -->
   <header><%- include('navbar') %></header>
 
+  <!-- -------------------Breadcrumbs----------------------- -->
+<nav class="breadcrumbs text-sm text-gray-600 py-4 bg-gray-50 border-b">
+  <ul class="flex items-center space-x-2 container mx-auto px-6">
+      <li>
+          <a
+              href="/home"
+              class="text-blue-500 hover:text-blue-700 font-medium transition"
+              >Home</a
+          >
+      </li>
+      <span class="text-gray-400">/</span>
+      <li>
+          <a
+              href="/cart"
+              class="text-blue-500 hover:text-blue-700 font-medium transition"
+              >Cart</a
+          >
+      </li>
+      
+  </ul>
+</nav>
+
   <!-- Main Content -->
   <main class="container mx-auto px-4 py-10">
     <div class="flex flex-col lg:flex-row gap-8">
@@ -136,71 +158,82 @@
     const currentQuantity = parseInt(quantitySpan.textContent);
     const newQuantity = currentQuantity + change;
 
-    // Don't allow quantity below 1
+    // Check minimum quantity
     if (newQuantity < 1) {
-      Swal.fire({
-        icon: "warning",
-        text: "Quantity cannot be less than 1",
-        toast: true,
-        position: "top-end",
-        timer: 2000,
-        showConfirmButton: false,
-      });
-      return;
+        Swal.fire({
+            icon: "warning",
+            text: "Quantity cannot be less than 1",
+            toast: true,
+            position: "top-end",
+            timer: 2000,
+            showConfirmButton: false
+        });
+        return;
+    }
+
+    // Check maximum quantity
+    if (newQuantity > 5) {
+        Swal.fire({
+            icon: "warning",
+            text: "Maximum quantity allowed is 5",
+            toast: true,
+            position: "top-end",
+            timer: 2000,
+            showConfirmButton: false
+        });
+        return;
     }
 
     try {
-      const response = await fetch("/updateCart", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          productId: productId,
-          quantity: newQuantity,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.status) {
-        // Update quantity display
-        quantitySpan.textContent = newQuantity;
-
-        // Update product subtotal
-        const subtotalElement = document.getElementById(
-          `subtotal-${productId}`
-        );
-        subtotalElement.textContent = `Rs. ${data.subtotal}`;
-
-        // Update cart total
-        const cartTotalElement = document.getElementById("total");
-        cartTotalElement.textContent = `Rs. ${data.total}`;
-
-        // Optional: Show success message
-        Swal.fire({
-          icon: "success",
-          text: "Cart updated",
-          toast: true,
-          position: "top-end",
-          timer: 1500,
-          showConfirmButton: false,
+        const response = await fetch("/updateCart", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                productId: productId,
+                quantity: newQuantity
+            })
         });
-      } else {
-        throw new Error(data.message);
-      }
+
+        const data = await response.json();
+
+        if (data.status) {
+            // Update quantity display
+            quantitySpan.textContent = newQuantity;
+
+            // Update product subtotal
+            const subtotalElement = document.getElementById(`subtotal-${productId}`);
+            subtotalElement.textContent = `Rs. ${data.subtotal}`;
+
+            // Update cart total
+            const cartTotalElement = document.getElementById("total");
+            cartTotalElement.textContent = `Rs. ${data.total}`;
+
+            // Show success message
+            Swal.fire({
+                icon: "success",
+                text: "Cart updated successfully",
+                toast: true,
+                position: "top-end",
+                timer: 1500,
+                showConfirmButton: false
+            });
+        } else {
+            throw new Error(data.message || "Failed to update cart");
+        }
     } catch (error) {
-      console.error("Error updating cart:", error);
-      Swal.fire({
-        icon: "error",
-        text: error.message || "Failed to update cart",
-        toast: true,
-        position: "top-end",
-        timer: 2000,
-        showConfirmButton: false,
-      });
+        console.error("Error updating cart:", error);
+        Swal.fire({
+            icon: "error",
+            text: error.message || "Failed to update cart",
+            toast: true,
+            position: "top-end",
+            timer: 2000,
+            showConfirmButton: false
+        });
     }
-  }
+}
 
   // remove product
   async function removeFromCart(productId) {

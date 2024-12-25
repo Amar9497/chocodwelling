@@ -6,75 +6,90 @@
   <%- include('alert') %>
 
   <!-- ------------------- Breadcrumbs ----------------------- -->
-  <nav class="breadcrumbs text-sm text-gray-600 py-4">
-    <ul class="flex items-center space-x-2">
+  <!-- Breadcrumb Navigation -->
+<nav class="breadcrumbs text-sm text-gray-600 py-4 bg-gray-50 border-b">
+  <ul class="flex items-center space-x-2 container mx-auto px-6">
       <li>
-        <a
-          href="/user/home"
-          class="text-blue-500 hover:text-blue-700 font-medium"
-          >Home</a
-        >
+          <a
+              href="/home"
+              class="text-blue-500 hover:text-blue-700 font-medium transition"
+              >Home</a
+          >
       </li>
       <span class="text-gray-400">/</span>
       <li>
-        <a
-          href="/user/allproduct"
-          class="text-blue-500 hover:text-blue-700 font-medium"
-          >All Products</a
-        >
+          <a
+              href="/allproduct"
+              class="text-blue-500 hover:text-blue-700 font-medium transition"
+              >All Products</a
+          >
       </li>
-    </ul>
-  </nav>
+  </ul>
+</nav>
 
-  <!-- Product Section -->
-  <section class="bg-white py-10">
-    <div class="container mx-auto px-6">
-      <h2 class="text-2xl font-semibold text-center mb-8 text-gray-800">
-        All Products
-      </h2>
-      <div
-        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
-      >
-        <% product.forEach((product) => { %>
-        <a
-          href="/productDetail/<%- product.id %>"
-          class="block bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
-        >
-          <!-- Product Image -->
-          <img
-            src="<%= product.productImage[0] %>"
-            alt="<%= product.productName %>"
-            class="w-full h-48 object-cover transform transition-transform duration-300 hover:scale-105"
-          />
-
-          <!-- Product Details -->
-          <div class="p-4">
-            <!-- Product Name -->
-            <h3
-              class="text-lg font-medium text-gray-700 text-center mb-2 truncate"
-            >
-              <%= product.productName %>
-            </h3>
-
-            <!-- Product Description -->
-            <p class="text-sm text-gray-600 mb-4 text-center">
-              <%= product.productDescription %>
-            </p>
-
-            <!-- Product Price -->
-            <div class="flex justify-between items-center">
-              <span class="text-lg font-semibold text-gray-800">
-                ₹<% product.productVariants.forEach(variant => { %>
-                <span><%= variant.price %></span>
-                <% }) %>
-              </span>
-            </div>
-          </div>
-        </a>
-        <% }) %>
+<!-- Product Section -->
+<div class="container mx-auto px-6 py-6">
+  <!-- Search and Sort Section -->
+  <div class="flex flex-col md:flex-row gap-4 justify-between items-center mb-6">
+      <h2 class="text-xl font-semibold text-gray-800">Browse Products</h2>
+      <div class="flex items-center space-x-2">
+          <label for="sortSelect" class="text-gray-600 text-sm font-medium">Sort by:</label>
+          <select
+              id="sortSelect"
+              class="border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              onchange="Sort()"
+          >
+              <option value="new">New Arrivals</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="a-z">Name: A to Z</option>
+              <option value="z-a">Name: Z to A</option>
+          </select>
       </div>
-    </div>
-  </section>
+  </div>
+
+  <!-- Products Grid -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="productsGrid">
+      <% product.forEach(product => { %>
+          <div
+              class="product-card bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+              data-price="<%= product.productVariants[0].price %>"
+              data-name="<%= product.productName.toLowerCase() %>"
+              data-date="<%= product.createdAt %>"
+              data-search="<%= product.productName.toLowerCase() %> <%= product.productDescription.toLowerCase() %>"
+          >
+              <img
+                  src="<%= product.productImage[0] %>"
+                  alt="<%= product.productName %>"
+                  class="w-full h-48 object-cover"
+              />
+              <div class="p-4">
+                  <h3 class="text-lg font-semibold text-gray-800 mb-2 truncate">
+                      <%= product.productName %>
+                  </h3>
+                  <p class="text-gray-600 text-base font-medium mb-2">
+                      ₹<%= product.productVariants[0].price %>
+                  </p>
+                  <p class="text-sm text-gray-500 line-clamp-2">
+                      <%= product.productDescription %>
+                  </p>
+              </div>
+              <div class="p-4 border-t">
+                  <a
+                      href="/productDetail/<%- product.id %>""
+                      class="block text-center text-blue-500 hover:text-blue-700 font-medium transition"
+                  >
+                      View Details
+                  </a>
+              </div>
+          </div>
+      <% }); %>
+  </div>
+</div>
+
+
+
+
 
   <!-- Pagination Controls -->
   <div class="flex justify-center mt-6">
@@ -113,3 +128,71 @@
   <!-- Footer -->
   <%- include('footer') %>
 </div>
+
+<script>
+  function Sort() {
+  const sortBy = document.getElementById("sortSelect").value; // Get selected sort option
+  const productsGrid = document.getElementById("productsGrid");
+  const products = Array.from(productsGrid.getElementsByClassName("product-card"));
+
+  // Sort the products based on selected criteria
+  products.sort((a, b) => {
+    switch (sortBy) {
+      case "price-low":
+        return parseFloat(a.dataset.price) - parseFloat(b.dataset.price); // Low to high
+      case "price-high":
+        return parseFloat(b.dataset.price) - parseFloat(a.dataset.price); // High to low
+      case "a-z":
+        return a.dataset.name.localeCompare(b.dataset.name); // Name A-Z
+      case "z-a":
+        return b.dataset.name.localeCompare(a.dataset.name); // Name Z-A
+      case "new":
+        return new Date(b.dataset.date) - new Date(a.dataset.date); // New Arrivals
+      default:
+        return 0; // Default case, no sorting
+    }
+  });
+
+  // Clear existing products in the grid
+  productsGrid.innerHTML = "";
+
+  // Append sorted products to the grid
+  products.forEach((product) => productsGrid.appendChild(product));
+}
+
+// Optional: Search functionality for filtering products
+function Filter(searchTerm) {
+  const productsGrid = document.getElementById("productsGrid");
+  const products = Array.from(productsGrid.getElementsByClassName("product-card"));
+  const lowerCaseSearchTerm = searchTerm.toLowerCase();
+
+  // Filter products based on the search term
+  const filteredProducts = products.filter((product) =>
+    product.dataset.search.includes(lowerCaseSearchTerm)
+  );
+
+  // Clear existing products in the grid
+  productsGrid.innerHTML = "";
+
+  // Append filtered products or show no results message
+  if (filteredProducts.length === 0) {
+    productsGrid.innerHTML = `
+      <div class="col-span-full text-center py-8">
+        <p class="text-gray-500">No products found matching "${searchTerm}"</p>
+      </div>`;
+  } else {
+    filteredProducts.forEach((product) => productsGrid.appendChild(product));
+  }
+}
+
+// Add event listener for sorting on page load
+document.addEventListener("DOMContentLoaded", () => {
+  const sortSelect = document.getElementById("sortSelect");
+
+  // Initialize default sorting (New Arrivals)
+  Sort();
+
+  // Add an event listener for changes in sort selection
+  sortSelect.addEventListener("change", Sort);
+}); 
+</script>

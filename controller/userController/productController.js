@@ -9,6 +9,7 @@ const allProduct = async (req, res) => {
         const search = req.query.search || "";
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 12;
+        
 
         // Fetch only active categories
         const activeCategories = await categorySchema.find({ isActive: true }).select('_id');
@@ -23,9 +24,9 @@ const allProduct = async (req, res) => {
         // Filter products: Active products with active categories and brands
         const productFilter = {
             isActive: true,
-            productCategory: { $in: activeCategoryIds },  // Only include products in active categories
-            productBrand: { $in: activeBrandIds },        // Only include products in active brands
-            productName: { $regex: search, $options: "i" }, // Case-insensitive search
+            productCategory: { $in: activeCategoryIds }, 
+            productBrand: { $in: activeBrandIds },        
+            productName: { $regex: search, $options: "i" },
         };
 
         // Fetch the filtered products with pagination

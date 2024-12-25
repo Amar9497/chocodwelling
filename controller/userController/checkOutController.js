@@ -159,7 +159,7 @@ const placeOrder = async (req, res) => {
             totalAmount,
             shippingAddress: selectedAddress,
             paymentMethod,
-            paymentStatus: paymentMethod === 'COD' ? 'Pending' : 'Completed',
+            paymentStatus: paymentMethod === 'COD' ? 'Completed' : 'Completed',
             orderStatus: 'Confirmed'
         });
 

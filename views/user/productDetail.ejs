@@ -5,31 +5,34 @@
 <%- include('alert') %>
 
 <!-- -------------------Breadcrumbs----------------------- -->
-<nav class="breadcrumbs text-sm text-gray-600 py-4">
-  <ul class="flex items-center space-x-2">
-    <li>
-      <a href="/home" class="text-blue-500 hover:text-blue-700 font-medium"
-        >Home</a
-      >
-    </li>
-    <span class="text-gray-400">/</span>
-    <li>
-      <a
-        href="/allproduct"
-        class="text-blue-500 hover:text-blue-700 font-medium"
-        >All Products</a
-      >
-    </li>
-    <span class="text-gray-400">/</span>
-    <li>
-      <a
-        href="/productDetail/:id"
-        class="text-blue-500 hover:text-blue-700 transition duration-300"
-        ><%- product.productName %></a
-      >
-    </li>
+<nav class="breadcrumbs text-sm text-gray-600 py-4 bg-gray-50 border-b">
+  <ul class="flex items-center space-x-2 container mx-auto px-6">
+      <li>
+          <a
+              href="/home"
+              class="text-blue-500 hover:text-blue-700 font-medium transition"
+              >Home</a
+          >
+      </li>
+      <span class="text-gray-400">/</span>
+      <li>
+          <a
+              href="/allproduct"
+              class="text-blue-500 hover:text-blue-700 font-medium transition"
+              >All Products</a
+          >
+      </li>
+      <span class="text-gray-400">/</span>
+      <li>
+          <a
+              href="/productDetail/:id"
+              class="text-blue-500 hover:text-blue-700 font-medium transition"
+              ><%= product.productName %></a
+          >
+      </li>
   </ul>
 </nav>
+
 
 <div class="product-view grid grid-cols-1 md:grid-cols-2 gap-8 p-6">
   <!-- Left Section: Image Gallery -->
@@ -188,33 +191,36 @@
         <% }) %>
       </P>
 
-      <% // Calculate the total stock from all variants let totalStock = 0;
-      product.productVariants.forEach(variant => { totalStock += variant.stock;
-      }); %> <% if (totalStock === 0) { %>
-      <!-- Out of Stock -->
-      <h4 class="text-red-600 font-semibold">Out of Stock</h4>
-      <% } else if (totalStock < 10) { %>
-      <!-- Limited Stock -->
-      <h4 class="text-red-500">Only <%= totalStock %> left in stock</h4>
-      <% } else if (totalStock >= 10){ %>
-      <!-- Stock -->
-      <h4 class="text-green-500">Stock <%= totalStock %></h4>
-      <% } %>
+      <!-- Stock Status Indicator -->
+<div class="mt-4">
+  <% if (product.productVariants[0].stock <= 0) { %>
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+          Out of Stock
+      </span>
+  <% } else if (product.productVariants[0].stock <= 5) { %>
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+          Low Stock: Only <%= product.productVariants[0].stock %> left
+      </span>
+  <% } else { %>
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+          In Stock
+      </span>
+  <% } %>
+</div>
     </div>
 
     <!-- Add to Cart and Buy Now Buttons -->
     <div class="flex gap-4">
-      <button
-        data-add-to-cart
-        data-product-id="<%= product._id %>"
-        class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center transition duration-300"
-        type="button"
-      >
-        <span>Add to Cart</span>
-        <i class="ml-2 fas fa-shopping-cart"></i>
-      </button>
+      <button 
+    onclick="addToCart('<%= product._id %>', '<%= product.productVariants[0].stock %>')"
+    class="<%= product.productVariants[0].stock <= 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700' %> text-white px-4 py-2 rounded"
+    <%= product.productVariants[0].stock <= 0 ? 'disabled' : '' %>
+>
+    <%= product.productVariants[0].stock <= 0 ? 'Out of Stock' : 'Add to Cart' %>
+</button>
+
       <a
-        href="/product-checkout/<%= product.id %>"
+        href="#"
         class="px-6 py-2 bg-yellow-500 text-gray-800 rounded-md hover:bg-yellow-600 flex items-center transition duration-300"
       >
         <span>Buy Now</span>
@@ -278,108 +284,64 @@
     }
   });
 
-  // Add to Cart Function
+
+// product add to cart alerts
+
   async function addToCart(productId) {
     const quantity = parseInt(document.getElementById("quantity").textContent);
     console.log("Adding to cart:", { productId, quantity });
 
     try {
-      const response = await fetch("/addToCart", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          productId: productId,
-          quantity: quantity,
-        }),
-      });
-
-      console.log("Response status:", response.status);
-
-      // If response redirects to login page
-      if (response.redirected) {
-        window.location.href = response.url;
-        return;
-      }
-
-      try {
+        const response = await fetch("/addToCart", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                productId: productId,
+                quantity: quantity,
+            }),
+        });
+        
         const data = await response.json();
-        if (data.status) {
-          // Success message without redirect
-          Swal.fire({
-            icon: "success",
-            title: "Added to Cart!",
-            text: "Product added to cart successfully",
-            showConfirmButton: false,
-            timer: 1500,
-            position: "top-end", // Shows alert in top-right corner
-            toast: true, // Makes it more compact
-          });
 
-          // Optionally update cart count if you have one
-          if (typeof updateCartCount === "function") {
-            updateCartCount();
-          }
-        } else {
-          throw new Error(data.message || "Failed to add to cart");
-        }
-      } catch (jsonError) {
-        // Handle login requirement
-        if (response.status === 401 || response.status === 403) {
-          Swal.fire({
-            icon: "warning",
-            title: "Please Login",
-            text: "You need to login to add items to cart",
-            showCancelButton: true,
-            confirmButtonText: "Login",
-            cancelButtonText: "Cancel",
-          }).then((result) => {
-            if (result.isConfirmed) {
-              window.location.href = "/login";
+        if (response.ok && data.status) { // Changed 'data.success' to 'data.status'
+            // Success message
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: data.message || 'Product added to cart successfully',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 1500,
+                timerProgressBar: true
+            });
+
+            // Update cart count
+            if (document.getElementById('cart-count')) {
+                const cartCount = document.getElementById('cart-count');
+                cartCount.textContent = parseInt(cartCount.textContent || 0) + 1;
             }
-          });
         } else {
-          throw new Error("Invalid response from server");
+            // Error from server
+            throw new Error(data.message || 'Failed to add to cart');
         }
-      }
+
     } catch (error) {
-      console.error("Error adding to cart:", error);
-
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Something went wrong! Please try again later.",
-        position: "top-end",
-        toast: true,
-        timer: 3000,
-      });
+        console.error('Error adding to cart:', error);
+        // Show error message from server
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message || 'Something went wrong!',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+        });
     }
-  }
+}
 
-  // Add this to your productDetail.ejs
-  document.addEventListener("DOMContentLoaded", function () {
-    // Add click event listener to Add to Cart button
-    const addToCartBtn = document.querySelector("[data-add-to-cart]");
-    if (addToCartBtn) {
-      addToCartBtn.addEventListener("click", function (e) {
-        e.preventDefault();
-        const productId = this.dataset.productId;
-        addToCart(productId);
-      });
-    }
-  });
-
-  function updateCartCount() {
-    fetch("/cart/count")
-      .then((response) => response.json())
-      .then((data) => {
-        const cartCountElement = document.getElementById("cart-count");
-        if (cartCountElement) {
-          cartCountElement.textContent = data.count;
-          cartCountElement.classList.remove("hidden");
-        }
-      })
-      .catch((error) => console.error("Error updating cart count:", error));
-  }
-</script>
+  </script>

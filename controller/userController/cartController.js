@@ -81,8 +81,13 @@ const addToCart = async (req, res) => {
     let cartItem = await cartSchema.findOne({ userId, productId });
 
     if (cartItem) {
-     
       const totalQuantity = cartItem.quantity + quantity;
+      if (totalQuantity > 4) {
+        return res.status(400).json({
+            status: false,
+            message: "You cannot add more than 4 units Limit Exceeded",
+        });
+    }
       cartItem.quantity = totalQuantity;
       await cartItem.save();
 
@@ -115,6 +120,110 @@ const addToCart = async (req, res) => {
     });
   }
 };
+
+
+// const addToCart = async (req, res) => {
+//   try {
+//       const userId = req.session.user;
+//       const { productId, quantity } = req.body;
+
+//       // Check if user is logged in
+//       if (!userId) {
+//           return res.status(401).json({
+//               success: false,
+//               message: 'Please login to add items to cart'
+//           });
+//       }
+
+//       // Validate quantity
+//       if (quantity > 5) {
+//           return res.status(400).json({
+//               success: false,
+//               message: 'Maximum quantity limit is 5 items'
+//           });
+//       }
+
+//       // Check product and stock
+//       const product = await productSchema.findById(productId);
+//       if (!product) {
+//           return res.status(404).json({
+//               success: false,
+//               message: 'Product not found'
+//           });
+//       }
+
+//       if (product.productVariants[0].stock <= 0) {
+//           return res.status(400).json({
+//               success: false,
+//               message: 'Sorry, this product is out of stock'
+//           });
+//       }
+
+//       // Find cart
+//       let userCart = await cartSchema.findOne({ userId: userId });
+
+//       //console.log((userCart));
+      
+
+//       if (!userCart) {
+//           // Create new cart
+//           userCart = new cartSchema({
+//               userId: userId,
+//               products: [{
+//                   productId: productId,
+//                   quantity: quantity,
+//                   //price: product.productVariants[0].price
+//               }]
+//           });
+//           await userCart.save();
+          
+//           return res.status(200).json({
+//               success: true,
+//               message: 'Product added to your cart'
+//           });
+//       }
+
+//       // Check if product exists in cart
+//       const existingProduct = await cartSchema.findOne({ userId, productId });
+//       console.log(existingProduct);
+      
+//       if (existingProduct) {
+//           // Check total quantity after adding
+//           const newQuantity = existingProduct.quantity + quantity;
+          
+//           if (newQuantity > 5) {
+//               return res.status(400).json({
+//                   success: false,
+//                   message: 'Cart quantity cannot exceed 5 items'
+//               });
+//           }
+
+//           existingProduct.quantity = newQuantity;
+//       } else {
+//           // Add new product
+//           userCart.cartSchema.push({
+//               productId: productId,
+//               quantity: quantity,
+//               //price: product.productVariants[0].price
+//           });
+//       }
+
+//       await userCart.save();
+
+//       res.status(200).json({
+//           success: true,
+//           message: 'Product added to your cart successfully'
+//       });
+
+//   } catch (error) {
+//       console.error('Error in add to cart:', error);
+//       res.status(500).json({
+//           success: false,
+//           message: 'Failed to add product to cart. Please try again.'
+//       });
+//   }
+// };
+
 
 // ----------------------------- update cart -----------------------------
 

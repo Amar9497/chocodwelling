@@ -66,11 +66,11 @@ admin.get('/customerstatus',auth.isAdmin,userController.status);
 
 // ----------------------- orders ------------------------
 
-admin.get('/orders',orderController.orderPage);
+admin.get('/orders',auth.isAdmin,orderController.orderPage);
 
-admin.post('/order/:orderId/status',orderController.orderStatus);
+admin.post('/order/:orderId/status',auth.isAdmin,orderController.orderStatus);
 
-admin.get('/order-view/:id',orderController.orderView);
+admin.get('/order-view/:id',auth.isAdmin,orderController.orderView);
 
 
 
