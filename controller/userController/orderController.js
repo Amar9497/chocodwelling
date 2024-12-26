@@ -12,7 +12,7 @@ const orderPage = async (req, res) => {
             return res.redirect('/login');
         }
 
-        // Find orders with correct field name (userId instead of customer_id)
+        // Find orders with correct field name(userId instead of customer_id)
         const orderDetails = await orderSchema.find({ userId })
             .populate({
                 path: 'products.productId',
@@ -36,8 +36,6 @@ const orderPage = async (req, res) => {
                 product_price: product.price
             }))
         }));
-
-        //console.log('Formatted Orders:', formattedOrders);
 
         res.render('user/orders', {
             title: "Orders",

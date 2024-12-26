@@ -12,7 +12,7 @@ const loadProduct = async (req, res) => {
   const search = req.query.search || "";
 
   try {
-    // Apply search filter
+    // search filter
     const filter = search
       ? { productName: { $regex: search, $options: "i" } }
       : {};
@@ -155,7 +155,7 @@ const loadEditProduct = async (req, res) => {
     const products = await productSchema
       .findById(id)
       .populate("productCategory")
-      .populate("productBrand"); // Ensure productBrand is populated as well
+      .populate("productBrand"); 
 
     const category = await categorySchema.find();
     const brand = await brandSchema.find();
@@ -193,11 +193,7 @@ const editProductPost = async (req, res) => {
       },
     ];
 
-    // Debug: Log input data for category and brand
-    // console.log(`Category Input: ${req.body.category}`);
-    // console.log(`Brand Input: ${req.body.brand}`);
 
-    // Fetch the category ID (use the category name or ID passed in req.body)
     const category = await categorySchema.findById(req.body.category);
     const brand = await brandSchema.findById(req.body.brand);
 
@@ -213,9 +209,6 @@ const editProductPost = async (req, res) => {
       return res.redirect(`/admin/editproduct/${id}`);
     }
 
-    // Debug: Log category and brand IDs
-    // console.log(`Category ID: ${category._id}`);
-    // console.log(`Brand ID: ${brand._id}`);
 
     // Delete the images from Cloudinary
     for (const img of imageToDelete) {

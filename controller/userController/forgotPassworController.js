@@ -69,12 +69,12 @@ const forgotPasswordOtp = async (req, res) => {
             title: 'Forget Password OTP',
             email: req.session.email,
             otpTime: req.session.otptimer,
-            user: req.session.user || null, // Ensure user data is optional and secure
+            user: req.session.user || null, 
         });
     } catch (error) {
         console.error(`Error in rendering OTP page for forgot password: ${error}`);
         req.flash('error', 'Something went wrong. Please try again later.');
-        res.redirect('/forgotpassword'); // Adjust redirect path as needed
+        res.redirect('/forgotpassword'); 
     }
 };
 
@@ -83,12 +83,12 @@ const forgotPasswordOtp = async (req, res) => {
 const forgotPasswordOtpPost = async (req, res) => {
     try {
         // Securely compare OTPs
-        const isOtpValid = req.session.otp === req.body.otp; // Replace with constant-time comparison if needed
+        const isOtpValid = req.session.otp === req.body.otp; 
         if (isOtpValid) {
             // Render reset password page
             res.render('user/resetPassword', {
                 title: 'Reset Password',
-                user: req.session.user || null, // Sanitize user data if needed
+                user: req.session.user || null, 
             });
         } else {
             // Handle invalid OTP
@@ -162,10 +162,6 @@ const forgotResend = async (req, res) => {
         res.redirect('/forgotPasswordOtp');
     }
 };
-
-
-
-
 
 
 module.exports={

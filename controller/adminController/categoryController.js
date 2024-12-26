@@ -88,13 +88,13 @@ const editCategory = async (req, res) => {
 // status category
 const status= async(req,res)=>{
     //console.log(req.params.id);
-    const { id } = req.params; // Get category ID
+    const { id } = req.params; 
     try {
         const category = await categorySchema.findById(id);
         if (!category) {
             return res.status(404).send('Category not found');
         }
-        category.isActive = !category.isActive; // Toggle the isActive field
+        category.isActive = !category.isActive; 
         await category.save();
         res.redirect('/admin/category'); 
     }

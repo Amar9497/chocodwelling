@@ -197,7 +197,7 @@
       <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
           Out of Stock
       </span>
-  <% } else if (product.productVariants[0].stock <= 5) { %>
+  <% } else if (product.productVariants[0].stock <= 10) { %>
       <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
           Low Stock: Only <%= product.productVariants[0].stock %> left
       </span>

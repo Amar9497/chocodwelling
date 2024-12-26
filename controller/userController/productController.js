@@ -78,10 +78,7 @@ const productDetail = async (req,res)=>{
             return res.redirect('/home');
         }
 
-        const product = await productSchema.findById(id);
-
-        //console.log(product);
-        
+        const product = await productSchema.findById(id);        
 
         if(!product){
             
@@ -94,9 +91,7 @@ const productDetail = async (req,res)=>{
                 productCategory:product.productCategory,
                 isActive:true
             })
-            //console.log(similarProduct);
             
-
             return res.render('user/productDetail',{
                         title: product.productName,
                         user:req.session.user,

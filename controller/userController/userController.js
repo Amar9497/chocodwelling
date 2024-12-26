@@ -25,30 +25,29 @@ const loadLogin=(req,res)=>{
 const loginPost = async (req, res) => {
     try {
         //console.log(req.body); 
-        const user = await userSchema.findOne({ email: req.body.email }); // Fetch user by email
+        const user = await userSchema.findOne({ email: req.body.email }); 
 
         if (!user) {
             req.flash('error', 'Could not find user, please login again');
-            return res.redirect('/login'); // Early return if user not found
+            return res.redirect('/login'); 
         }
 
         if (!user.isActive) {
             req.flash('error', 'User is blocked by admin');
-            return res.redirect('/login'); // Early return if user is blocked
+            return res.redirect('/login'); 
         }
 
         const isPasswordValid = await bcrypt.compare(req.body.password, user.password);
         if (!isPasswordValid) {
             req.flash('error', 'Invalid email ID or password');
-            return res.redirect('/login'); // Early return if password is invalid
+            return res.redirect('/login'); 
         }
 
-        // User authenticated successfully
-        req.session.user = user.id; // Store user ID in session
+        req.session.user = user.id; 
         return res.redirect('/home');
         
     } catch (error) {
-        console.error('Error during login:', error); // Log the error for debugging
+        console.error('Error during login:', error); 
         req.flash('error', 'An unexpected error occurred. Please try again.');
         res.redirect('/login');
     }
@@ -91,12 +90,12 @@ const googleAuthCallback = (req, res, next) => {
             req.login(user, (loginErr) => {
                 if (loginErr) {
                     console.error(`Error during user login: ${loginErr.message}`);
-                    return next(loginErr); // Pass error to global error handler
+                    return next(loginErr); 
                 }
-                req.session.user = user.id; // Store user ID in session
-                res.redirect('/home'); // Redirect to home page
+                req.session.user = user.id; 
+                res.redirect('/home'); 
             });
-        })(req, res, next); // Call the passport authenticate middleware
+        })(req, res, next); 
     } catch (error) {
         console.error(`Unexpected error in Google callback: ${error.message}`);
         res.status(500).send("An unexpected error occurred. Please try again.");
@@ -192,12 +191,12 @@ const otpPost = async (req, res) => {
         }
 
         if (req.session.otp.toString() === otpEntered.toString()) {
-            console.log('OTP verified');
+            //console.log('OTP verified');
             req.flash('success', 'OTP Verified');
 
              // Create a new user and store the returned document
             const user = await userSchema.create(details);
-            console.log('New user registered successfully:', user);
+            //console.log('New user registered successfully:', user);
 
             req.flash('success', 'New user registered successfully');
             
@@ -255,21 +254,21 @@ const home = async (req, res) => {
         // Extract the IDs of active categories
         const activeCategoryIds = activeCategories.map(category => category._id);
 
-        // Fetch active products that belong to active categories, are not blocked, and are recently launched (e.g., added in the last 30 days)
+        // Fetch active products are recently launched 
         const newLaunches = await productSchema.find({
-            isActive: true,  // Only include active products
-            isBlocked: { $ne: true },  // Exclude blocked products
-            productCategory: { $in: activeCategoryIds }, // Filter products by active category IDs
-            productBrand: { $nin: brand.filter(b => b.isBlocked).map(b => b._id) } // Exclude products with blocked brands
+            isActive: true,  
+            isBlocked: { $ne: true },  
+            productCategory: { $in: activeCategoryIds }, 
+            productBrand: { $nin: brand.filter(b => b.isBlocked).map(b => b._id) } 
         })
-        .sort({ createdAt: -1 })  // Sort by creation date in descending order (most recent first)
-        .limit(5); // Limit to the 5 most recent products (you can change this number)
+        .sort({ createdAt: -1 })  
+        .limit(5); 
 
-        // Fetch other products for the main display (non-new launches)
+        
         const product = await productSchema.find({
-            isActive: true,  // Only include active products
-            isBlocked: { $ne: true },  // Exclude blocked products
-            productCategory: { $in: activeCategoryIds } // Filter products by active category IDs
+            isActive: true,  
+            isBlocked: { $ne: true },  
+            productCategory: { $in: activeCategoryIds } 
         });
 
         res.render('user/homepage', {

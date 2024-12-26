@@ -12,11 +12,6 @@ const profile = async (req, res) => {
     try {
         const userId = req.session.user;
 
-        // if (!userId) {
-        //     req.flash('error', 'Session expired. Please log in again.');
-        //     return res.redirect('/login');
-        // }
-
         const userDetail = await userSchema.findById(userId);
         if (!userDetail) {
             req.flash('error', 'Profile not found. Please try again later.');
@@ -117,10 +112,10 @@ const removeAddress = async (req, res) => {
         const index = parseInt(req.params.index, 10);
 
         // Validate user session
-        if (!userId) {
-            req.flash('error', 'Session expired. Please log in again.');
-            return res.redirect('/login');
-        }
+        // if (!userId) {
+        //     req.flash('error', 'Session expired. Please log in again.');
+        //     return res.redirect('/login');
+        // }
 
         // Validate index parameter
         if (isNaN(index)) {
@@ -161,7 +156,7 @@ const updateAddress = async (req,res) =>{
 
     // console.log(id);
     // console.log(index);
-    //console.log(req.body);
+    // console.log(req.body);
     const data = {
         building : req.body.building,
         street : req.body.street,
@@ -235,10 +230,6 @@ const resetPassword = async (req, res) => {
        res.redirect('/profile');
    }
 }
-
-
-
-
 
 
 module.exports = {

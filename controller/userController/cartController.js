@@ -20,22 +20,20 @@ const cart = async (req, res) => {
       .find({ userId })
       .populate("productId")
       .exec();
-    //console.log(cartItems);
 
     // Calculate total for the cart
     const cartDetails = cartItems.map((item) => {
-      // Get price from the first variant (or default variant)
+      // Get price from the first variant 
       const price = item.productId.productVariants[0].price;
       return {
         product: item.productId,
         quantity: item.quantity,
-        subtotal: price * item.quantity, // Calculate subtotal using variant price
+        subtotal: price * item.quantity,
       };
     });
-    //console.log("Cart Details:", cartDetails);
+    
 
     const total = cartDetails.reduce((acc, item) => acc + item.subtotal, 0);
-    //console.log("Total:", total);
 
     res.render("user/cart", {
       title: "Cart",
@@ -121,108 +119,6 @@ const addToCart = async (req, res) => {
   }
 };
 
-
-// const addToCart = async (req, res) => {
-//   try {
-//       const userId = req.session.user;
-//       const { productId, quantity } = req.body;
-
-//       // Check if user is logged in
-//       if (!userId) {
-//           return res.status(401).json({
-//               success: false,
-//               message: 'Please login to add items to cart'
-//           });
-//       }
-
-//       // Validate quantity
-//       if (quantity > 5) {
-//           return res.status(400).json({
-//               success: false,
-//               message: 'Maximum quantity limit is 5 items'
-//           });
-//       }
-
-//       // Check product and stock
-//       const product = await productSchema.findById(productId);
-//       if (!product) {
-//           return res.status(404).json({
-//               success: false,
-//               message: 'Product not found'
-//           });
-//       }
-
-//       if (product.productVariants[0].stock <= 0) {
-//           return res.status(400).json({
-//               success: false,
-//               message: 'Sorry, this product is out of stock'
-//           });
-//       }
-
-//       // Find cart
-//       let userCart = await cartSchema.findOne({ userId: userId });
-
-//       //console.log((userCart));
-      
-
-//       if (!userCart) {
-//           // Create new cart
-//           userCart = new cartSchema({
-//               userId: userId,
-//               products: [{
-//                   productId: productId,
-//                   quantity: quantity,
-//                   //price: product.productVariants[0].price
-//               }]
-//           });
-//           await userCart.save();
-          
-//           return res.status(200).json({
-//               success: true,
-//               message: 'Product added to your cart'
-//           });
-//       }
-
-//       // Check if product exists in cart
-//       const existingProduct = await cartSchema.findOne({ userId, productId });
-//       console.log(existingProduct);
-      
-//       if (existingProduct) {
-//           // Check total quantity after adding
-//           const newQuantity = existingProduct.quantity + quantity;
-          
-//           if (newQuantity > 5) {
-//               return res.status(400).json({
-//                   success: false,
-//                   message: 'Cart quantity cannot exceed 5 items'
-//               });
-//           }
-
-//           existingProduct.quantity = newQuantity;
-//       } else {
-//           // Add new product
-//           userCart.cartSchema.push({
-//               productId: productId,
-//               quantity: quantity,
-//               //price: product.productVariants[0].price
-//           });
-//       }
-
-//       await userCart.save();
-
-//       res.status(200).json({
-//           success: true,
-//           message: 'Product added to your cart successfully'
-//       });
-
-//   } catch (error) {
-//       console.error('Error in add to cart:', error);
-//       res.status(500).json({
-//           success: false,
-//           message: 'Failed to add product to cart. Please try again.'
-//       });
-//   }
-// };
 
 
 // ----------------------------- update cart -----------------------------

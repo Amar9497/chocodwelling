@@ -22,9 +22,6 @@ const orderPage = async (req,res) =>{
             .limit(limit)
             .skip((page - 1) * limit);
 
-            //console.log(orders);
-            
-
         const count = await orderSchema.countDocuments(query);
 
         res.render('admin/order',{

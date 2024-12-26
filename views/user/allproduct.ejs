@@ -28,7 +28,7 @@
 </nav>
 
 <!-- Product Section -->
-<div class="container mx-auto px-6 py-6">
+<div class="container mx-auto px-6 py-6 ">
   <!-- Search and Sort Section -->
   <div class="flex flex-col md:flex-row gap-4 justify-between items-center mb-6">
       <h2 class="text-xl font-semibold text-gray-800">Browse Products</h2>
@@ -91,8 +91,9 @@
 
 
 
+
   <!-- Pagination Controls -->
-  <div class="flex justify-center mt-6">
+  <div class="flex justify-center mt-6 ">
     <ul class="flex space-x-2">
       <% if (currentPage > 1) { %>
       <li>
@@ -124,10 +125,11 @@
       <% } %>
     </ul>
   </div>
-
-  <!-- Footer -->
-  <%- include('footer') %>
 </div>
+
+
+<!-- Footer -->
+<%- include('footer') %>
 
 <script>
   function Sort() {

@@ -3,12 +3,12 @@ const mongoose = require('mongoose');
 const categorySchema = new mongoose.Schema({
     categoryName: {
         type: String,
-        required: true,  // Ensure categoryName is required
+        required: true,  
     },
     isActive: {
         type: Boolean,
         default: true,
     },
-}, { timestamps: true }); // Corrected option name here
+}, { timestamps: true }); 
 
 module.exports = mongoose.model('Category', categorySchema); // 

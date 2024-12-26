@@ -10,10 +10,7 @@ const {objectId} = require('mongoose');
 
 const checkout = async (req, res) => {
     try {
-        if (!req.session.user) {
-            req.flash('error', 'User not found, Please login again');
-            return res.redirect('/login');
-        }
+        
 
         const userId = req.session.user;
         const user = await userSchema.findById(userId);
@@ -23,7 +20,7 @@ const checkout = async (req, res) => {
 
         // Get cart items with populated product details
         const cartItems = await cartSchema.find({ userId })
-            .populate('productId')  // Changed from items.productId to productId
+            .populate('productId') 
             .exec();
 
         if (!cartItems || cartItems.length === 0) {
@@ -47,7 +44,6 @@ const checkout = async (req, res) => {
         }));
 
         const total = cartDetails.reduce((sum, item) => sum + item.subtotal, 0);
-        //console.log(cartDetails)
 
         res.render('user/checkout', {
             title: 'Checkout',
@@ -96,7 +92,6 @@ const addAddress = async (req, res) => {
 //------------------------place order---------------------
 
 const placeOrder = async (req, res) => {
-    //console.log(req.body)
     try {
         const userId = req.session.user;
         const { addressId, paymentMethod } = req.body;
