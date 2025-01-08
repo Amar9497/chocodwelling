@@ -19,7 +19,6 @@ const productSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    
     productImage:{
         type:[String],
         required:true
@@ -46,7 +45,20 @@ const productSchema = new mongoose.Schema({
       isActive:{
         type:Boolean,
         default:true
-    }
+    },
+    productDiscount: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 98
+  }
 },{timestamps:true})
 
+
+
+
 module.exports = mongoose.model('Product',productSchema);
+
+
+
+

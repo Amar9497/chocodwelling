@@ -45,23 +45,18 @@
         <span>Orders</span>
       </a>
       <a
-        href="#"
+        href="/admin/coupons"
         class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg"
       >
         <span>Coupons</span>
       </a>
       <a
-        href="#"
+        href="/admin/offer"
         class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg"
       >
         <span>Offers</span>
       </a>
-      <a
-        href="#"
-        class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg"
-      >
-        <span>Banner</span>
-      </a>
+      
     </nav>
   </aside>
 
@@ -70,13 +65,12 @@
     <header class="flex justify-between items-center">
       <h1 class="text-xl font-bold text-brown-800">Sales Summary</h1>
       <div class="flex items-center gap-4">
-        <select class="border p-2 rounded-lg">
-          <option>2024</option>
-          <option>2023</option>
-        </select>
-        <button class="bg-green-500 text-white px-4 py-2 rounded-lg">
-          Download
+        <button 
+          class="bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 mr-2"
+          onclick="window.location.href='/admin/salesReport'">
+          Sales Report
         </button>
+
       </div>
     </header>
 
@@ -84,23 +78,20 @@
     <div class="grid grid-cols-4 gap-4 mt-6">
       <div class="bg-white p-4 shadow rounded-lg">
         <h2 class="text-gray-700 font-bold">Revenue</h2>
-        <p class="text-2xl font-semibold">$7,825</p>
-        <p class="text-green-500 text-sm">+22%</p>
+        <p class="text-2xl font-semibold">₹ <%= summary.finalAmount %></p>
       </div>
       <div class="bg-white p-4 shadow rounded-lg">
         <h2 class="text-gray-700 font-bold">Orders</h2>
-        <p class="text-2xl font-semibold">920</p>
-        <p class="text-red-500 text-sm">-25%</p>
+        <p class="text-2xl font-semibold"><%= summary.totalOrders %></p>
       </div>
       <div class="bg-white p-4 shadow rounded-lg">
         <h2 class="text-gray-700 font-bold">Products Sold</h2>
-        <p class="text-2xl font-semibold">15.5K</p>
-        <p class="text-green-500 text-sm">+49%</p>
+        <p class="text-2xl font-semibold"><%= summary.productCount%></p>
       </div>
       <div class="bg-white p-4 shadow rounded-lg">
         <h2 class="text-gray-700 font-bold">Total Customers</h2>
-        <p class="text-2xl font-semibold">120</p>
-        <p class="text-green-500 text-sm">+4%</p>
+        <p class="text-2xl font-semibold"><%= user %></p>
+
       </div>
     </div>
 

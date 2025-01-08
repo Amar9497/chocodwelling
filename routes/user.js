@@ -7,8 +7,12 @@ const productController= require('../controller/userController/productController
 const forgotPasswordController = require('../controller/userController/forgotPassworController');
 const profileController = require('../controller/userController/profileController');
 const cartController = require('../controller/userController/cartController');
-const checkOutSchema = require('../controller/userController/checkOutController');
+const checkOutController = require('../controller/userController/checkOutController');
 const orderController = require('../controller/userController/orderController');
+const wishlistController = require('../controller/userController/wishlistController');
+const walletController = require('../controller/userController/walletController');
+const brandController = require('../controller/userController/brandContrller');
+
 const auth = require('../middleware/userSession');
 
 // -------------------- login --------------------
@@ -50,59 +54,91 @@ user.post('/resetPassword',forgotPasswordController.resetPasswordPost);
 
 user.get('/forgotpassword-resendotp',forgotPasswordController.forgotResend)
 
-// --------------------- home -----------------------------
+// ----------------------- home -----------------------------
 
 user.get('/home',userController.home);
 
-// ------------------- profile ---------------------------- 
+
+
+// ------------------------ profile ------------------------------ 
 
 user.get('/profile',auth.isCheck,profileController.profile);
 
-user.post('/updateProfile',profileController.updateProfile);
+user.post('/updateProfile',auth.isCheck,profileController.updateProfile);
 
-user.post('/add-address',profileController.addAddress);
+user.post('/add-address',auth.isCheck,profileController.addAddress);
 
-user.get('/remove-address/:index', profileController.removeAddress);
+user.get('/remove-address/:index',auth.isCheck,profileController.removeAddress);
 
-user.post('/updateaddress/:index',profileController.updateAddress);
+user.post('/updateaddress/:index',auth.isCheck,profileController.updateAddress);
 
-user.post('/reset-password',profileController.resetPassword);
+user.post('/reset-password',auth.isCheck,profileController.resetPassword);
 
 // ------------------------ cart ---------------------------------
 
-user.get('/cart',cartController.cart);
+user.get('/cart',auth.isCheck,cartController.cart);
 
-user.post('/addToCart',cartController.addToCart);
+user.post('/addToCart',auth.isCheck,cartController.addToCart);
 
-user.post('/updateCart',cartController.updateCart);
+user.post('/updateCart',auth.isCheck,cartController.updateCart);
 
-user.post('/removeFromCart',cartController.removeFromCart);
+user.post('/removeFromCart',auth.isCheck,cartController.removeFromCart);
 
 // ------------------------- check out -----------------------------
 
-user.get('/checkout',checkOutSchema.checkout);
+user.get('/checkout',auth.isCheck,checkOutController.checkout);
 
-user.post('/checkout-address',checkOutSchema.addAddress);
+user.post('/checkout-address',auth.isCheck,checkOutController.addAddress);
 
-user.post('/place-order',checkOutSchema.placeOrder);
+user.post('/place-order',auth.isCheck,checkOutController.placeOrder);
+
+user.post('/create-razorpay-order',checkOutController.createRazorpayOrder);
+
+user.post('/verify-payment',checkOutController.verifyPayment);
+
+user.post('/validate-coupon', checkOutController.validateCoupon);
+
 
 // ------------------------- order ---------------------------------
 
-user.get('/orders',orderController.orderPage);
+user.get('/orders',auth.isCheck,orderController.orderPage);
 
-user.post('/cancelOrder/:orderId', orderController.cancelOrder);
+user.post('/cancelOrder/:orderId',auth.isCheck,orderController.cancelOrder);
 
-user.get('/orderDetail/:id', orderController.orderDetails);
+user.post('/return-order/:orderId', auth.isCheck, orderController.returnOrder);
+
+user.get('/orderDetail/:id',auth.isCheck,orderController.orderDetails);
 
 // ------------------------ category -------------------------------
 
 user.get('/category',auth.isCheck,categoryController.categoryget);
+
+user.get('/category/:id', categoryController.getCategoryProducts);
+
+
+// ----------------------- brand -----------------------------------
+
+user.get('/brand/:id', brandController.getBrandProducts);
 
 // ------------------------- product -------------------------------
 
 user.get('/allproduct',auth.isCheck,productController.allProduct);
 
 user.get('/productDetail/:id',auth.isCheck,productController.productDetail);
+
+
+// ------------------------- wishlist -------------------------------
+
+user.get('/wishlist',wishlistController.wishlistpage);
+
+user.get('/add-wishlist/:id',wishlistController.addWishlist);
+
+user.delete('/delete-wish/:id',wishlistController.deleteWishlist );
+
+
+// ------------------------- wallet ------------------------------
+
+user.get('/wallet',walletController.walletPage);
 
 // ------------------------- logout --------------------------------
 

@@ -1,10 +1,21 @@
+const Order = require('../../model/orderSchema');
+const userSchema = require('../../model/userSchema');
+
+
 // admin login
 const loadLogin = (req, res) => {
   try {
-    res.render("admin/login", { title: "Admin Login" });
+    if(req.session.admin){
+      res.redirect('/admin/home');
+  }
+  else{
+      res.render('admin/login',{
+          title:'Admin Login'
+      });
+  }
   } catch (error) {
     console.log(error);
-    res.status(500).send("Error Occured");
+    res.flash("error","Error Occured")
   }
 };
 
@@ -17,7 +28,7 @@ const loadLoginPost = (req, res) => {
       req.body.email === process.env.ADMIN_EMAIL &&
       req.body.password === process.env.ADMIN_PASSWORD
     ) {
-      req.session.isAuthenticated = true; // Store admin's email in the session
+      req.session.admin = req.body.email;
       // req.session.save(()=>{
       //     res.redirect('admin/home')
       // })
@@ -29,18 +40,59 @@ const loadLoginPost = (req, res) => {
     }
   } catch (error) {
     console.log(`Error in login post: ${error}`);
-    res.status(500).send("Internal Server Error");
+    req.flash("error","Internal Server Error")
   }
 };
 
 // admin dashboard
 
-const loadHome = (req, res) => {
+const loadHome = async(req, res) => {
   try {
-    res.render("admin/dashboard", { title: "Admin Home" });
+    const orders = await Order.find({
+            orderStatus: { $nin: ["Cancelled", "Returned"] },
+          }).populate("userId", "name");
+    
+          const user = await userSchema.countDocuments({});
+
+          // Calculate total products sold
+          const productResult = await Order.aggregate([
+            {
+              $match: {
+                orderStatus: { $nin: ["Cancelled", "Returned"] },
+              },
+            },
+            {
+              $unwind: "$products",
+            },
+            {
+              $group: {
+                _id: null,
+                totalQuantity: {
+                  $sum: "$products.quantity",
+                },
+              },
+            },
+          ]);
+    
+          // Get the total quantity
+          const productCount =
+            productResult.length > 0 ? productResult[0].totalQuantity : 0;
+    
+          const summary = {
+            totalOrders: orders.length,
+            finalAmount: orders.reduce((sum, order) => sum + order.finalAmount, 0),
+            productCount,
+          };
+          
+          
+    res.render("admin/dashboard", {
+      title: "Admin Home",
+      summary,
+      user
+    });
   } catch (error) {
     console.log(error);
-    res.status(500).send("Error Occured");
+    res.flash("error","Error Occured")
   }
 };
 
@@ -48,11 +100,11 @@ const loadHome = (req, res) => {
 
 const logout = (req, res) => {
   try {
-    req.session.destroy();
+    req.session.admin = null;
     res.redirect("/admin/logout");
   } catch (error) {
     console.log(error);
-    res.status(500).send("Error occured");
+    res.flash("error","Error Occured")
   }
 };
 

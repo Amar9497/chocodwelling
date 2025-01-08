@@ -1,3 +1,4 @@
+
 const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
@@ -22,11 +23,16 @@ const orderSchema = new mongoose.Schema({
         },
         status: {
             type: String,
-            enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled','Returned'],
+            enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'],
             default: 'Pending'
         }
+    
     }],
     totalAmount: {
+        type: Number,
+        required: true
+    },
+    finalAmount: {
         type: Number,
         required: true
     },
@@ -50,18 +56,31 @@ const orderSchema = new mongoose.Schema({
     },
     paymentStatus: {
         type: String,
-        required: false
-        // enum: ['Pending', 'Completed', 'Failed'],
-        // default: 'Pending'
+        enum: ['Pending', 'Completed', 'Failed'],
+        default: 'Pending'
     },
     orderStatus: {
         type: String,
-        enum: ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled','Returned'],
+        enum: ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled', 'Returned'],
         default: 'Pending'
     },
     orderDate: {
         type: Date,
         default: Date.now
+    },
+    paymentDetails: {
+        orderId: String,
+        paymentId: String,
+        signature: String,
+        amount: Number,
+        currency: String
+    },
+    couponCode: {
+        type: String
+    },
+    couponDiscount: {
+        type: Number,
+        default: 0
     }
 }, { timestamps: true });
 

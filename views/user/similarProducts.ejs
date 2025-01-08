@@ -1,45 +1,100 @@
-<div class="w-full bg-white py-8">
-  <h2 class="text-2xl text-center font-semibold mb-6 text-gray-800">
-    Similar Products
-  </h2>
-
-  <div
-    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-6 lg:px-16"
-  >
-    <% for (let i = 0; i < similarProduct.length && i < 4; i++) { %>
-    <div
-      class="product-box bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
-    >
-      <!-- Product Image -->
-      <div class="product-image-box">
-        <a
-          href="/productDetail/<%= similarProduct[i].id %>"
-          class="product-name-link"
-        >
-          <img
-            src="<%= similarProduct[i].productImage[0] %>"
-            alt="<%= similarProduct[i].productName %>"
-            class="w-full h-48 object-cover transition-transform transform hover:scale-105 duration-300"
-          />
-        </a>
+<section class="bg-gray-50 py-16">
+  <div class="container mx-auto px-4">
+      <!-- Section Header -->
+      <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-gray-900 mb-2">Similar Products</h2>
+          <div class="w-24 h-1 bg-[#8B7355] mx-auto"></div>
       </div>
 
-      <!-- Product Details -->
-      <div class="product-name-box p-4">
-        <h6 class="product-text-row text-lg font-medium text-gray-700 truncate">
-          <%= similarProduct[i].productName %>
-        </h6>
+      <!-- Products Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <% for (let i = 0; i < similarProduct.length && i < 4; i++) { %>
+              <div class="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300">
+                  <!-- Wishlist Button -->
+                  <button 
+                      onclick="addToWishlist('<%= similarProduct[i]._id %>')"
+                      class="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  >
+                      <svg class="w-5 h-5 text-gray-600 hover:text-red-500 transition-colors" 
+                           fill="none" 
+                           stroke="currentColor" 
+                           viewBox="0 0 24 24">
+                          <path stroke-linecap="round" 
+                                stroke-linejoin="round" 
+                                stroke-width="2" 
+                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                      </svg>
+                  </button>
 
-        <h5 class="product-price text-lg text-gray-900 mt-2 flex items-center">
-          <i class="fa-solid fa-indian-rupee-sign mr-1"></i>
-          <% similarProduct[i].productVariants.forEach(variant => { %>
-          <p class="text-gray-700">
-            Price: <%= variant.price.toLocaleString() %>
-          </p>
-          <% }) %>
-        </h5>
+                  <!-- Product Image -->
+                  <a href="/productDetail/<%= similarProduct[i]._id %>" class="block relative aspect-square">
+                      <img 
+                          src="<%= similarProduct[i].productImage[0] %>" 
+                          alt="<%= similarProduct[i].productName %>"
+                          class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                      />
+                      
+                      <% if (similarProduct[i].productDiscount > 0) { %>
+                          <div class="absolute top-4 left-4 bg-red-500 text-white text-sm font-medium px-2 py-1 rounded-full">
+                              <%= similarProduct[i].productDiscount %>% OFF
+                          </div>
+                      <% } %>
+                  </a>
+
+                  <!-- Product Details -->
+                  <div class="p-6">
+                      <!-- Product Name -->
+                      <h3 class="text-lg font-medium text-gray-900 mb-2 line-clamp-1">
+                          <%= similarProduct[i].productName %>
+                      </h3>
+
+                      <!-- Price Section -->
+                      <div class="flex items-center gap-2 mb-4">
+                          <% similarProduct[i].productVariants.forEach(variant => { %>
+                              <% if (similarProduct[i].productDiscount > 0) { %>
+                                  <span class="text-xl font-bold text-gray-900">
+                                      ₹<%= Math.round(variant.price * (1 - similarProduct[i].productDiscount/100)).toLocaleString() %>
+                                  </span>
+                                  <span class="text-sm text-gray-500 line-through">
+                                      ₹<%= variant.price.toLocaleString() %>
+                                  </span>
+                              <% } else { %>
+                                  <span class="text-xl font-bold text-gray-900">
+                                      ₹<%= variant.price.toLocaleString() %>
+                                  </span>
+                              <% } %>
+                          <% }) %>
+                      </div>
+
+                      <!-- Stock Status -->
+                      <% const variant = similarProduct[i].productVariants[0]; %>
+                      <div class="mb-4">
+                          <% if (variant.stock <= 0) { %>
+                              <span class="text-xs font-medium text-red-600 bg-red-50 px-2 py-1 rounded-full">
+                                  Out of Stock
+                              </span>
+                          <% } else if (variant.stock <= 10) { %>
+                              <span class="text-xs font-medium text-orange-600 bg-orange-50 px-2 py-1 rounded-full">
+                                  Only <%= variant.stock %> left
+                              </span>
+                          <% } else { %>
+                              <span class="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                                  In Stock
+                              </span>
+                          <% } %>
+                      </div>
+
+                      <!-- Quick Add Button -->
+                      <button 
+                          onclick="addToCart('<%= similarProduct[i]._id %>')"
+                          class="w-full py-2 bg-[#8B7355] text-white rounded-lg hover:bg-[#A79277] transition-colors duration-300 <%= variant.stock <= 0 ? 'opacity-50 cursor-not-allowed' : '' %>"
+                          <%= variant.stock <= 0 ? 'disabled' : '' %>
+                      >
+                          <%= variant.stock <= 0 ? 'Out of Stock' : 'Add to Cart' %>
+                      </button>
+                  </div>
+              </div>
+          <% } %>
       </div>
-    </div>
-    <% } %>
   </div>
-</div>
+</section>

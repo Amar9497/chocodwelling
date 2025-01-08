@@ -57,7 +57,7 @@
             <p class="text-gray-600">
               Quantity: <%= product.quantity %> × ₹<%= product.price %>
             </p>
-            <p class="text-gray-600">Status: <%= product.status %></p>
+            <!-- <p class="text-gray-600">Status: <%= product.status %></p> -->
           </div>
           <div class="text-right">
             <p class="font-semibold">₹<%= product.subtotal %></p>
@@ -85,9 +85,15 @@
     <!-- Order Summary -->
     <div class="border-t border-gray-200 py-6">
       <h2 class="text-xl font-semibold mb-4">Order Summary</h2>
-      <div class="flex justify-between text-lg font-semibold">
+      <% if (orderDetails.couponCode) { %>
+        <div class="flex justify-between text-lg font-semibold py-2">
+          <span>Coupon Added</span>
+          <span>Code : <%= orderDetails.couponCode %></span>
+        </div>
+      <% } %>
+      <div class="flex justify-between text-lg font-semibold py-2">
         <span>Total Amount</span>
-        <span>₹<%= orderDetails.totalAmount %></span>
+        <span>₹<%= orderDetails.finalAmount %></span>
       </div>
     </div>
 

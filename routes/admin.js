@@ -7,6 +7,9 @@ const categoryController = require('../controller/adminController/categoryContro
 const brandController = require('../controller/adminController/brandController');
 const userController = require('../controller/adminController/userController');
 const orderController = require('../controller/adminController/orderController');
+const offerController = require('../controller/adminController/offerController');
+const couponController = require('../controller/adminController/couponController');
+const saleController = require('../controller/adminController/saleController');
 const { upload } = require('../service/cloudinary');
 const auth = require('../middleware/adminSession');
 
@@ -14,13 +17,23 @@ const auth = require('../middleware/adminSession');
 
 // -------------------- admin login --------------------
 
-admin.get('/login',auth.isLogin,adminController.loadLogin);
+admin.get('/login',adminController.loadLogin);
 
 admin.post('/login',adminController.loadLoginPost)
 
 // -------------------- admin dashboard -----------------
 
 admin.get('/home',auth.isAdmin,adminController.loadHome);
+
+
+// ------------------------- sales --------------------------------
+
+admin.get('/salesReport', saleController.salePage);
+
+admin.post('/sales-report', saleController.generateReport);
+
+admin.get('/download-report/:format', saleController.downloadReport);
+
 
 // -------------------- admin products -------------------
 
@@ -71,6 +84,26 @@ admin.get('/orders',auth.isAdmin,orderController.orderPage);
 admin.post('/order/:orderId/status',auth.isAdmin,orderController.orderStatus);
 
 admin.get('/order-view/:id',auth.isAdmin,orderController.orderView);
+
+// ----------------------- offer --------------------------
+
+admin.get('/offer',offerController.getOffer);
+
+admin.post('/addOffer',offerController.addOffer);
+
+admin.post('/editOffer',offerController.editOffer);
+
+admin.get('/offerStatus',offerController.offerStatus);
+
+// ---------------------- coupon --------------------------
+
+admin.get('/coupons/:id?',couponController.getCoupons);
+
+admin.post('/addcoupon',couponController.addCoupon);
+
+admin.post('/editcoupon/:id',couponController.editCoupon);
+
+admin.get('/statuscoupon',couponController.toggleCouponStatus);
 
 
 

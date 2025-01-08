@@ -364,23 +364,35 @@
     }
 
     // Validate Weight, Price, and Stock
-    if (!/^\d+$/.test(weight)) {
-      errors.push("Weight must be a valid number.");
-    }
-    if (!/^\d+$/.test(price)) {
-      errors.push("Price must be a valid number.");
-    }
-    if (!/^\d+$/.test(stock)) {
-      errors.push("Stock must be a valid number.");
-    }
+if (!/^\d{1,4}$/.test(weight)) {
+  errors.push("Weight must be a valid number with up to 4 digits.");
+}
+if (!/^\d{1,6}$/.test(price)) {
+  errors.push("Price must be a valid number with up to 6 digits.");
+}
+if (!/^\d{1,6}$/.test(stock)) {
+  errors.push("Stock must be a valid number with up to 6 digits.");
+}
+
 
     // Validate Images
-    const uploadedFiles = imageUpload.files;
-    if (uploadedFiles.length < 3) {
-      errors.push("Please select at least 3 images.");
-    } else if (uploadedFiles.length > 5) {
-      errors.push("You can upload a maximum of 5 images.");
+const uploadedFiles = imageUpload.files;
+const validImageTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+
+if (uploadedFiles.length < 3) {
+  errors.push("Please select at least 3 images.");
+} else if (uploadedFiles.length > 5) {
+  errors.push("You can upload a maximum of 5 images.");
+} else {
+  for (const file of uploadedFiles) {
+    if (!validImageTypes.includes(file.type)) {
+      errors.push(
+        `Invalid file type: ${file.name}. Only JPEG, PNG, GIF, and WEBP images are allowed.`
+      );
     }
+  }
+}
+
 
     // Display Errors
     if (errors.length > 0) {

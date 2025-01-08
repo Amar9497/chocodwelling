@@ -3,62 +3,86 @@ const categorySchema= require('../../model/categorySchema');
 const brandSchema = require('../../model/brandSchema');
 const mongoose = require('mongoose');
 
+
 // --------------- list all product -------------
+
+
 const allProduct = async (req, res) => {
     try {
         const search = req.query.search || "";
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 12;
-        
+        const categories = req.query.categories?.split(',') || [];
+        const minPrice = req.query.minPrice ? parseFloat(req.query.minPrice) : null;
+        const maxPrice = req.query.maxPrice ? parseFloat(req.query.maxPrice) : null;
+        const sort = req.query.sort || "new"; // Default sort
 
-        // Fetch only active categories
-        const activeCategories = await categorySchema.find({ isActive: true }).select('_id');
-
-        // Fetch only active brands
-        const activeBrands = await brandSchema.find({ isActive: true }).select('_id');
-
-        // Extract the category IDs and brand IDs
-        const activeCategoryIds = activeCategories.map(category => category._id);
-        const activeBrandIds = activeBrands.map(brand => brand._id);
-
-        // Filter products: Active products with active categories and brands
+        // Build filter object
         const productFilter = {
             isActive: true,
-            productCategory: { $in: activeCategoryIds }, 
-            productBrand: { $in: activeBrandIds },        
-            productName: { $regex: search, $options: "i" },
+            productName: { $regex: search, $options: "i" }
         };
 
-        // Fetch the filtered products with pagination
+        // Add category filter if categories are selected
+        if (categories.length > 0) {
+            productFilter.productCategory = { 
+                $in: categories.map(id => new mongoose.Types.ObjectId(id))
+            };
+        }
+
+        // Add price range filter
+        if (minPrice !== null || maxPrice !== null) {
+            productFilter['productVariants.price'] = {};
+            if (minPrice !== null) productFilter['productVariants.price'].$gte = minPrice;
+            if (maxPrice !== null) productFilter['productVariants.price'].$lte = maxPrice;
+        }
+
+        // Define sort options
+        let sortOption = {};
+        switch (sort) {
+            case 'price-low':
+                sortOption = { 'productVariants.0.price': 1 };
+                break;
+            case 'price-high':
+                sortOption = { 'productVariants.0.price': -1 };
+                break;
+            case 'a-z':
+                sortOption = { productName: 1 };
+                break;
+            case 'z-a':
+                sortOption = { productName: -1 };
+                break;
+            default: // 'new'
+                sortOption = { createdAt: -1 };
+        }
+
+        // Fetch active categories and brands
+        const activeCategories = await categorySchema.find({ isActive: true });
+        const activeBrands = await brandSchema.find({ isActive: true });
+
+        // Fetch filtered and sorted products
         const products = await productSchema
             .find(productFilter)
+            .sort(sortOption)
             .skip((page - 1) * limit)
             .limit(limit);
 
-        // Count the total products matching the filter
         const count = await productSchema.countDocuments(productFilter);
 
-        // Fetch active categories for rendering
-        const categories = await categorySchema.find({ isActive: true });
-
-        // Fetch active brands for rendering
-        const brands = await brandSchema.find({ isActive: true });
-
-        // Render the product page
         res.render('user/allproduct', {
             title: "All Products",
             user: req.session.user,
             product: products,
-            category: categories,
-            brand: brands,
+            category: activeCategories,
+            brand: activeBrands,
             search,
             totalPages: Math.ceil(count / limit),
             currentPage: page,
-            page,
-            limit
+            limit,
+            sort 
         });
     } catch (error) {
-        console.log(`Error in all products rendering: ${error}`);
+        console.error('Error in all products rendering:', error);
         res.status(500).send('Internal Server Error');
     }
 };

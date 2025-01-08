@@ -1,0 +1,227 @@
+<style>
+  @keyframes fade-in-down {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in-up {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in-down {
+    animation: fade-in-down 0.8s ease-out;
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.8s ease-out;
+  }
+</style>
+<div class="bg-gray-50 min-h-screen">
+  <%- include('navbar') %> <%- include('alert') %>
+
+  <div>
+    <nav class="text-sm text-blue-500 mb-4">
+      <ol class="flex items-center space-x-2">
+        <li><a href="/home" class="hover:text-white transition">Home</a></li>
+        <span>/</span>
+        <li>
+          <a href="/category" class="hover:text-white transition">Categories</a>
+        </li>
+        <span>/</span>
+        <li class="text-gray-400 font-medium"><%= category.categoryName %></li>
+      </ol>
+    </nav>
+  </div>
+
+  <div
+    class="bg-gradient-to-r from-[#D7B49E] to-[#8B5E34] text-white py-6 md:py-10"
+  >
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col items-center text-center max-w-3xl mx-auto">
+        <h1 class="text-4xl md:text-5xl font-bold mb-6 animate-fade-in-down">
+          <%= category.categoryName %>
+        </h1>
+        <p
+          class="text-lg md:text-xl text-gray-100 max-w-2xl animate-fade-in-up"
+        >
+          Explore our collection of <%= category.categoryName.toLowerCase() %>
+          products
+        </p>
+
+        <!-- Optional: Add category stats or features -->
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-8 mt-12">
+          <div class="text-center">
+            <span class="block text-3xl font-bold mb-2"
+              ><%= products.length %></span
+            >
+            <span class="text-gray-200">Products</span>
+          </div>
+          <div class="text-center">
+            <span class="block text-3xl font-bold mb-2">24/7</span>
+            <span class="text-gray-200">Support</span>
+          </div>
+          <div class="text-center hidden md:block">
+            <span class="block text-3xl font-bold mb-2">100%</span>
+            <span class="text-gray-200">Authentic</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container mx-auto px-4 py-8">
+    <!-- Filters and Products Section -->
+    <div class="flex flex-col lg:flex-row gap-8">
+      <!-- Sidebar Filters -->
+
+      <!-- Products Section -->
+      <div class="flex-1">
+        <!-- Sort Controls (Desktop) -->
+        <div class="hidden lg:flex justify-between items-center mb-6">
+          <p class="text-gray-600">Showing <%= products.length %> products</p>
+          <select
+            id="sortSelect"
+            class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+            onchange="Sort()"
+          >
+            <option value="new">New Arrivals</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="a-z">Name: A to Z</option>
+            <option value="z-a">Name: Z to A</option>
+          </select>
+        </div>
+
+        <!-- Products Grid -->
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+        >
+          <% products.forEach(product => { %>
+          <div class="group relative">
+            <!-- Wishlist Button -->
+            <button
+              onclick="addToWishlist('<%= product._id %>')"
+              class="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <svg
+                class="w-5 h-5 text-gray-600 hover:text-red-500 transition-colors"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                />
+              </svg>
+            </button>
+            <div
+              class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition duration-300"
+            >
+              <!-- Product Image with Overlay -->
+              <div class="relative aspect-w-1 aspect-h-1">
+                <img
+                  src="<%= product.productImage[0] %>"
+                  alt="<%= product.productName %>"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+
+                <!-- Quick View Overlay -->
+                <div
+                  class="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"
+                >
+                  <a
+                    href="/productDetail/<%= product._id %>"
+                    class="bg-white text-gray-900 px-6 py-2 rounded-full hover:bg-blue-600 hover:text-white transition-colors transform hover:scale-105"
+                  >
+                    Quick View
+                  </a>
+                </div>
+              </div>
+
+              <!-- Product Info -->
+              <div class="p-4">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2 truncate">
+                  <%= product.productName %>
+                </h3>
+                <div class="flex items-center justify-between mb-2">
+                  <p class="text-blue-600 font-medium text-lg">
+                    ₹<%= product.productVariants[0].price %>
+                  </p>
+                  <% if (product.productDiscount > 0) { %>
+                  <span
+                    class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full"
+                  >
+                    <%= product.productDiscount %>% OFF
+                  </span>
+                  <% } %>
+                </div>
+                <p class="text-sm text-gray-500 line-clamp-2">
+                  <%= product.productDescription %>
+                </p>
+              </div>
+              <div class="p-4">
+                <!-- Add to Cart Button -->
+                <button
+                  onclick="addToCart('<%= product._id %>')"
+                  class="w-full py-2.5 bg-[#8B7355] text-white rounded-lg hover:bg-[#A79277] transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[#8B7355] focus:ring-offset-2"
+                >
+                  Add to Cart
+                </button>
+              </div>
+            </div>
+          </div>
+          <% }); %>
+        </div>
+
+        <!-- Enhanced Pagination -->
+        <% if (totalPages > 1) { %>
+        <div class="mt-12 flex justify-center">
+          <div class="inline-flex rounded-md shadow-sm">
+            <% if (currentPage > 1) { %>
+            <a
+              href="?page=<%= currentPage - 1 %>&sort=<%= sort %>"
+              class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-50"
+            >
+              Previous
+            </a>
+            <% } %> <% for(let i = 1; i <= totalPages; i++) { %>
+            <a
+              href="?page=<%= i %>&sort=<%= sort %>"
+              class="px-4 py-2 text-sm font-medium <%= currentPage == i ? 'text-white bg-blue-600 border-blue-600' : 'text-gray-700 bg-white border-gray-300' %> border-t border-b hover:bg-gray-50"
+            >
+              <%= i %>
+            </a>
+            <% } %> <% if (currentPage < totalPages) { %>
+            <a
+              href="?page=<%= currentPage + 1 %>&sort=<%= sort %>"
+              class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-50"
+            >
+              Next
+            </a>
+            <% } %>
+          </div>
+        </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('footer') %>

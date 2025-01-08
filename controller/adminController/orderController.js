@@ -99,6 +99,8 @@ const orderView = async (req, res) => {
             paymentMethod: orderDetails.paymentMethod,
             paymentStatus: orderDetails.paymentStatus,
             totalAmount: orderDetails.totalAmount,
+            finalAmount: orderDetails.finalAmount,
+            couponCode: orderDetails.couponCode,
             shippingAddress: orderDetails.shippingAddress,
             products: orderDetails.products.map(item => ({
                 name: item.productId.productName,

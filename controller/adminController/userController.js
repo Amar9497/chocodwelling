@@ -39,27 +39,14 @@ const status = async (req, res) => {
 
         // Update the user active status in the database
         await userSchema.findByIdAndUpdate(id, { isActive: newStatus });
-
-        // Check blocked user is the currently logged-in user
-        if (req.session.user && req.session.user.toString() === id && !newStatus) {
-            // End the session for the blocked user
-            req.session.destroy((err) => {
-                if (err) {
-                    console.log(`Error while destroying session: ${err}`);
-                    req.flash('error', 'An error occurred while logging out.');
-                }
-                res.redirect('/login');
-            });
-        } else {
-            res.redirect('/admin/customers');
-        }
+        req.session.user = null;
+        res.redirect('/admin/customers');
     } catch (error) {
         console.log(`Error in changing status of user: ${error}`);
         req.flash('error', 'An error occurred while changing user status.');
         res.redirect('/admin/customers');
     }
 };
-
 
 module.exports={
     loadCustomers,

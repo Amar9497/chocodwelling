@@ -8,6 +8,7 @@ const { model } = require("mongoose");
 
 // ----------------------- cart page redring --------------------------
 
+
 const cart = async (req, res) => {
   try {
     const userId = req.session.user;
@@ -21,24 +22,35 @@ const cart = async (req, res) => {
       .populate("productId")
       .exec();
 
-    // Calculate total for the cart
+    // Calculate total for the cart with discounts
     const cartDetails = cartItems.map((item) => {
-      // Get price from the first variant 
-      const price = item.productId.productVariants[0].price;
+      const basePrice = item.productId.productVariants[0].price;
+      const discount = item.productId.productDiscount || 0;
+      const discountedPrice = basePrice - (basePrice * discount / 100);
+      
       return {
         product: item.productId,
         quantity: item.quantity,
-        subtotal: price * item.quantity,
+        basePrice: basePrice,
+        discount: discount,
+        discountedPrice: discountedPrice,
+        subtotal: discountedPrice * item.quantity,
+        savings: (basePrice - discountedPrice) * item.quantity
       };
     });
-    
 
-    const total = cartDetails.reduce((acc, item) => acc + item.subtotal, 0);
+    const totals = cartDetails.reduce((acc, item) => {
+      return {
+        total: acc.total + item.subtotal,
+        savings: acc.savings + item.savings
+      };
+    }, { total: 0, savings: 0 });
 
     res.render("user/cart", {
       title: "Cart",
       cartItems: cartDetails,
-      total,
+      total: totals.total,
+      totalSavings: totals.savings,
       user,
     });
   } catch (error) {
@@ -128,7 +140,6 @@ const updateCart = async (req, res) => {
     const userId = req.session.user;
     const { productId, quantity } = req.body;
 
-    // Validate quantity
     if (quantity < 1) {
       return res.status(400).json({
         status: false,
@@ -136,7 +147,6 @@ const updateCart = async (req, res) => {
       });
     }
 
-    // Find the cart item
     const cartItem = await cartSchema
       .findOne({ userId, productId })
       .populate("productId");
@@ -148,7 +158,6 @@ const updateCart = async (req, res) => {
       });
     }
 
-    // Check stock availability
     const product = cartItem.productId;
     const hasStock = product.productVariants.some(
       (variant) => variant.stock >= quantity
@@ -161,26 +170,42 @@ const updateCart = async (req, res) => {
       });
     }
 
-    // Update quantity
     cartItem.quantity = quantity;
     await cartItem.save();
 
-    // Calculate new subtotal 
-    const subtotal = product.productVariants[0].price * quantity;
+    // Calculate new subtotal with discount
+    const basePrice = product.productVariants[0].price;
+    const discount = product.productDiscount || 0;
+    const discountedPrice = basePrice - (basePrice * discount / 100);
+    const subtotal = discountedPrice * quantity;
+    const itemSavings = (basePrice - discountedPrice) * quantity;
 
-    // Get cart total
+    // Get cart total with discounts
     const allCartItems = await cartSchema
       .find({ userId })
       .populate("productId");
-    const total = allCartItems.reduce((sum, item) => {
-      return sum + item.productId.productVariants[0].price * item.quantity;
-    }, 0);
+      
+    const totals = allCartItems.reduce((acc, item) => {
+      const itemBasePrice = item.productId.productVariants[0].price;
+      const itemDiscount = item.productId.productDiscount || 0;
+      const itemDiscountedPrice = itemBasePrice - (itemBasePrice * itemDiscount / 100);
+      
+      return {
+        total: acc.total + (itemDiscountedPrice * item.quantity),
+        savings: acc.savings + ((itemBasePrice - itemDiscountedPrice) * item.quantity)
+      };
+    }, { total: 0, savings: 0 });
 
     return res.status(200).json({
       status: true,
       message: "Cart updated successfully",
       subtotal: subtotal,
-      total: total,
+      itemSavings: itemSavings,
+      total: totals.total,
+      totalSavings: totals.savings,
+      discountedPrice: discountedPrice,
+      basePrice: basePrice,
+      discount: discount
     });
   } catch (error) {
     console.error("Error updating cart:", error);
@@ -192,6 +217,7 @@ const updateCart = async (req, res) => {
 };
 
 // ------------------------------ remove product from cart ----------------------------
+
 const removeFromCart = async (req, res) => {
     try {
         const userId = req.session.user;

@@ -1,6 +1,47 @@
 <!-- navbar -->
 <%- include('navbar') -%>
 
+<!-- alert -->
+<%- include('alert') %>
+
+<!-- Breadcrumb Navigation -->
+<nav class="breadcrumbs text-sm text-gray-600 py-4 bg-gray-50 border-b">
+  <ul class="flex items-center space-x-2 container mx-auto px-6">
+      <li>
+          <a
+              href="/home"
+              class="text-blue-500 hover:text-blue-700 font-medium transition"
+              >Home</a
+          >
+      </li>
+      <span class="text-gray-400">/</span>
+      <li>
+          <a
+              href="/profile"
+              class="text-blue-500 hover:text-blue-700 font-medium transition"
+              >Profile</a
+          >
+      </li>
+      <span class="text-gray-400">/</span>
+      <li>
+        <a
+            href="/orders"
+            class="text-blue-500 hover:text-blue-700 font-medium transition"
+            >Orders</a
+        >
+      </li>
+      <span class="text-gray-400">/</span>
+      <li>
+        <a
+            href=""
+            class="text-blue-500 hover:text-blue-700 font-medium transition"
+            >Order Detail</a
+        >
+      </li>
+      
+  </ul>
+</nav>
+
 <div class="container mx-auto px-4 py-8">
   <div class="bg-white rounded-lg shadow-lg p-6 space-y-6">
     <!-- Order Header -->
@@ -57,7 +98,7 @@
             <p class="text-gray-600">
               Quantity: <%= product.quantity %> × ₹<%= product.price %>
             </p>
-            <p class="text-gray-600">Status: <%= product.status %></p>
+            <!-- <p class="text-gray-600">Status: <%= product.status %></p> -->
           </div>
           <div class="text-right">
             <p class="font-semibold">₹<%= product.subtotal %></p>
@@ -85,11 +126,18 @@
     <!-- Order Summary -->
     <div class="border-t border-gray-200 py-6">
       <h2 class="text-xl font-semibold mb-4">Order Summary</h2>
-      <div class="flex justify-between text-lg font-semibold">
+      <% if (orderData.couponCode) { %>
+        <div class="flex justify-between text-lg font-semibold py-2">
+          <span>Coupon Added</span>
+          <span>Code : <%= orderData.couponCode %></span>
+        </div>
+      <% } %>
+      <div class="flex justify-between text-lg font-semibold py-2">
         <span>Total Amount</span>
-        <span>₹<%= orderDetails.totalAmount %></span>
+        <span>₹<%= orderData.finalAmount %></span>
       </div>
     </div>
+    
 
     <!-- Back Button -->
     <div class="mt-6">

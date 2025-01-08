@@ -3,237 +3,195 @@
 
 <!-- alert -->
 <%- include('alert') %>
-
-<!-- -------------------Breadcrumbs----------------------- -->
-<nav class="breadcrumbs text-sm text-gray-600 py-4 bg-gray-50 border-b">
-  <ul class="flex items-center space-x-2 container mx-auto px-6">
-      <li>
-          <a
-              href="/home"
-              class="text-blue-500 hover:text-blue-700 font-medium transition"
-              >Home</a
-          >
-      </li>
-      <span class="text-gray-400">/</span>
-      <li>
-          <a
-              href="/allproduct"
-              class="text-blue-500 hover:text-blue-700 font-medium transition"
-              >All Products</a
-          >
-      </li>
-      <span class="text-gray-400">/</span>
-      <li>
-          <a
-              href="/productDetail/:id"
-              class="text-blue-500 hover:text-blue-700 font-medium transition"
-              ><%= product.productName %></a
-          >
-      </li>
-  </ul>
+<!-- Breadcrumbs with better visual hierarchy -->
+<nav class="bg-gray-50 border-b">
+  <div class="container mx-auto px-4 py-3">
+      <ol class="flex items-center space-x-2 text-sm">
+          <li>
+              <a href="/home" class="text-[#8B7355] hover:text-[#A79277] transition-colors">Home</a>
+          </li>
+          <li class="text-gray-400">/</li>
+          <li>
+              <a href="/allproduct" class="text-[#8B7355] hover:text-[#A79277] transition-colors">Products</a>
+          </li>
+          <li class="text-gray-400">/</li>
+          <li class="text-gray-600 font-medium"><%= product.productName %></li>
+      </ol>
+  </div>
 </nav>
 
-
-<div class="product-view grid grid-cols-1 md:grid-cols-2 gap-8 p-6">
-  <!-- Left Section: Image Gallery -->
-  <div class="product-image-container flex gap-4">
-    <!-- Thumbnails (Left Side) -->
-    <div class="flex flex-col gap-4 mt-8">
-      <% product.productImage.forEach((img, index) => { %>
-      <div
-        class="product-image-min cursor-pointer border rounded-lg p-1 hover:shadow-lg hover:scale-105 transform transition duration-300"
-        onclick="changeImage('<%= img %>')"
-      >
-        <img
-          src="<%= img %>"
-          alt="Thumbnail <%= index + 1 %>"
-          class="w-20 h-20 object-cover rounded-md"
-        />
-      </div>
-      <% }) %>
-    </div>
-    <!-- Main Image (Right Side) -->
-    <div
-      class="main-image border rounded-lg overflow-hidden flex-grow w-3/4 max-w-md mx-auto"
-    >
-      <img
-        id="image-view"
-        src="<%= product.productImage[0] %>"
-        alt="Main Product Image"
-        class="w-full h-auto object-cover transition duration-300"
-      />
-    </div>
-  </div>
-
-  <!-- Right Section: Product Details -->
-  <div class="product-details flex flex-col gap-6">
-    <!-- Product Title -->
-    <h1 class="text-3xl font-semibold text-gray-800 kurale-regular">
-      <%= product.productName %>
-    </h1>
-    <!-- Product Description -->
-    <div class="product-description text-gray-600">
-      <p><%= product.productDescription %></p>
-    </div>
-    <!-- Price Section -->
-    <div class="detail-price-section">
-      <div class="flex items-center gap-4 mb-4">
-        <!-- Original Price -->
-        <p class="text-sm text-gray-500 line-through">
-          Rs. <% product.productVariants.forEach(variant => { %>
-          <span><%= (variant.price * 1.20).toFixed(2) %></span>
-          <% }) %>
-        </p>
-        <!-- Discount Label -->
-        <h4 class="text-lg text-red-500 font-semibold">20% Off</h4>
+<!-- Main Product Section -->
+<div class="container mx-auto px-4 py-8">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+      <!-- Left: Image Gallery -->
+      <div class="flex gap-6">
+          <!-- Thumbnails -->
+          <div class="flex flex-col gap-4">
+              <% product.productImage.forEach((img, index) => { %>
+              <div onclick="changeImage('<%= img %>')" 
+                   class="w-20 h-20 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-[#8B7355] transition-all duration-300">
+                  <img src="<%= img %>" 
+                       alt="Product view <%= index + 1 %>" 
+                       class="w-full h-full object-cover">
+              </div>
+              <% }) %>
+          </div>
+          
+          <!-- Main Image -->
+          <div class="flex-1 rounded-2xl overflow-hidden bg-gray-50 p-4">
+              <div class="main-image relative aspect-square">
+                  <img id="image-view" 
+                       src="<%= product.productImage[0] %>" 
+                       alt="<%= product.productName %>" 
+                       class="w-full h-full object-cover rounded-xl transition-transform duration-300">
+              </div>
+          </div>
       </div>
 
-      <!-- New Price -->
-      <div class="flex items-center gap-2">
-        <h3 class="text-2xl font-bold text-gray-800">
-          Rs. <% product.productVariants.forEach(variant => { %>
-          <span><%= variant.price %></span>
-          <!-- Display the original price -->
-          <% }) %>
-        </h3>
+      <!-- Right: Product Details -->
+      <div class="flex flex-col gap-8">
+          <!-- Title and Rating -->
+          <div class="space-y-4">
+            <!-- Product Title -->
+            <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 tracking-tight">
+                <%= product.productName %>
+            </h1>
+        
+            <!-- Rating Section -->
+            <div class="flex flex-wrap items-center gap-4">
+                <!-- Stars -->
+                <div class="flex items-center">
+                    <!-- Star Rating -->
+                    <div class="flex gap-1">
+                        <% for(let i = 1; i <= 5; i++) { %>
+                            <% if(i <= 4) { %>
+                                <!-- Filled Star -->
+                                <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                            <% } else { %>
+                                <!-- Empty Star -->
+                                <svg class="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                            <% } %>
+                        <% } %>
+                    </div>
+        
+                    <!-- Rating Score -->
+                    <span class="ml-2 text-lg font-semibold text-gray-700">4.0</span>
+                </div>
+        
+                <!-- Divider -->
+                <div class="h-4 w-px bg-gray-300"></div>
+        
+                <!-- Reviews Count -->
+                <div class="flex items-center gap-2">
+                    <span class="text-sm font-medium text-gray-600">
+                        122 verified reviews
+                    </span>
+                    <!-- Optional: Add review button -->
+                    <button class="text-sm font-medium text-[#8B7355] hover:text-[#A79277] transition-colors">
+                        Write a review
+                    </button>
+                </div>
+            </div> 
+        </div>
+
+          <!-- Price Section -->
+          <div class="space-y-2">
+              <div class="flex items-center gap-3">
+                  <% if (product.productDiscount > 0) { %>
+                      <span class="text-3xl font-bold text-gray-900">
+                          ₹<%= (product.productVariants[0].price * (1 - product.productDiscount/100)).toFixed(2) %>
+                      </span>
+                      <span class="text-lg text-gray-500 line-through">
+                          ₹<%= product.productVariants[0].price.toFixed(2) %>
+                      </span>
+                      <span class="px-2 py-1 text-sm font-semibold text-red-600 bg-red-100 rounded-full">
+                          <%= product.productDiscount %>% OFF
+                      </span>
+                  <% } else { %>
+                      <span class="text-3xl font-bold text-gray-900">
+                          ₹<%= product.productVariants[0].price.toFixed(2) %>
+                      </span>
+                  <% } %>
+              </div>
+              <p class="text-sm text-green-600">Inclusive of all taxes</p>
+          </div>
+
+
+          <!-- Quantity Selector -->
+<div class="flex items-center gap-6">
+  <span class="text-gray-700">Quantity</span>
+  <div class="flex flex-col">
+      <div class="flex items-center border rounded-lg">
+          <button id="decrease" 
+                  class="px-4 py-2 text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  onclick="updateQuantity('decrease')">
+              −
+          </button>
+          <span id="quantity" 
+                class="px-4 py-2 text-gray-800 font-medium border-x min-w-[48px] text-center">
+              1
+          </span>
+          <button id="increase" 
+                  class="px-4 py-2 text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  onclick="updateQuantity('increase')">
+              +
+          </button>
       </div>
-    </div>
-
-    <!-- Rating Section -->
-    <div class="flex items-center gap-2 text-yellow-500">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="yellow"
-        class="w-6 h-6"
-      >
-        <path
-          d="M12 2l3.09 6.26L22 9.27l-5 4.91 1.18 6.91L12 17.77l-6.18 3.32L7 14.18 2 9.27l6.91-1.01L12 2z"
-        />
-      </svg>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="yellow"
-        class="w-6 h-6"
-      >
-        <path
-          d="M12 2l3.09 6.26L22 9.27l-5 4.91 1.18 6.91L12 17.77l-6.18 3.32L7 14.18 2 9.27l6.91-1.01L12 2z"
-        />
-      </svg>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="yellow"
-        class="w-6 h-6"
-      >
-        <path
-          d="M12 2l3.09 6.26L22 9.27l-5 4.91 1.18 6.91L12 17.77l-6.18 3.32L7 14.18 2 9.27l6.91-1.01L12 2z"
-        />
-      </svg>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="yellow"
-        class="w-6 h-6"
-      >
-        <path
-          d="M12 2l3.09 6.26L22 9.27l-5 4.91 1.18 6.91L12 17.77l-6.18 3.32L7 14.18 2 9.27l6.91-1.01L12 2z"
-        />
-      </svg>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="yellow"
-        class="w-6 h-6"
-      >
-        <path
-          fill-rule="evenodd"
-          d="M11.998 2.25a.75.75 0 01.671.418l2.504 5.075 5.601.814a.75.75 0 01.416 1.279l-4.053 3.95.957 5.579a.75.75 0 01-1.088.791L12 17.963l-5.016 2.635a.75.75 0 01-1.088-.79l.957-5.58-4.053-3.95a.75.75 0 01.416-1.279l5.601-.814 2.504-5.075a.75.75 0 01.671-.418zm0 3.019L10.114 9.37a.75.75 0 01-.564.41l-4.573.665 3.31 3.228a.75.75 0 01.216.664l-.781 4.556 4.1-2.156a.75.75 0 01.698 0l4.1 2.156-.781-4.556a.75.75 0 01.216-.664l3.31-3.228-4.573-.665a.75.75 0 01-.564-.41L12 5.27z"
-          clip-rule="evenodd"
-        />
-      </svg>
-      <!-- Repeat for other stars -->
-      <p class="text-blue-600">| 122 reviews</p>
-    </div>
-
-    <!-- Quantity Selector -->
-    <div class="flex items-center mb-4">
-      <span class="text-gray-600 mr-4">Quantity</span>
-      <div class="flex items-center space-x-2">
-        <button
-          id="decrease"
-          class="bg-gray-200 text-gray-800 px-2 py-1 rounded-md transition duration-300 hover:bg-gray-300"
-        >
-          -
-        </button>
-        <span id="quantity" class="text-gray-800">1</span>
-        <button
-          id="increase"
-          class="bg-gray-200 text-gray-800 px-2 py-1 rounded-md transition duration-300 hover:bg-gray-300"
-        >
-          +
-        </button>
-      </div>
-    </div>
-
-    <!-- Hidden Limit Exceeded Message -->
-    <div id="limit-exceeded" class="hidden text-red-600 mt-2 font-semibold">
-      Quantity limit exceeded. Maximum quantity is 4.
-    </div>
-
-    <!-- Stock Information -->
-    <div class="product-description">
-      <P class="text-2xl font-bold text-gray-800">
-        Weight. <% product.productVariants.forEach(variant => { %>
-        <span><%= variant.weight %></span>
-        <!-- Display the original price -->
-        <% }) %>
-      </P>
-
-      <!-- Stock Status Indicator -->
-<div class="mt-4">
-  <% if (product.productVariants[0].stock <= 0) { %>
-      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
-          Out of Stock
-      </span>
-  <% } else if (product.productVariants[0].stock <= 10) { %>
-      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
-          Low Stock: Only <%= product.productVariants[0].stock %> left
-      </span>
-  <% } else { %>
-      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-          In Stock
-      </span>
-  <% } %>
-</div>
-    </div>
-
-    <!-- Add to Cart and Buy Now Buttons -->
-    <div class="flex gap-4">
-      <button 
-    onclick="addToCart('<%= product._id %>', '<%= product.productVariants[0].stock %>')"
-    class="<%= product.productVariants[0].stock <= 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700' %> text-white px-4 py-2 rounded"
-    <%= product.productVariants[0].stock <= 0 ? 'disabled' : '' %>
->
-    <%= product.productVariants[0].stock <= 0 ? 'Out of Stock' : 'Add to Cart' %>
-</button>
-
-      <a
-        href="#"
-        class="px-6 py-2 bg-yellow-500 text-gray-800 rounded-md hover:bg-yellow-600 flex items-center transition duration-300"
-      >
-        <span>Buy Now</span>
-        <i class="ml-2 bi bi-bag-fill"></i>
-      </a>
-    </div>
-
-    <!-- Delivery Information -->
-    <div class="product-delivery flex flex-col gap-6 border-t pt-6"></div>
   </div>
 </div>
 
+          <!-- Stock Status -->
+          <div class="space-y-2">
+              <div class="flex items-center gap-2">
+                  <% if (product.productVariants[0].stock <= 0) { %>
+                      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                          Out of Stock
+                      </span>
+                  <% } else if (product.productVariants[0].stock <= 10) { %>
+                      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                          Only <%= product.productVariants[0].stock %> left
+                      </span>
+                  <% } else { %>
+                      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                          In Stock
+                      </span>
+                  <% } %>
+              </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex gap-4">
+              <button onclick="addToCart('<%= product._id %>')" 
+                      class="flex-1 px-6 py-3 bg-[#8B7355] text-white rounded-lg hover:bg-[#A79277] transition-colors">
+                  Add to Cart
+              </button>
+              <button onclick="addToWishlist('<%= product._id %>')"
+                      class="p-3 rounded-lg border border-[#8B7355] hover:bg-gray-50 transition-colors">
+                  <svg class="w-6 h-6 text-[#8B7355]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                  </svg>
+              </button>
+          </div>
+
+          <!-- Product Description -->
+          <div class="prose prose-sm max-w-none">
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">Description</h3>
+              <p class="text-gray-600"><%= product.productDescription %></p>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- similar products -->
 <%- include('similarProducts') %>
+
+<!-- footer -->
+<%- include('footer') %>
 
 <script>
   const imageContainer = document.getElementsByClassName("main-image")[0];
@@ -257,32 +215,44 @@
   }
 
   // Quantity Controls
-  document.getElementById("increase").addEventListener("click", function () {
-    const quantityElement = document.getElementById("quantity");
-    let quantity = parseInt(quantityElement.textContent);
-    const limitExceededMessage = document.getElementById("limit-exceeded");
+  let currentQuantity = 1;
+const maxQuantity = 4;
 
-    // Limit quantity to 4
-    if (quantity < 4) {
-      quantityElement.textContent = quantity + 1;
-      limitExceededMessage.classList.add("hidden"); // Hide the limit message
-    } else {
-      // Show limit exceeded message
-      limitExceededMessage.classList.remove("hidden");
+function updateQuantity(action) {
+    const quantityElement = document.getElementById('quantity');
+    const decreaseButton = document.getElementById('decrease');
+    const increaseButton = document.getElementById('increase');
+
+    if (action === 'increase' && currentQuantity < maxQuantity) {
+        currentQuantity++;
+    } else if (action === 'decrease' && currentQuantity > 1) {
+        currentQuantity--;
     }
-  });
 
-  document.getElementById("decrease").addEventListener("click", function () {
-    const quantityElement = document.getElementById("quantity");
-    let quantity = parseInt(quantityElement.textContent);
-    const limitExceededMessage = document.getElementById("limit-exceeded");
+    // Update quantity display
+    quantityElement.textContent = currentQuantity;
 
-    // Decrease quantity only if it's greater than 1
-    if (quantity > 1) {
-      quantityElement.textContent = quantity - 1;
-      limitExceededMessage.classList.add("hidden"); // Hide the limit message when decreasing
+    // Update button states
+    decreaseButton.disabled = currentQuantity === 1;
+    increaseButton.disabled = currentQuantity === maxQuantity;
+
+    // Show toast message if max quantity is reached
+    if (action === 'increase' && currentQuantity === maxQuantity) {
+        Swal.fire({
+            icon: 'info',
+            title: 'Maximum Quantity Reached',
+            text: 'You can only add up to 4 items',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            customClass: {
+                popup: 'colored-toast'
+            }
+        });
     }
-  });
+}
 
 
 // product add to cart alerts
@@ -305,7 +275,7 @@
         
         const data = await response.json();
 
-        if (response.ok && data.status) { // Changed 'data.success' to 'data.status'
+        if (response.ok && data.status) { 
             // Success message
             Swal.fire({
                 icon: 'success',
@@ -340,6 +310,97 @@
             showConfirmButton: false,
             timer: 3000,
             timerProgressBar: true
+        });
+    }
+}
+
+// add wishlist
+
+async function addToWishlist(productId) {
+    try {
+        const response = await fetch(`/add-wishlist/${productId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            // Handle unauthorized (not logged in) case
+            if (response.status === 401) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Please Login',
+                    text: 'You need to login to add items to wishlist',
+                    showCancelButton: true,
+                    confirmButtonText: 'Login',
+                    confirmButtonColor: '#8B7355',
+                    cancelButtonColor: '#d33',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/login';
+                    }
+                });
+                return;
+            }
+            
+            // Handle already in wishlist case
+            if (response.status === 400) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Already in Wishlist',
+                    text: 'This item is already in your wishlist',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    customClass: {
+                        popup: 'colored-toast'
+                    }
+                });
+                return;
+            }
+
+            throw new Error(data.message || 'Failed to add to wishlist');
+        }
+
+        // Success case
+        const wishlistIcon = document.getElementById(`wishlist-icon-${productId}`);
+        if (wishlistIcon) {
+            wishlistIcon.setAttribute('fill', 'red');
+        }
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Added to Wishlist!',
+            text: 'Item successfully added to your wishlist',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            customClass: {
+                popup: 'colored-toast'
+            }
+        });
+
+    } catch (error) {
+        console.error('Error adding to wishlist:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: error.message || 'Something went wrong!',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            customClass: {
+                popup: 'colored-toast'
+            }
         });
     }
 }

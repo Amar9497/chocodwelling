@@ -1,7 +1,7 @@
 //--------------check admin is there-------------
 
 function isAdmin(req,res,next){
-  if(req.session && req.session.isAuthenticated){
+  if(req.session.admin){
       next();
   }
   else {
@@ -10,15 +10,8 @@ function isAdmin(req,res,next){
 }
 
 
-const isLogin = (req,res,next)=>{
-  if(req.session && req.session.isAuthenticated){
-      res.redirect('/admin/home')
-  }else{
-      next()
-  }
-}
+
 
 module.exports = {
-  isAdmin,
-  isLogin
+  isAdmin
 }

@@ -2,6 +2,7 @@ const userSchema = require('../../model/userSchema');
 const categorySchema = require('../../model/categorySchema');
 const productSchema = require('../../model/productSchema');
 const brandSchema = require('../../model/brandSchema');
+const offerSchema = require('../../model/offerSchema');
 const bcrypt = require('bcrypt');
 const saltround = 10;
 
@@ -245,16 +246,16 @@ const otpResend = (req,res)=>{
 
 const home = async (req, res) => {
     try {
-        // Fetch only active and not blocked brands
+        // Fetch only active brands
         const brand = await brandSchema.find({ isActive: true, isBlocked: { $ne: true } });
 
-        // Fetch only active and not blocked categories
+        // Fetch only active categories
         const activeCategories = await categorySchema.find({ isActive: true, isBlocked: { $ne: true } }).select('_id');
 
         // Extract the IDs of active categories
         const activeCategoryIds = activeCategories.map(category => category._id);
 
-        // Fetch active products are recently launched 
+        // Fetch active products 
         const newLaunches = await productSchema.find({
             isActive: true,  
             isBlocked: { $ne: true },  
@@ -276,7 +277,7 @@ const home = async (req, res) => {
             user: req.session.user,
             brand,
             product,
-            newLaunches // Pass the new launches to the view
+            newLaunches 
         });
     } catch (error) {
         console.log(`Error in home function: ${error}`);
@@ -285,13 +286,11 @@ const home = async (req, res) => {
 };
 
 
-
-
 // ---------------- logout ----------------
 
 const logout = (req,res)=>{
     try {
-        req.session.destroy();
+        req.session.user = null;
         res.redirect('/login');
     } catch (error) {
         console.log(error)

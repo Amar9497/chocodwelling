@@ -37,8 +37,6 @@ app.use(express.urlencoded({extended: true}))
 
 // Set EJS template engine
 app.set('view engine', 'ejs');
-// flash
-app.use(flash())
 
 // Define the views directory (optional, defaults to './views')
 app.set('views', path.join(__dirname, 'views'));
@@ -48,15 +46,13 @@ app.use(nocache());
 
 // session
 app.use(session({
-  secret:"secretKey",
-  resave:false,
-  saveUninitialized:true,
-  cookie:{
-      maxAge: 24 * 60 * 60 * 1000, 
-      secure: false, 
-      httpOnly: true 
-  }
-}));
+    secret:'my-secret-key',
+    resave:false,
+    saveUninitialized: false
+}))
+
+// flash
+app.use(flash())
 
 // flash message
 app.use((req,res,next)=>{
@@ -64,6 +60,13 @@ app.use((req,res,next)=>{
     res.locals.error = req.flash('error')
     next();
 })
+
+// Example middleware to differentiate sessions
+app.use((req, res, next) => {
+    if (!req.session.user) req.session.user = null;
+    if (!req.session.admin) req.session.admin = null;
+    next();
+});
 
 // -------- passport ----------
 

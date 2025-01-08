@@ -1,89 +1,162 @@
-<div class="bg-gray-100">
+
+<style>
+  @keyframes fade-in-down {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in-up {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in-down {
+    animation: fade-in-down 1s ease-out;
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 1s ease-out;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 1s ease-out;
+  }
+</style>
+<div class="bg-gray-50 min-h-screen">
   <!-- Navbar -->
-  <%- include('Navbar') %> <%- include('alert') %>
+  <%- include('Navbar') %>
+  <%- include('alert') %>
+
+  <!-- Hero Section with Parallax Effect -->
+
+  <div class="relative h-[60vh] md:h-[70vh] overflow-hidden">
+    <div class="absolute inset-0 transform hover:scale-105 transition-transform duration-700">
+      <img
+        src="/public/assets/slide1.png"
+        alt="Hero Banner"
+        class="w-full h-full object-cover"
+      />
+      <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent">
+        <div class="container mx-auto px-4 h-full flex flex-col justify-center items-center text-center">
+          <h1 class="text-4xl md:text-6xl font-bold text-white mb-6 animate-fade-in-down">
+            Explore Our Collections
+          </h1>
+          <p class="text-lg md:text-xl text-gray-200 mb-8 max-w-2xl animate-fade-in-up">
+            Discover premium products across various categories and brands.
+          </p>
+          <a
+            href="/allproduct"
+            class="bg-white text-gray-900 px-8 py-3 rounded-full hover:bg-gray-100 
+                   transform hover:scale-105 transition-all duration-300 
+                   shadow-lg hover:shadow-xl animate-fade-in"
+          >
+            View All Products
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Categories Section -->
-  <section class="bg-white py-10">
-    <div class="container mx-auto px-6">
-      <h2
-        class="kurale-regular text-3xl text-center font-bold text-gray-800 mb-8"
-      >
-        Categories
-      </h2>
-      <div
-        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
-      >
+  <section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <!-- Section Title -->
+      <div class="text-center mb-12">
+        <h2 class="kurale-regular text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+          Shop by Categories
+        </h2>
+        <div class="w-24 h-1 bg-[#8B7355] mx-auto"></div>
+      </div>
+
+
+      <!-- Categories Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
         <% category.forEach((category) => { %>
-        <div
-          class="bg-white shadow-md rounded-lg overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl"
+        <a
+          href="/category/<%= category._id %>"
+          class="group bg-white rounded-xl shadow-md overflow-hidden 
+                 transform transition duration-300 hover:scale-105 hover:shadow-xl"
         >
-          <div class="p-6">
-            <h3
-              class="kurale-regular text-2xl text-center font-semibold text-gray-800"
-            >
+          <div class="p-8 text-center">
+            <h3 class="kurale-regular text-xl font-semibold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">
               <%= category.categoryName %>
             </h3>
+            <p class="text-gray-500 text-sm">Explore Collection →</p>
           </div>
-        </div>
+        </a>
         <% }) %>
       </div>
     </div>
   </section>
 
-  <!-- Brand Section -->
-  <section class="bg-white py-10">
-    <div class="container mx-auto px-6">
-      <h2
-        class="kurale-regular text-3xl text-center font-bold text-gray-800 mb-8"
-      >
-        Brand
-      </h2>
-      <div
-        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
-      >
+  <!-- Brands Section -->
+  <section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <!-- Section Title -->
+      <div class="text-center mb-12">
+        <h2 class="kurale-regular text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+          Featured Brands
+        </h2>
+        <div class="w-24 h-1 bg-[#8B7355] mx-auto"></div>
+      </div>
+
+      <!-- Brand Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
         <% brand.forEach((brand) => { %>
-        <div
-          class="bg-white shadow-lg rounded-lg overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl"
-        >
-          <div class="relative">
-            <!-- Category Image -->
+        <a href="/brand/<%= brand._id %>" class="group bg-white rounded-xl shadow-md overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl">
+          <!-- Brand Image -->
+          <div class="relative w-full h-40">
             <img
               src="<%= brand.brandImage %>"
               alt="<%= brand.brandName %>"
-              class="w-full h-48 object-cover object-center rounded-t-lg"
+              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             />
-            <div
-              class="absolute inset-0 bg-gradient-to-t from-black opacity-40 rounded-t-lg"
-            ></div>
+            <!-- Gradient Overlay -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
+              <div class="absolute bottom-0 left-0 right-0 p-4">
+                <h3 class="kurale-regular text-lg font-semibold text-white mb-2">
+                  <%= brand.brandName %>
+                </h3>
+                <p class="text-gray-200 text-sm flex items-center">
+                  Explore Collection
+                  <svg
+                    class="w-4 h-4 ml-2 group-hover:translate-x-2 transition-transform"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </p>
+              </div>
+            </div>
           </div>
-          <div class="p-6">
-            <h3
-              class="kurale-regular text-2xl text-center font-semibold text-gray-800 mb-4"
-            >
-              <%= brand.brandName %>
-            </h3>
-            <a
-              href="#"
-              class="block text-center text-yellow-500 font-medium hover:text-yellow-600 transition duration-300"
-            >
-              Explore <i class="fa fa-arrow-right"></i>
-            </a>
-          </div>
-        </div>
+        </a>
         <% }) %>
       </div>
     </div>
   </section>
 
-  <!-- Show All Products Button -->
-  <a href="/allproduct">
-    <button
-      class="absolute top-20 right-10 bg-blue-500 text-white text-sm font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-blue-700 transition-colors transform hover:scale-105"
-    >
-      Show All Products
-    </button>
-  </a>
-
   <!-- Footer -->
   <%- include('footer') %>
+
+  <!-- Custom Animations -->
+  
 </div>

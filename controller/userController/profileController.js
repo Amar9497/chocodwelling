@@ -111,12 +111,6 @@ const removeAddress = async (req, res) => {
         const userId = req.session.user;
         const index = parseInt(req.params.index, 10);
 
-        // Validate user session
-        // if (!userId) {
-        //     req.flash('error', 'Session expired. Please log in again.');
-        //     return res.redirect('/login');
-        // }
-
         // Validate index parameter
         if (isNaN(index)) {
             req.flash('error', 'Invalid request. Address index must be a number.');
@@ -154,9 +148,6 @@ const updateAddress = async (req,res) =>{
     const id = req.session.user;
     const index = parseInt(req.params.index, 10);
 
-    // console.log(id);
-    // console.log(index);
-    // console.log(req.body);
     const data = {
         building : req.body.building,
         street : req.body.street,

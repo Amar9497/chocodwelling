@@ -1,0 +1,617 @@
+<div class="min-h-screen flex flex-col">
+  <!-- Header -->
+  <%- include('navbar') %> <%- include('alert') %>
+
+  <!-- Main Content -->
+  <div class="flex flex-grow">
+    <!-- Sidebar -->
+    <aside
+      class="bg-gradient-to-r from-gray-100 to-[#d2b69b] text-black w-64 py-6 px-4 hidden lg:block"
+    >
+      <nav class="space-y-6">
+        <a
+          href="/admin/home"
+          class="flex items-center space-x-4 py-2 px-3 hover:bg-white hover:shadow-lg rounded-lg transition-all"
+        >
+          <span>Dashboard</span>
+        </a>
+        <a
+          href="/admin/products"
+          class="flex items-center space-x-4 py-2 px-3 hover:bg-white hover:shadow-lg rounded-lg transition-all"
+        >
+          <span>Products</span>
+        </a>
+        <a
+          href="/admin/category"
+          class="flex items-center space-x-4 py-2 px-3 hover:bg-white hover:shadow-lg rounded-lg transition-all"
+        >
+          <span>Category</span>
+        </a>
+        <a
+          href="/admin/brand"
+          class="flex items-center space-x-4 py-2 px-3 hover:bg-white hover:shadow-lg rounded-lg transition-all"
+        >
+          <span>Brand</span>
+        </a>
+        <a
+          href="/admin/customers"
+          class="flex items-center space-x-4 py-2 px-3 hover:bg-white hover:shadow-lg rounded-lg transition-all"
+        >
+          <span>Customers</span>
+        </a>
+        <a
+          href="/admin/orders"
+          class="flex items-center space-x-4 py-2 px-3 hover:bg-white hover:shadow-lg rounded-lg transition-all"
+        >
+          <span>Orders</span>
+        </a>
+        <a
+          href="/admin/coupons"
+          class="flex items-center space-x-4 py-2 px-3 bg-white text-black rounded-lg shadow-md font-semibold transition-all"
+        >
+          <span>Coupons</span>
+        </a>
+        <a
+          href="/admin/offer"
+          class="flex items-center space-x-4 py-2 px-3 hover:bg-white hover:shadow-lg rounded-lg transition-all"
+        >
+          <span>Offers</span>
+        </a>
+        <a
+          href="#"
+          class="flex items-center space-x-4 py-2 px-3 hover:bg-white hover:shadow-lg rounded-lg transition-all"
+        >
+          <span>Banner</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Section -->
+    <main class="flex-1 p-6 bg-gray-50">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-3xl font-semibold text-gray-800">Coupons</h2>
+        <div class="flex items-center gap-4">
+          <form
+            action="/admin/coupons"
+            method="get"
+            class="flex items-center gap-2"
+          >
+            <input
+              type="text"
+              name="search"
+              placeholder="Search"
+              class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring focus:ring-[#A79277]"
+            />
+            <input
+              type="submit"
+              value="Search"
+              class="bg-[#A79277] text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-[#96725d]"
+            />
+          </form>
+          <button
+            type="button"
+            class="bg-[#A79277] text-white px-6 py-2 rounded-lg shadow-md hover:opacity-90"
+            onclick="openAddModal()"
+            id="openModal"
+          >
+            Add Coupon
+          </button>
+        </div>
+      </div>
+
+      <!-- Coupons Table -->
+      <div class="rounded-lg shadow-lg bg-white overflow-hidden">
+        <table class="w-full text-left text-base border-collapse">
+          <thead class="bg-[#A79277] text-white">
+            <tr>
+              <th class="py-4 px-5 text-center">SL.No</th>
+              <th class="py-4 px-5 text-center">Coupon Code</th>
+              <th class="py-4 px-5 text-center">Discount Type</th>
+              <th class="py-4 px-5 text-center">Discount Value</th>
+              <th class="py-4 px-5 text-center">Min Amount</th>
+              <th class="py-4 px-5 text-center">Start Date</th>
+              <th class="py-4 px-5 text-center">End Date</th>
+              <th class="py-4 px-5 text-center">Status</th>
+              <th class="py-4 px-5 text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% coupons.forEach((coupon, index) => { %>
+            <tr class="hover:bg-gray-100 transition-all">
+              <td class="px-4 py-2 text-center">
+                <%= index + 1 + ((page - 1) * 8) %>
+              </td>
+              <td class="px-4 py-2 text-center"><%= coupon.code %></td>
+              <td class="px-4 py-2 text-center"><%= coupon.discountType %></td>
+              <td class="px-4 py-2 text-center"><%= coupon.discountValue %></td>
+              <td class="px-4 py-2 text-center">
+                <%= coupon.minimumOrderAmount %>
+              </td>
+              <td class="px-4 py-2 text-center">
+                <%= new Date(coupon.startDate).toLocaleDateString() %>
+              </td>
+              <td class="px-4 py-2 text-center">
+                <%= new Date(coupon.endDate).toLocaleDateString() %>
+              </td>
+              <td class="px-4 py-2 text-center">
+                <span
+                  class="<%= coupon.isActive ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold' %>"
+                >
+                  <%= coupon.isActive ? 'Active' : 'Blocked' %>
+                </span>
+              </td>
+              <td class="py-3 px-5 flex space-x-2 items-center">
+                <a
+                  href="#"
+                  id="edit-collection-modal"
+                  data-bs-toggle="modal"
+                  data-bs-target="#editCollection"
+                  class="text-blue-500 hover:underline"
+                  onclick="editCoupon('<%= coupon.id %>')"
+                  >✏️</a
+                >
+                
+                <a
+                  href="javascript:void(0);"
+                  class="text-red-500 hover:text-red-700"
+                  onclick="confirmStatusChange('<%= coupon.id %>', '<%= coupon.isActive %>')"
+                  >❌</a
+                >
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination-controls flex mt-5 justify-center">
+        <ul class="flex items-center space-x-2">
+          <% if (currentPage > 1) { %>
+          <li>
+            <a
+              href="/admin/coupons=<%= currentPage - 1 %>&limit=<%= limit %>&search=<%= search %>"
+              class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+              ><<</a
+            >
+          </li>
+          <% } %> <% for (let i = 1; i <= totalPages; i++) { %>
+          <li>
+            <a
+              href="/admin/coupons?page=<%= i %>&limit=<%= limit %>&search=<%= search %>"
+              class="px-4 py-2 rounded <%= currentPage == i ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %>"
+            >
+              <%= i %>
+            </a>
+          </li>
+          <% } %> <% if (currentPage < totalPages) { %>
+          <li>
+            <a
+              href="/admin/coupons=<%= currentPage + 1 %>&limit=<%= limit %>&search=<%= search %>"
+              class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+              >>></a
+            >
+          </li>
+          <% } %>
+        </ul>
+      </div>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <%- include('footer') %>
+</div>
+
+<!-- ------------------------------------Add coupon Modal------------------------ -->
+
+<div
+  id="addCollection"
+  class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden"
+>
+  <div
+    class="bg-white rounded-lg shadow-xl w-full max-w-md transform transition-all duration-300 ease-in-out"
+  >
+    <div
+      class="flex justify-between items-center px-6 py-4 border-b border-gray-200"
+    >
+      <h5 class="text-xl font-semibold text-gray-800" id="addCouponLabel">
+        Add Coupon
+      </h5>
+      <button
+        type="button"
+        class="text-gray-500 hover:text-gray-700 focus:outline-none"
+        onclick="closeModal()"
+      >
+        <span class="sr-only">Close</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
+    <div class="p-6 space-y-4">
+      <form id="addCouponForm">
+        <div class="mb-4">
+          <label for="code" class="block text-sm font-medium text-gray-700"
+            >Coupon Code</label
+          >
+          <input
+            type="text"
+            id="code"
+            name="code"
+            class="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          />
+        </div>
+        <div class="mb-4">
+          <label
+            for="discountType"
+            class="block text-sm font-medium text-gray-700"
+            >Discount Type</label
+          >
+          <select
+            id="discountType"
+            name="discountType"
+            class="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          >
+            <option value="Percentage">Percentage</option>
+            <option value="Fixed">Fixed</option>
+          </select>
+        </div>
+        <div class="mb-4">
+          <label
+            for="discountValue"
+            class="block text-sm font-medium text-gray-700"
+            >Discount Value</label
+          >
+          <input
+            type="number"
+            id="discountValue"
+            name="discountValue"
+            class="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          />
+        </div>
+        <div class="mb-4">
+          <label for="startDate" class="block text-sm font-medium text-gray-700"
+            >Start Date</label
+          >
+          <input
+            type="date"
+            id="startDate"
+            name="startDate"
+            class="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          />
+        </div>
+        <div class="mb-4">
+          <label for="endDate" class="block text-sm font-medium text-gray-700"
+            >End Date</label
+          >
+          <input
+            type="date"
+            id="endDate"
+            name="endDate"
+            class="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          />
+        </div>
+        <div class="mb-4">
+          <label
+            for="minimumOrderAmount"
+            class="block text-sm font-medium text-gray-700"
+            >Minimum Order Amount</label
+          >
+          <input
+            type="number"
+            id="minimumOrderAmount"
+            name="minimumOrderAmount"
+            class="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          />
+        </div>
+        <button
+          type="submit"
+          class="w-full bg-indigo-600 text-white py-3 px-4 rounded-md font-medium hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none transition duration-150 ease-in-out"
+        >
+          Add Coupon
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- --------------------------edit coupon Modal--------------------------    -->
+
+<div
+  id="editCollection"
+  class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden"
+>
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-md">
+    <div class="flex justify-between items-center px-4 py-3 border-b">
+      <h5 id="editCouponLabel" class="text-lg font-semibold">Edit Coupon</h5>
+      <button
+        type="button"
+        class="text-gray-500 hover:text-gray-700 focus:outline-none"
+        onclick="closeEditModal()"
+      >
+        <span class="sr-only">Close</span>&times;
+      </button>
+    </div>
+    <div class="p-4">
+      <form id="editCouponForm">
+        <input type="hidden" id="editCouponId" name="id" />
+
+        <div class="mb-4">
+          <label for="editCode" class="block text-sm font-medium text-gray-700"
+            >Coupon Code</label
+          >
+          <input
+            type="text"
+            id="editCode"
+            name="code"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          />
+        </div>
+
+        <div class="mb-4">
+          <label
+            for="editDiscountType"
+            class="block text-sm font-medium text-gray-700"
+            >Discount Type</label
+          >
+          <select
+            id="editDiscountType"
+            name="discountType"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          >
+            <option value="Percentage">Percentage</option>
+            <option value="Fixed">Fixed</option>
+          </select>
+        </div>
+
+        <div class="mb-4">
+          <label
+            for="editDiscountValue"
+            class="block text-sm font-medium text-gray-700"
+            >Discount Value</label
+          >
+          <input
+            type="number"
+            id="editDiscountValue"
+            name="discountValue"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          />
+        </div>
+
+        <div class="mb-4">
+          <label
+            for="editStartDate"
+            class="block text-sm font-medium text-gray-700"
+            >Start Date</label
+          >
+          <input
+            type="date"
+            id="editStartDate"
+            name="startDate"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          />
+        </div>
+
+        <div class="mb-4">
+          <label
+            for="editEndDate"
+            class="block text-sm font-medium text-gray-700"
+            >End Date</label
+          >
+          <input
+            type="date"
+            id="editEndDate"
+            name="endDate"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          />
+        </div>
+
+        <div class="mb-4">
+          <label
+            for="editMinimumOrderAmount"
+            class="block text-sm font-medium text-gray-700"
+            >Minimum Order Amount</label
+          >
+          <input
+            type="number"
+            id="editMinimumOrderAmount"
+            name="minimumOrderAmount"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+        >
+          Update Coupon
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openAddModal() {
+    document.getElementById("addCollection").classList.remove("hidden");
+  }
+
+  function closeModal() {
+    document.getElementById("addCollection").classList.add("hidden");
+  }
+
+  function closeEditModal() {
+    document.getElementById("editCollection").classList.add("hidden");
+  }
+  //-----------------------------------Add Coupon-------------------------------------
+
+  document
+    .getElementById("addCouponForm")
+    .addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const data = Object.fromEntries(formData.entries());
+      try {
+        const response = await fetch("/admin/addcoupon", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+        const result = await response.json();
+        if (response.ok) {
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: result.message,
+          }).then(() => {
+            this.reset();
+            location.reload();
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: result.message,
+          });
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "An error occurred while adding the coupon.",
+        });
+      }
+    });
+
+  //------------------- Edit Coupon ------------------------------
+  // ... existing code ...
+
+  //------------------- Edit Coupon ------------------------------
+  function editCoupon(id) {
+    // Add id parameter here
+    document.getElementById("editCollection").classList.remove("hidden");
+
+    // Fetch coupon data immediately instead of waiting for DOMContentLoaded
+    fetch(`/admin/coupons/${id}`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((coupon) => {
+        document.getElementById("editCouponId").value = coupon._id;
+        document.getElementById("editCode").value = coupon.code;
+        document.getElementById("editDiscountType").value = coupon.discountType;
+        document.getElementById("editDiscountValue").value =
+          coupon.discountValue;
+        document.getElementById("editStartDate").value = new Date(
+          coupon.startDate
+        )
+          .toISOString()
+          .split("T")[0];
+        document.getElementById("editEndDate").value = new Date(coupon.endDate)
+          .toISOString()
+          .split("T")[0];
+        document.getElementById("editMinimumOrderAmount").value =
+          coupon.minimumOrderAmount;
+      })
+      .catch((error) => {
+        console.error("Error fetching coupon data:", error);
+        Swal.fire({
+          title: "Error",
+          text: "Failed to load coupon data.",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+      });
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    document
+      .getElementById("editCouponForm")
+      .addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const data = Object.fromEntries(formData.entries());
+
+        // Log the data being sent
+        console.log("Submitting data:", data);
+
+        try {
+          const response = await fetch(`/admin/editcoupon/${data.id}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id: document.getElementById("editCouponId").value,
+              code: document.getElementById("editCode").value,
+              discountType: document.getElementById("editDiscountType").value,
+              discountValue: document.getElementById("editDiscountValue").value,
+              startDate: document.getElementById("editStartDate").value,
+              endDate: document.getElementById("editEndDate").value,
+              minimumOrderAmount: document.getElementById(
+                "editMinimumOrderAmount"
+              ).value,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+
+          const result = await response.json();
+          Swal.fire({
+            title: "Success",
+            text: result.message,
+            icon: "success",
+            confirmButtonText: "OK",
+          }).then(() => {
+            window.location.reload();
+          });
+        } catch (error) {
+          console.error("Error:", error);
+          Swal.fire({
+            title: "Error",
+            text: "Failed to update coupon.",
+            icon: "error",
+            confirmButtonText: "OK",
+          });
+        }
+      });
+  });
+</script>
+
+<script>
+    function confirmStatusChange(couponId, currentStatus) {
+        const status = currentStatus === 'true' ? 'Block' : 'Active';
+        
+        Swal.fire({
+            title: `Are you sure you want to change the status to ${status}?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, change it!',
+            cancelButtonText: 'No, cancel!',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Redirect to the server-side route to update the coupon status
+                window.location.href = `/admin/statuscoupon?id=${couponId}&status=${currentStatus}`;
+            }
+        });
+    }
+</script>
+

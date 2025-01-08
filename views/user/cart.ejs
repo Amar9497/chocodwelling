@@ -1,158 +1,183 @@
-<body class="text-gray-800 min-h-screen">
   <!-- Navbar -->
-  <header><%- include('navbar') %></header>
+  <%- include('navbar') %>
+  
+<!-- alert -->
+<%- include('alert') %>
 
-  <!-- -------------------Breadcrumbs----------------------- -->
-<nav class="breadcrumbs text-sm text-gray-600 py-4 bg-gray-50 border-b">
-  <ul class="flex items-center space-x-2 container mx-auto px-6">
-      <li>
-          <a
-              href="/home"
-              class="text-blue-500 hover:text-blue-700 font-medium transition"
-              >Home</a
-          >
-      </li>
-      <span class="text-gray-400">/</span>
-      <li>
-          <a
-              href="/cart"
-              class="text-blue-500 hover:text-blue-700 font-medium transition"
-              >Cart</a
-          >
-      </li>
-      
-  </ul>
-</nav>
+<div class="min-h-screen bg-gray-50">
+  <!-- Breadcrumbs -->
+  <nav class="bg-white border-b">
+      <div class="container mx-auto px-4 py-3">
+          <div class="flex items-center space-x-2 text-sm">
+              <a href="/home" class="text-[#8B7355] hover:text-[#A79277] transition-colors">Home</a>
+              <span class="text-gray-400">/</span>
+              <span class="text-gray-600">Shopping Cart</span>
+          </div>
+      </div>
+  </nav>
 
   <!-- Main Content -->
-  <main class="container mx-auto px-4 py-10">
-    <div class="flex flex-col lg:flex-row gap-8">
-      <!-- Cart Table Section -->
-      <section class="flex-1 bg-white shadow-lg rounded-lg p-6">
-        <h2 class="text-2xl font-bold text-gray-700 mb-6">Your Cart</h2>
-        <table class="w-full border-collapse text-left text-gray-700">
-          <thead>
-            <tr class="bg-gray-100 text-gray-600 uppercase text-sm">
-              <th class="p-4">Product</th>
-              <th class="p-4">Details</th>
-              <th class="p-4">Price</th>
-              <th class="p-4">Quantity</th>
-              <th class="p-4">Subtotal</th>
-              <th class="p-4">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% if (cartItems.length) { %> <% cartItems.forEach(item => { %>
-            <tr class="border-b hover:bg-gray-50 transition">
-              <td class="p-4">
-                <img
-                  src="<%= item.product.productImage[0] %>"
-                  alt="Product Image"
-                  class="w-16 h-16 object-cover rounded-lg"
-                />
-              </td>
-              <td class="p-4">
-                <h3 class="font-medium"><%= item.product.productName %></h3>
-                <p class="text-sm text-gray-500">
-                  Weight: <%= item.product.productVariants[0].weight %>
-                </p>
-              </td>
-              <td class="p-4">
-                Rs. <%= item.product.productVariants[0].price %>
-              </td>
-              <td class="p-4">
-                <div class="flex items-center space-x-2">
-                  <button
-                    onclick="updateQuantity('<%= item.product._id %>', -1)"
-                    class="bg-gray-200 px-2 py-1 rounded"
-                  >
-                    -
-                  </button>
-                  <span id="quantity-<%= item.product._id %>"
-                    ><%= item.quantity %></span
-                  >
-                  <button
-                    onclick="updateQuantity('<%= item.product._id %>', 1)"
-                    class="bg-gray-200 px-2 py-1 rounded"
-                  >
-                    +
-                  </button>
-                </div>
-              </td>
-              <td
-                class="p-4 font-semibold"
-                id="subtotal-<%= item.product._id %>"
-              >
-                Rs. <%= item.product.productVariants[0].price * item.quantity %>
-              </td>
-              <td class="p-4 text-center">
-                <button
-                  onclick="removeFromCart('<%= item.product._id %>')"
-                  class="text-red-500 hover:text-red-600"
-                >
-                  <i class="fas fa-trash"></i>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M19 7L5 7M10 11V17M14 11V17M5 7L7 21H17L19 7H5Z"
-                    />
-                  </svg>
-                </button>
-              </td>
-            </tr>
-            <% }); %> <% } else { %>
-            <tr>
-              <td
-                colspan="6"
-                class="text-center font-semibold p-4 text-gray-600"
-              >
-                Your cart is empty.
-              </td>
-            </tr>
-            <% } %>
-          </tbody>
-        </table>
-      </section>
+  <main class="container mx-auto px-4 py-8">
+      <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-8">Shopping Cart</h1>
+      
+      <div class="flex flex-col lg:flex-row gap-8">
+          <!-- Cart Items -->
+          <section class="flex-1">
+              <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                  <div class="overflow-x-auto">
+                      <table class="w-full">
+                          <thead class="bg-gray-50 text-gray-600">
+                              <tr>
+                                  <th class="py-4 px-6 text-left">Product</th>
+                                  <th class="py-4 px-6 text-left hidden md:table-cell">Price</th>
+                                  <th class="py-4 px-6 text-left">Quantity</th>
+                                  <th class="py-4 px-6 text-left hidden sm:table-cell">Subtotal</th>
+                                  <th class="py-4 px-6 text-center">Action</th>
+                              </tr>
+                          </thead>
+                          <tbody class="divide-y divide-gray-100">
+                              <% if (cartItems.length) { %>
+                                  <% cartItems.forEach(item => { %>
+                                      <tr class="hover:bg-gray-50/50 transition-colors">
+                                          <!-- Product Info -->
+                                          <td class="py-4 px-6">
+                                              <div class="flex items-center gap-4">
+                                                  <img src="<%= item.product.productImage[0] %>" 
+                                                       alt="<%= item.product.productName %>"
+                                                       class="w-16 h-16 object-cover rounded-lg" 
+                                                  />
+                                                  <div>
+                                                      <h3 class="font-medium text-gray-900"><%= item.product.productName %></h3>
+                                                      <p class="text-sm text-gray-500">Weight: <%= item.product.productVariants[0].weight %></p>
+                                                  </div>
+                                              </div>
+                                          </td>
 
-      <!-- Cart Totals Section -->
-      <aside class="w-full lg:w-1/4 bg-white shadow-lg rounded-lg p-6">
-        <h2 class="text-2xl font-bold text-gray-700 mb-6 text-center">
-          Cart Totals
-        </h2>
-        <div class="flex justify-between items-center mb-4">
-          <span class="text-gray-600">Subtotal</span>
-          <span class="font-medium">Rs. <%= total %></span>
-        </div>
-        <div
-          class="flex justify-between items-center border-t border-gray-200 pt-4"
-        >
-          <span class="text-gray-800 font-bold">Total</span>
-          <span id="total" class="text-red-500 font-bold"
-            >Rs. <%= total %></span
-          >
-        </div>
-        <button
-          class="mt-6 w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 rounded-lg transition"
-          onclick="window.location.href = '/checkout';"
-        >
-          Check Out
-        </button>
-      </aside>
-    </div>
+                                          <!-- Price -->
+                                          <td class="py-4 px-6 hidden md:table-cell">
+                                              <div class="space-y-1">
+                                                  <% if (item.discount > 0) { %>
+                                                      <div class="text-lg font-medium text-gray-900">₹<%= item.discountedPrice.toFixed(2) %></div>
+                                                      <div class="text-sm text-gray-500 line-through">₹<%= item.basePrice.toFixed(2) %></div>
+                                                      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                          <%= item.discount %>% OFF
+                                                      </span>
+                                                  <% } else { %>
+                                                      <div class="text-lg font-medium text-gray-900">₹<%= item.basePrice.toFixed(2) %></div>
+                                                  <% } %>
+                                              </div>
+                                          </td>
+
+                                          <!-- Quantity Selector -->
+                                          <td class="py-4 px-6">
+                                              <div class="flex items-center gap-2">
+                                                  <button onclick="updateQuantity('<%= item.product._id %>', -1)"
+                                                          class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors">
+                                                      <span class="text-gray-600">−</span>
+                                                  </button>
+                                                  <span id="quantity-<%= item.product._id %>" 
+                                                        class="w-8 text-center font-medium">
+                                                      <%= item.quantity %>
+                                                  </span>
+                                                  <button onclick="updateQuantity('<%= item.product._id %>', 1)"
+                                                          class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors">
+                                                      <span class="text-gray-600">+</span>
+                                                  </button>
+                                              </div>
+                                          </td>
+
+                                          <!-- Subtotal -->
+                                          <td class="py-4 px-6 hidden sm:table-cell">
+                                              <span id="subtotal-<%= item.product._id %>" class="font-medium text-gray-900">
+                                                  ₹<%= item.subtotal.toFixed(2) %>
+                                              </span>
+                                          </td>
+
+                                          <!-- Remove Button -->
+                                          <td class="py-4 px-6 text-center">
+                                              <button onclick="removeFromCart('<%= item.product._id %>')"
+                                                      class="text-red-500 hover:text-red-600 transition-colors">
+                                                      <svg
+                                                      xmlns="http://www.w3.org/2000/svg"
+                                                      class="h-5 w-5"
+                                                      fill="none"
+                                                      viewBox="0 0 24 24"
+                                                      stroke="currentColor"
+                                                    >
+                                                      <path
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M19 7L5 7M10 11V17M14 11V17M5 7L7 21H17L19 7H5Z"
+                                                      />
+                                                    </svg>
+                                              </button>
+                                          </td>
+                                      </tr>
+                                  <% }); %>
+                              <% } else { %>
+                                  <tr>
+                                      <td colspan="5" class="py-8 text-center text-gray-500">
+                                          Your cart is empty
+                                      </td>
+                                  </tr>
+                              <% } %>
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+          </section>
+
+          <!-- Order Summary -->
+          <aside class="w-full lg:w-80">
+              <div class="bg-white rounded-xl shadow-sm p-6 sticky top-4">
+                  <h2 class="text-lg font-semibold text-gray-900 mb-6">Order Summary</h2>
+                  
+                  <div class="space-y-4">
+                      <div class="flex justify-between text-sm">
+                          <span class="text-gray-600">Subtotal</span>
+                          <span id="cart-subtotal" class="font-medium">₹<%= total.toFixed(2) %></span>
+                      </div>
+
+                      <div class="flex justify-between text-sm">
+                          <span class="text-gray-600">Delivery Charge</span>
+                          <span id="delivery-charge" class="font-medium">
+                              <%= total < 500 ? `₹100.00` : 'Free' %>
+                          </span>
+                      </div>
+
+                      <div class="flex justify-between text-sm text-green-600">
+                          <span>Total Savings</span>
+                          <span id="total-savings" class="font-medium">₹<%= totalSavings.toFixed(2) %></span>
+                      </div>
+
+                      <div class="h-px bg-gray-200 my-4"></div>
+
+                      <div class="flex justify-between">
+                          <span class="text-base font-semibold">Total</span>
+                          <span id="final-total" class="text-lg font-bold text-[#8B7355]">
+                              ₹<%= (total + (total < 500 ? 100 : 0)).toFixed(2) %>
+                          </span>
+                      </div>
+
+                      <button onclick="window.location.href='/checkout'"
+                              class="w-full mt-6 bg-[#8B7355] text-white py-3 px-4 rounded-lg
+                                     hover:bg-[#A79277] transition-colors duration-300
+                                     focus:outline-none focus:ring-2 focus:ring-[#8B7355] focus:ring-offset-2">
+                          Proceed to Checkout
+                      </button>
+                  </div>
+              </div>
+          </aside>
+      </div>
   </main>
+</div>
 
   <!-- Footer -->
-  <footer><%- include('footer') %></footer>
-</body>
+  <%- include('footer') %>
+
 <script>
+  
   async function updateQuantity(productId, change) {
     const quantitySpan = document.getElementById(`quantity-${productId}`);
     const currentQuantity = parseInt(quantitySpan.textContent);
@@ -160,84 +185,128 @@
 
     // Check minimum quantity
     if (newQuantity < 1) {
-        Swal.fire({
-            icon: "warning",
-            text: "Quantity cannot be less than 1",
-            toast: true,
-            position: "top-end",
-            timer: 2000,
-            showConfirmButton: false
-        });
-        return;
+      Swal.fire({
+        icon: "warning",
+        text: "Quantity cannot be less than 1",
+        toast: true,
+        position: "top-end",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      return;
     }
 
     // Check maximum quantity
     if (newQuantity > 5) {
-        Swal.fire({
-            icon: "warning",
-            text: "Maximum quantity allowed is 5",
-            toast: true,
-            position: "top-end",
-            timer: 2000,
-            showConfirmButton: false
-        });
-        return;
+      Swal.fire({
+        icon: "warning",
+        text: "Maximum quantity allowed is 5",
+        toast: true,
+        position: "top-end",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      return;
     }
 
     try {
-        const response = await fetch("/updateCart", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                productId: productId,
-                quantity: newQuantity
-            })
-        });
+      const response = await fetch("/updateCart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productId: productId,
+          quantity: newQuantity,
+        }),
+      });
 
-        const data = await response.json();
+      const data = await response.json();
 
-        if (data.status) {
-            // Update quantity display
-            quantitySpan.textContent = newQuantity;
+      if (data.status) {
+        // Update quantity display
+        quantitySpan.textContent = newQuantity;
 
-            // Update product subtotal
-            const subtotalElement = document.getElementById(`subtotal-${productId}`);
-            subtotalElement.textContent = `Rs. ${data.subtotal}`;
-
-            // Update cart total
-            const cartTotalElement = document.getElementById("total");
-            cartTotalElement.textContent = `Rs. ${data.total}`;
-
-            // Show success message
-            Swal.fire({
-                icon: "success",
-                text: "Cart updated successfully",
-                toast: true,
-                position: "top-end",
-                timer: 1500,
-                showConfirmButton: false
-            });
-        } else {
-            throw new Error(data.message || "Failed to update cart");
+        // Update product subtotal
+        const subtotalElement = document.getElementById(
+          `subtotal-${productId}`
+        );
+        if (subtotalElement) {
+          subtotalElement.textContent = `₹ ${data.subtotal.toFixed(2)}`;
         }
-    } catch (error) {
-        console.error("Error updating cart:", error);
-        Swal.fire({
-            icon: "error",
-            text: error.message || "Failed to update cart",
-            toast: true,
-            position: "top-end",
-            timer: 2000,
-            showConfirmButton: false
-        });
-    }
-}
 
-  // remove product
+        // Update cart totals
+        updateCartTotals(data);
+
+        // Update price display
+        const priceCell = subtotalElement.closest("tr").querySelector(".price");
+        if (priceCell && data.discount > 0) {
+          priceCell.innerHTML = `
+                    <span class="final-price">₹${data.discountedPrice.toFixed(
+                      2
+                    )}</span>
+                    <div class="discount-badge">${data.discount}% OFF</div>
+                `;
+        }
+
+        // Show success message
+        Swal.fire({
+          icon: "success",
+          text: "Cart updated successfully",
+          toast: true,
+          position: "top-end",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      } else {
+        throw new Error(data.message || "Failed to update cart");
+      }
+    } catch (error) {
+      console.error("Error updating cart:", error);
+      Swal.fire({
+        icon: "error",
+        text: error.message || "Failed to update cart",
+        toast: true,
+        position: "top-end",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    }
+  }
+
+  // Add this new function to handle cart totals updates
+  function updateCartTotals(data) {
+    // Update total savings
+    const totalSavingsElement = document.getElementById("total-savings");
+    if (totalSavingsElement) {
+      totalSavingsElement.textContent = `Rs. ${data.totalSavings.toFixed(2)}`;
+    }
+
+    // Update subtotal
+    const subtotalElement = document.getElementById("cart-subtotal");
+    if (subtotalElement) {
+      subtotalElement.textContent = `Rs. ${data.total.toFixed(2)}`;
+    }
+
+    // Update delivery charge
+    const deliveryChargeElement = document.getElementById("delivery-charge");
+    if (deliveryChargeElement) {
+      const deliveryCharge = data.total < 500 ? 100 : 0;
+      deliveryChargeElement.textContent =
+        deliveryCharge > 0 ? `Rs. ${deliveryCharge.toFixed(2)}` : "Free";
+    }
+
+    // Update final total
+    const finalTotalElement = document.getElementById("final-total");
+    if (finalTotalElement) {
+      const deliveryCharge = data.total < 500 ? 100 : 0;
+      const finalTotal = data.total + deliveryCharge;
+      finalTotalElement.textContent = `Rs. ${finalTotal.toFixed(2)}`;
+    }
+  }
+
+  // Also update your removeFromCart function 
   async function removeFromCart(productId) {
-    // Show confirmation dialog
     const result = await Swal.fire({
       title: "Are you sure?",
       text: "You want to remove this item from cart?",
@@ -262,24 +331,19 @@
         const data = await response.json();
 
         if (data.status) {
-          // Remove the product row from the table
-          const productRow = document.getElementById(`cart-item-${productId}`);
+          // Remove the product row
+          const productRow = document.querySelector(
+            `tr:has(button[onclick*="${productId}"])`
+          );
           if (productRow) {
             productRow.remove();
           }
 
-          // Update cart summary
-          if (data.total !== undefined) {
-            const subtotalElement = document.getElementById("cart-subtotal");
-            const totalElement = document.getElementById("cart-total");
-
-            if (subtotalElement) {
-              subtotalElement.textContent = `Rs. ${data.total.toFixed(2)}`;
-            }
-            if (totalElement) {
-              totalElement.textContent = `Rs. ${data.total.toFixed(2)}`;
-            }
-          }
+          // Update cart totals
+          updateCartTotals({
+            total: data.total,
+            totalSavings: data.totalSavings || 0,
+          });
 
           // Show success message
           Swal.fire({
@@ -292,8 +356,8 @@
             timer: 1500,
           });
 
-          // If cart is empty, refresh the page or show empty cart message
-          if (data) {
+          // If cart is empty, refresh the page
+          if (data.isEmpty) {
             location.reload();
           }
         } else {
@@ -312,5 +376,37 @@
       }
     }
   }
-  // checkout
+
+  // Update the updateCartTotals function to handle empty cart case
+  function updateCartTotals(data) {
+    // Update total savings
+    const totalSavingsElement = document.getElementById("total-savings");
+    if (totalSavingsElement) {
+      totalSavingsElement.textContent = `Rs. ${(data.totalSavings || 0).toFixed(
+        2
+      )}`;
+    }
+
+    // Update subtotal
+    const subtotalElement = document.getElementById("cart-subtotal");
+    if (subtotalElement) {
+      subtotalElement.textContent = `Rs. ${(data.total || 0).toFixed(2)}`;
+    }
+
+    // Update delivery charge
+    const deliveryChargeElement = document.getElementById("delivery-charge");
+    if (deliveryChargeElement) {
+      const deliveryCharge = (data.total || 0) < 500 ? 100 : 0;
+      deliveryChargeElement.textContent =
+        deliveryCharge > 0 ? `Rs. ${deliveryCharge.toFixed(2)}` : "Free";
+    }
+
+    // Update final total
+    const finalTotalElement = document.getElementById("final-total");
+    if (finalTotalElement) {
+      const deliveryCharge = (data.total || 0) < 500 ? 100 : 0;
+      const finalTotal = (data.total || 0) + deliveryCharge;
+      finalTotalElement.textContent = `Rs. ${finalTotal.toFixed(2)}`;
+    }
+  }
 </script>

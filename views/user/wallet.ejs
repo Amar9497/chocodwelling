@@ -1,0 +1,102 @@
+<%- include('navbar') %>
+<%- include('alert') %>
+
+<!-- Breadcrumb Navigation -->
+<nav class="bg-gray-50 border-b">
+  <div class="container mx-auto px-4 py-3">
+    <ol class="flex items-center space-x-2 text-sm">
+      <li>
+        <a href="/home" class="text-blue-600 hover:text-blue-800 transition-colors">Home</a>
+      </li>
+      <li class="text-gray-500">/</li>
+      <li>
+        <a href="/profile" class="text-blue-600 hover:text-blue-800 transition-colors">Profile</a>
+      </li>
+      <li class="text-gray-500">/</li>
+      <li>
+        <span class="text-gray-800 font-medium">Wallet</span>
+      </li>
+    </ol>
+  </div>
+</nav>
+
+<div class="container mx-auto px-4 py-8">
+  <!-- Wallet Balance Card -->
+  <div class="max-w-md mx-auto mb-8">
+    <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-6 text-white shadow-lg">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center space-x-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M3 6v12a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2z" />
+          </svg>
+          <h2 class="text-xl font-bold">Your Wallet</h2>
+        </div>
+        <div class="text-white/70 text-sm">Available Balance</div>
+      </div>
+      <div class="text-center py-4">
+        <div class="text-4xl font-bold mb-1">₹ <%= (wallet.balance).toFixed(2) %></div>
+        <div class="text-white/70 text-sm">Current Balance</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Transaction History -->
+  <div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+      <div class="p-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">Transaction History</h2>
+        
+        <% if(wallet.transaction.length > 0) { %>
+          <!-- Transaction Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="bg-gray-50 text-left">
+                  <th class="px-6 py-3 text-sm font-semibold text-gray-600">Date</th>
+                  <th class="px-6 py-3 text-sm font-semibold text-gray-600">Type</th>
+                  <th class="px-6 py-3 text-sm font-semibold text-gray-600">Order ID</th>
+                  <th class="px-6 py-3 text-sm font-semibold text-gray-600 text-right">Amount</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                <% wallet.transaction.forEach(element => { %>
+                  <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm text-gray-600">
+                      <%= element.transaction_date.toDateString() %>
+                    </td>
+                    <td class="px-6 py-4">
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                 <%= element.transactionType === 'Credited' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
+                        <%= element.transactionType %>
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 text-sm font-medium text-gray-700">
+                      #<%= element.order_id %>
+                    </td>
+                    <td class="px-6 py-4 text-sm font-bold text-right
+                               <%= element.transactionType === 'credit' ? 'text-green-600' : 'text-red-600' %>">
+                      ₹ <%= element.wallet_amount %>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        <% } else { %>
+          <!-- Empty State -->
+          <div class="text-center py-12">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            <h3 class="text-lg font-semibold text-gray-600 mb-2">No Transactions Yet</h3>
+            <p class="text-gray-500">Your transaction history will appear here</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('footer') %>

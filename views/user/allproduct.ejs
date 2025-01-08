@@ -1,200 +1,695 @@
-<div class="bg-gray-100 min-h-screen">
+<style>
+  body.modal-open {
+    overflow: hidden;
+  }
+
+  #filterModal {
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  #filterModal > div {
+    transition: transform 0.3s ease-in-out;
+  }
+
+  #filterModal.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  #filterModal.hidden > div {
+    transform: translateX(100%);
+  }
+</style>
+
+<div class="bg-gray-100 min-h-screen pb-8">
   <!-- Navbar -->
   <%- include('navbar') %>
 
   <!-- Alert (if applicable) -->
   <%- include('alert') %>
 
-  <!-- ------------------- Breadcrumbs ----------------------- -->
   <!-- Breadcrumb Navigation -->
-<nav class="breadcrumbs text-sm text-gray-600 py-4 bg-gray-50 border-b">
-  <ul class="flex items-center space-x-2 container mx-auto px-6">
+  <nav class="breadcrumbs text-sm text-gray-600 py-4 bg-gray-50 border-b">
+    <ul class="flex items-center space-x-2 container mx-auto px-4 md:px-6">
       <li>
-          <a
-              href="/home"
-              class="text-blue-500 hover:text-blue-700 font-medium transition"
-              >Home</a
-          >
+        <a
+          href="/home"
+          class="text-blue-500 hover:text-blue-700 font-medium transition"
+        >
+          Home
+        </a>
       </li>
       <span class="text-gray-400">/</span>
       <li>
-          <a
-              href="/allproduct"
-              class="text-blue-500 hover:text-blue-700 font-medium transition"
-              >All Products</a
-          >
-      </li>
-  </ul>
-</nav>
-
-<!-- Product Section -->
-<div class="container mx-auto px-6 py-6 ">
-  <!-- Search and Sort Section -->
-  <div class="flex flex-col md:flex-row gap-4 justify-between items-center mb-6">
-      <h2 class="text-xl font-semibold text-gray-800">Browse Products</h2>
-      <div class="flex items-center space-x-2">
-          <label for="sortSelect" class="text-gray-600 text-sm font-medium">Sort by:</label>
-          <select
-              id="sortSelect"
-              class="border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              onchange="Sort()"
-          >
-              <option value="new">New Arrivals</option>
-              <option value="price-low">Price: Low to High</option>
-              <option value="price-high">Price: High to Low</option>
-              <option value="a-z">Name: A to Z</option>
-              <option value="z-a">Name: Z to A</option>
-          </select>
-      </div>
-  </div>
-
-  <!-- Products Grid -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="productsGrid">
-      <% product.forEach(product => { %>
-          <div
-              class="product-card bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-              data-price="<%= product.productVariants[0].price %>"
-              data-name="<%= product.productName.toLowerCase() %>"
-              data-date="<%= product.createdAt %>"
-              data-search="<%= product.productName.toLowerCase() %> <%= product.productDescription.toLowerCase() %>"
-          >
-              <img
-                  src="<%= product.productImage[0] %>"
-                  alt="<%= product.productName %>"
-                  class="w-full h-48 object-cover"
-              />
-              <div class="p-4">
-                  <h3 class="text-lg font-semibold text-gray-800 mb-2 truncate">
-                      <%= product.productName %>
-                  </h3>
-                  <p class="text-gray-600 text-base font-medium mb-2">
-                      ₹<%= product.productVariants[0].price %>
-                  </p>
-                  <p class="text-sm text-gray-500 line-clamp-2">
-                      <%= product.productDescription %>
-                  </p>
-              </div>
-              <div class="p-4 border-t">
-                  <a
-                      href="/productDetail/<%- product.id %>""
-                      class="block text-center text-blue-500 hover:text-blue-700 font-medium transition"
-                  >
-                      View Details
-                  </a>
-              </div>
-          </div>
-      <% }); %>
-  </div>
-</div>
-
-
-
-
-
-
-  <!-- Pagination Controls -->
-  <div class="flex justify-center mt-6 ">
-    <ul class="flex space-x-2">
-      <% if (currentPage > 1) { %>
-      <li>
         <a
-          href="/allproduct/?page=<%= currentPage - 1 %>&limit=<%= limit %>&search=<%= search %>"
-          class="px-4 py-2 text-sm text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition duration-200"
+          href="/allproduct"
+          class="text-blue-500 hover:text-blue-700 font-medium transition"
         >
-          Previous
+          All Products
         </a>
       </li>
-      <% } %> <% for (let i = 1; i <= totalPages; i++) { %>
-      <li>
-        <a
-          href="/allproduct/?page=<%= i %>&limit=<%= limit %>&search=<%= search %>"
-          class="px-4 py-2 text-sm rounded transition duration-200 <%= currentPage == i ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %>"
-        >
-          <%= i %>
-        </a>
-      </li>
-      <% } %> <% if (currentPage < totalPages) { %>
-      <li>
-        <a
-          href="/allproduct/?page=<%= currentPage + 1 %>&limit=<%= limit %>&search=<%= search %>"
-          class="px-4 py-2 text-sm text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition duration-200"
-        >
-          Next
-        </a>
-      </li>
-      <% } %>
     </ul>
+  </nav>
+
+  <!-- Product Section -->
+  <div class="container mx-auto px-4 md:px-6 py-6">
+    <!-- Section Header -->
+    <div
+      class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6"
+    >
+      <h2 class="text-2xl font-semibold text-gray-800">Products</h2>
+      <div class="flex gap-4">
+        <div class="flex items-center space-x-4">
+          <!-- Sort Dropdown -->
+          <label for="sortSelect" class="text-gray-600 text-sm font-medium"
+            >Sort by:</label
+          >
+          <select
+            id="sortSelect"
+            class="border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            onchange="Sort()"
+          >
+            <option value="new">New Arrivals</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="a-z">Name: A to Z</option>
+            <option value="z-a">Name: Z to A</option>
+          </select>
+        </div>
+        <!-- Filter Button -->
+        <button
+          id="filterToggleBtn"
+          class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded shadow-md flex items-center space-x-2"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="w-6 h-6 text-gray-700"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M3 4h18M7 8h10M10 12h4M12 16h0"
+            />
+          </svg>
+          <span>Filter</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="container mx-auto px-4 py-8">
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+      >
+        <% product.forEach(product => { %>
+        <div class="group relative">
+          <!-- Wishlist Button -->
+          <button
+            onclick="addToWishlist('<%= product._id %>')"
+            class="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          >
+            <svg
+              class="w-5 h-5 text-gray-600 hover:text-red-500 transition-colors"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+              />
+            </svg>
+          </button>
+          <div
+            class="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
+          >
+            <!-- Product Image Container -->
+            <div class="relative aspect-square overflow-hidden">
+              <img
+                src="<%= product.productImage[0] %>"
+                alt="<%= product.productName %>"
+                class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+              />
+
+              <!-- Discount Badge -->
+              <% if (product.productDiscount > 0) { %>
+              <div
+                class="absolute top-4 left-4 bg-red-500 text-white text-sm font-medium px-2 py-1 rounded-full"
+              >
+                <%= product.productDiscount %>% OFF
+              </div>
+              <% } %>
+
+              <!-- Quick View Button -->
+              <div
+                class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              >
+                <div class="flex items-center justify-center h-full">
+                  <a
+                    href="/productDetail/<%= product.id %>"
+                    class="bg-white/90 backdrop-blur-sm text-gray-900 px-6 py-2.5 rounded-full hover:bg-[#8B7355] hover:text-white transition-all duration-300 transform translate-y-4 group-hover:translate-y-0"
+                  >
+                    Quick View
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Product Info -->
+            <div class="p-5">
+              <!-- Product Name -->
+              <h3
+                class="text-lg font-semibold text-gray-800 mb-2 line-clamp-1 group-hover:text-[#8B7355] transition-colors"
+              >
+                <%= product.productName %>
+              </h3>
+
+              <!-- Price and Discount -->
+              <div class="flex items-center gap-2 mb-3">
+                <% if (product.productDiscount > 0) { %>
+                <span class="text-2xl font-bold text-gray-900">
+                  ₹<%= Math.round(product.productVariants[0].price * (1 -
+                  product.productDiscount/100)) %>
+                </span>
+                <span class="text-sm text-gray-500 line-through">
+                  ₹<%= product.productVariants[0].price %>
+                </span>
+                <% } else { %>
+                <span class="text-2xl font-bold text-gray-900">
+                  ₹<%= product.productVariants[0].price %>
+                </span>
+                <% } %>
+              </div>
+
+              <!-- Description -->
+              <p class="text-sm text-gray-600 line-clamp-2 mb-4">
+                <%= product.productDescription %>
+              </p>
+
+              <!-- Add to Cart Button -->
+              <button
+                onclick="addToCart('<%= product._id %>')"
+                class="w-full py-2.5 bg-[#8B7355] text-white rounded-lg hover:bg-[#A79277] transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[#8B7355] focus:ring-offset-2"
+              >
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+        <% }); %>
+      </div>
+
+      <!-- Pagination -->
+      <div class="mt-12 flex justify-center">
+        <div class="inline-flex rounded-lg shadow-sm">
+          <% if (currentPage > 1) { %>
+          <a
+            href="/allproduct/?page=<%= currentPage - 1 %>&limit=<%= limit %>&search=<%= search %>"
+            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-l-lg hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-[#8B7355] focus:text-[#8B7355]"
+          >
+            Previous
+          </a>
+          <% } %> <% for (let i = 1; i <= totalPages; i++) { %>
+          <a
+            href="/allproduct/?page=<%= i %>&limit=<%= limit %>&search=<%= search %>"
+            class="px-4 py-2 text-sm font-medium <%= currentPage == i ? 'text-white bg-[#8B7355] border-[#8B7355] hover:bg-[#A79277]' : 'text-gray-700 bg-white border-gray-200 hover:bg-gray-50' %> border-t border-b <%= i === 1 && currentPage === 1 ? 'rounded-l-lg' : '' %> <%= i === totalPages && currentPage === totalPages ? 'rounded-r-lg' : '' %> focus:z-10 focus:ring-2 focus:ring-[#8B7355]"
+          >
+            <%= i %>
+          </a>
+          <% } %> <% if (currentPage < totalPages) { %>
+          <a
+            href="/allproduct/?page=<%= currentPage + 1 %>&limit=<%= limit %>&search=<%= search %>"
+            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-r-lg hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-[#8B7355] focus:text-[#8B7355]"
+          >
+            Next
+          </a>
+          <% } %>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
-
-
 <!-- Footer -->
 <%- include('footer') %>
 
+<!-- Filter Modal -->
+<div id="filterModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+  <div
+    class="fixed inset-y-0 right-0 max-w-md w-full bg-white shadow-lg flex flex-col"
+  >
+    <!-- Modal Header -->
+    <div class="flex justify-between items-center p-4 border-b">
+      <h3 class="text-lg font-semibold">Filters</h3>
+      <button
+        onclick="toggleFilterModal()"
+        class="text-gray-500 hover:text-gray-700"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Modal Content -->
+    <div class="p-4 overflow-y-auto flex-grow">
+      <!-- Category Filters -->
+      <div class="mb-6">
+        <h4 class="font-medium mb-3">Categories</h4>
+        <div class="space-y-2">
+          <% category.forEach(cat => { %>
+          <label class="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              name="category"
+              value="<%= cat._id %>"
+              class="form-checkbox text-[#A79277]"
+              onchange="handleFilters()"
+            />
+            <span class="text-gray-700"><%= cat.categoryName %></span>
+          </label>
+          <% }); %>
+        </div>
+      </div>
+
+      <!-- Price Range -->
+      <div class="mb-6">
+        <h4 class="font-medium mb-3">Price Range</h4>
+        <div class="flex items-center space-x-4">
+          <input
+            type="number"
+            id="minPrice"
+            placeholder="Min"
+            class="w-1/2 border rounded-lg p-2"
+            onchange="handleFilters()"
+          />
+          <input
+            type="number"
+            id="maxPrice"
+            placeholder="Max"
+            class="w-1/2 border rounded-lg p-2"
+            onchange="handleFilters()"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="p-4 bg-white border-t">
+      <div class="flex space-x-4">
+        <button
+          onclick="clearFilters()"
+          class="w-1/2 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+        >
+          Clear All
+        </button>
+        <button
+          onclick="applyFilters()"
+          class="w-1/2 py-2 bg-[#A79277] text-white rounded-lg hover:bg-[#8B7B64]"
+        >
+          Apply Filters
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  id="filterModal"
+  class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden transition-opacity duration-300 ease-in-out"
+>
+  <div
+    class="fixed inset-y-0 right-0 max-w-sm w-full bg-white shadow-xl transform translate-x-full transition-transform duration-300 ease-in-out"
+  >
+    <!-- Modal Header -->
+    <div class="flex justify-between items-center p-4 border-b">
+      <h3 class="text-lg font-semibold text-gray-800">Filters</h3>
+      <button
+        onclick="toggleFilterModal()"
+        class="text-gray-500 hover:text-gray-700 focus:outline-none"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Modal Content -->
+    <div class="p-4 overflow-y-auto h-full pb-32">
+      <!-- Category Filters -->
+      <div class="mb-6">
+        <h4 class="text-gray-800 font-medium mb-3">Categories</h4>
+        <div class="space-y-2">
+          <% category.forEach(cat => { %>
+          <label class="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              name="category"
+              value="<%= cat._id %>"
+              class="form-checkbox text-[#A79277] focus:ring-[#A79277]"
+              onchange="handleFilters()"
+            />
+            <span class="text-gray-700"><%= cat.categoryName %></span>
+          </label>
+          <% }); %>
+        </div>
+      </div>
+
+      <!-- Price Range -->
+      <div class="mb-6">
+        <h4 class="text-gray-800 font-medium mb-3">Price Range</h4>
+        <div class="flex items-center space-x-4">
+          <input
+            type="number"
+            id="minPrice"
+            placeholder="Min"
+            class="w-1/2 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-[#A79277] focus:border-[#A79277]"
+            onchange="handleFilters()"
+          />
+          <input
+            type="number"
+            id="maxPrice"
+            placeholder="Max"
+            class="w-1/2 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-[#A79277] focus:border-[#A79277]"
+            onchange="handleFilters()"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t">
+      <div class="flex space-x-4">
+        <button
+          onclick="clearFilters()"
+          class="w-1/2 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none"
+        >
+          Clear All
+        </button>
+        <button
+          onclick="applyFilters()"
+          class="w-1/2 py-2 bg-[#A79277] text-white rounded-lg hover:bg-[#8B7B64] focus:outline-none focus:ring-2 focus:ring-[#8B7B64]"
+        >
+          Apply Filters
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
   function Sort() {
-  const sortBy = document.getElementById("sortSelect").value; // Get selected sort option
-  const productsGrid = document.getElementById("productsGrid");
-  const products = Array.from(productsGrid.getElementsByClassName("product-card"));
+    const sortSelect = document.getElementById("sortSelect");
+    const sortValue = sortSelect.value;
 
-  // Sort the products based on selected criteria
-  products.sort((a, b) => {
-    switch (sortBy) {
-      case "price-low":
-        return parseFloat(a.dataset.price) - parseFloat(b.dataset.price); // Low to high
-      case "price-high":
-        return parseFloat(b.dataset.price) - parseFloat(a.dataset.price); // High to low
-      case "a-z":
-        return a.dataset.name.localeCompare(b.dataset.name); // Name A-Z
-      case "z-a":
-        return b.dataset.name.localeCompare(a.dataset.name); // Name Z-A
-      case "new":
-        return new Date(b.dataset.date) - new Date(a.dataset.date); // New Arrivals
-      default:
-        return 0; // Default case, no sorting
+    const params = new URLSearchParams(window.location.search);
+
+    params.set("sort", sortValue);
+
+    window.location.href = `/allproduct?${params.toString()}`;
+  }
+
+  // Update initializeFilters to include sort
+  function initializeFilters() {
+    const params = new URLSearchParams(window.location.search);
+
+    // Set category checkboxes
+    const categories = params.get("categories")?.split(",") || [];
+    categories.forEach((catId) => {
+      const checkbox = document.querySelector(`input[value="${catId}"]`);
+      if (checkbox) checkbox.checked = true;
+    });
+
+    // Set price inputs
+    const minPrice = params.get("minPrice");
+    const maxPrice = params.get("maxPrice");
+    if (minPrice) document.getElementById("minPrice").value = minPrice;
+    if (maxPrice) document.getElementById("maxPrice").value = maxPrice;
+
+    // Set sort select
+    const sortValue = params.get("sort");
+    if (sortValue) {
+      document.getElementById("sortSelect").value = sortValue;
     }
+  }
+
+  // Update handleFilters to preserve sort
+  function handleFilters() {
+    const selectedCategories = Array.from(
+      document.querySelectorAll('input[name="category"]:checked')
+    ).map((checkbox) => checkbox.value);
+
+    const minPrice = document.getElementById("minPrice").value;
+    const maxPrice = document.getElementById("maxPrice").value;
+
+    const params = new URLSearchParams(window.location.search);
+
+    // Preserve sort parameter if it exists
+    const currentSort = params.get("sort");
+
+    // Reset params but keep sort if it exists
+    params.forEach((value, key) => {
+      if (key !== "sort") {
+        params.delete(key);
+      }
+    });
+
+    if (selectedCategories.length > 0) {
+      params.set("categories", selectedCategories.join(","));
+    }
+
+    if (minPrice) params.set("minPrice", minPrice);
+    if (maxPrice) params.set("maxPrice", maxPrice);
+
+    // Add back sort parameter if it existed
+    if (currentSort) {
+      params.set("sort", currentSort);
+    }
+
+    window.location.href = `/allproduct?${params.toString()}`;
+  }
+</script>
+
+<script>
+  let filtersChanged = false;
+
+  function toggleFilterModal() {
+    const modal = document.getElementById("filterModal");
+    const body = document.body;
+
+    if (modal.classList.contains("hidden")) {
+      modal.classList.remove("hidden");
+      body.style.overflow = "hidden";
+    } else {
+      modal.classList.add("hidden");
+      body.style.overflow = "";
+    }
+  }
+
+  function handleFilters() {
+    filtersChanged = true;
+  }
+
+  function applyFilters() {
+    const selectedCategories = Array.from(
+      document.querySelectorAll('input[name="category"]:checked')
+    ).map((checkbox) => checkbox.value);
+
+    const minPrice = document.getElementById("minPrice").value;
+    const maxPrice = document.getElementById("maxPrice").value;
+
+    const params = new URLSearchParams(window.location.search);
+
+    // Preserve sort parameter
+    const currentSort = params.get("sort");
+
+    // Reset params but keep sort if it exists
+    params.forEach((value, key) => {
+      if (key !== "sort") {
+        params.delete(key);
+      }
+    });
+
+    if (selectedCategories.length > 0) {
+      params.set("categories", selectedCategories.join(","));
+    }
+
+    if (minPrice) params.set("minPrice", minPrice);
+    if (maxPrice) params.set("maxPrice", maxPrice);
+
+    // Add back sort parameter if it existed
+    if (currentSort) {
+      params.set("sort", currentSort);
+    }
+
+    toggleFilterModal(); // Close the modal
+    window.location.href = `/allproduct?${params.toString()}`;
+  }
+
+  function clearFilters() {
+    document.querySelectorAll('input[name="category"]').forEach((checkbox) => {
+      checkbox.checked = false;
+    });
+
+    document.getElementById("minPrice").value = "";
+    document.getElementById("maxPrice").value = "";
+
+    const params = new URLSearchParams(window.location.search);
+    const currentSort = params.get("sort");
+
+    if (currentSort) {
+      window.location.href = `/allproduct?sort=${currentSort}`;
+    } else {
+      window.location.href = "/allproduct";
+    }
+  }
+
+  // Add click event listener to the filter button
+  document
+    .getElementById("filterToggleBtn")
+    .addEventListener("click", toggleFilterModal);
+
+  // Close modal when clicking outside
+  document
+    .getElementById("filterModal")
+    .addEventListener("click", function (event) {
+      if (event.target === this) {
+        toggleFilterModal();
+      }
+    });
+
+  // Initialize filters when page loads
+  document.addEventListener("DOMContentLoaded", function () {
+    initializeFilters();
+
+    // Add event listener for escape key to close modal
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") {
+        const modal = document.getElementById("filterModal");
+        if (!modal.classList.contains("hidden")) {
+          toggleFilterModal();
+        }
+      }
+    });
   });
 
-  // Clear existing products in the grid
-  productsGrid.innerHTML = "";
 
-  // Append sorted products to the grid
-  products.forEach((product) => productsGrid.appendChild(product));
+  // add wishlist
+
+async function addToWishlist(productId) {
+    try {
+        const response = await fetch(`/add-wishlist/${productId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            // Handle unauthorized (not logged in) case
+            if (response.status === 401) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Please Login',
+                    text: 'You need to login to add items to wishlist',
+                    showCancelButton: true,
+                    confirmButtonText: 'Login',
+                    confirmButtonColor: '#8B7355',
+                    cancelButtonColor: '#d33',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/login';
+                    }
+                });
+                return;
+            }
+            
+            // Handle already in wishlist case
+            if (response.status === 400) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Already in Wishlist',
+                    text: 'This item is already in your wishlist',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    customClass: {
+                        popup: 'colored-toast'
+                    }
+                });
+                return;
+            }
+
+            throw new Error(data.message || 'Failed to add to wishlist');
+        }
+
+        // Success case
+        const wishlistIcon = document.getElementById(`wishlist-icon-${productId}`);
+        if (wishlistIcon) {
+            wishlistIcon.setAttribute('fill', 'red');
+        }
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Added to Wishlist!',
+            text: 'Item successfully added to your wishlist',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            customClass: {
+                popup: 'colored-toast'
+            }
+        });
+
+    } catch (error) {
+        console.error('Error adding to wishlist:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: error.message || 'Something went wrong!',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            customClass: {
+                popup: 'colored-toast'
+            }
+        });
+    }
 }
 
-// Optional: Search functionality for filtering products
-function Filter(searchTerm) {
-  const productsGrid = document.getElementById("productsGrid");
-  const products = Array.from(productsGrid.getElementsByClassName("product-card"));
-  const lowerCaseSearchTerm = searchTerm.toLowerCase();
-
-  // Filter products based on the search term
-  const filteredProducts = products.filter((product) =>
-    product.dataset.search.includes(lowerCaseSearchTerm)
-  );
-
-  // Clear existing products in the grid
-  productsGrid.innerHTML = "";
-
-  // Append filtered products or show no results message
-  if (filteredProducts.length === 0) {
-    productsGrid.innerHTML = `
-      <div class="col-span-full text-center py-8">
-        <p class="text-gray-500">No products found matching "${searchTerm}"</p>
-      </div>`;
-  } else {
-    filteredProducts.forEach((product) => productsGrid.appendChild(product));
-  }
-}
-
-// Add event listener for sorting on page load
-document.addEventListener("DOMContentLoaded", () => {
-  const sortSelect = document.getElementById("sortSelect");
-
-  // Initialize default sorting (New Arrivals)
-  Sort();
-
-  // Add an event listener for changes in sort selection
-  sortSelect.addEventListener("change", Sort);
-}); 
 </script>

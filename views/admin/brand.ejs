@@ -34,15 +34,15 @@
       
                     <span>Customers</span>
                 </a>
-                <a href="#" class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg">
+                <a href="/admin/orders" class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg">
       
                     <span>Orders</span>
                 </a>
-                <a href="#" class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg">
+                <a href="/admin/coupons" class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg">
       
                     <span>Coupons</span>
                 </a>
-                <a href="#" class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg">
+                <a href="/admin/offer" class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg">
       
                     <span>Offers</span>
                 </a>
@@ -107,10 +107,6 @@
                     onclick="showEditModal('<%= brand._id %>', '<%= brand.brandName %>','<%= brand.brandImage %>')">
                     Edit
                 </button>
-                <!-- <p><%= brand._id %></p>
-                <p><%= brand.brandName %></p>
-                <p><%= brand.brandImage %></p> -->
-
                 <!-- Block/Unblock Button -->
                 <form action="/admin/statusbrand/<%= brand._id %>" method="POST" class="inline">
                   <button

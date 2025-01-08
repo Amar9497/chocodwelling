@@ -47,13 +47,13 @@
           <span class="poppins-semibold">Orders</span>
         </a>
         <a
-          href="#"
+          href="/admin/coupons"
           class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg"
         >
           <span>Coupons</span>
         </a>
         <a
-          href="#"
+          href="/admin/offer"
           class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg"
         >
           <span>Offers</span>
@@ -98,7 +98,6 @@
             <tr>
               <th class="py-4 px-5">SL.No</th>
               <th class="py-4 px-5">OrderID</th>
-              <!-- Increased padding -->
               <th class="py-4 px-5">Date</th>
               <th class="py-4 px-5">Amount</th>
               <th class="py-4 px-5">Payment</th>
@@ -121,27 +120,27 @@
               <!-- Date -->
               <td class="px-5 py-3"><%= order.createdAt.toDateString() %></td>
               <!-- Price -->
-              <td class="px-5 py-3"><%= order.totalAmount %></td>
+              <td class="px-5 py-3"><%= order.finalAmount %></td>
               <!-- PaymentMethod -->
               <td class="px-5 py-3"><%= order.paymentMethod %></td>
               <!-- OrdrStatus -->
               <td class="px-5 py-3"><%= order.orderStatus %></td>
               <!-- Action -->
               <td class="px-5 py-3 border-b border-gray-200 text-sm">
-                <% if (order.orderStatus !== 'Cancelled' && order.orderStatus
-                !== 'Returned') { %>
-                <select
-                  class="status-dropdown block w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                  onchange="updateOrderStatus('<%= order._id %>', this.value)"
-                >
-                  <option value="Confirmed">Confirmed</option>
-                  <option value="Shipped">Shipped</option>
-                  <option value="Delivered">Delivered</option>
-                  <option value="Cancelled">Cancelled</option>
-                  <option value="Returned">Returned</option>
-                </select>
+                <% if (order.orderStatus !== 'Cancelled' && order.orderStatus !== 'Returned' && order.orderStatus !== 'Delivered') { %>
+                  <select
+                    class="status-dropdown block w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                    onchange="updateOrderStatus('<%= order._id %>', this.value)"
+                  >
+                    <option value="Confirmed" <%= order.orderStatus === 'Confirmed' ? 'selected' : '' %>>Confirmed</option>
+                    <option value="Shipped" <%= order.orderStatus === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                    <option value="Delivered" <%= order.orderStatus === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                    <option value="Cancelled" <%= order.orderStatus === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                    <option value="Returned" <%= order.orderStatus === 'Returned' ? 'selected' : '' %>>Returned</option>
+                  </select>
                 <% } %>
               </td>
+              
 
               <!-- Action -->
               <td class="px-5 py-3 text-center text-lg">
