@@ -16,7 +16,7 @@ const wishlistpage = async (req, res) => {
         const wishlist = await wishlistSchema.findOne({ userID: req.session.user })
             .populate({
                 path: 'products.productID',
-                model: 'Product'  // Make sure this matches your Product model name
+                model: 'Product'  
             });
 
         if (wishlist) {

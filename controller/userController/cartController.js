@@ -66,7 +66,6 @@ const addToCart = async (req, res) => {
     const userId = req.session.user;
     const { productId, quantity } = req.body;
 
-    // Find the product
     const product = await productSchema.findById(productId);
     if (!product) {
       return res.status(404).json({
@@ -112,7 +111,6 @@ const addToCart = async (req, res) => {
         userId,
         productId,
         quantity,
-        //price: product.productVariants[0].price,
       });
       await cartItem.save();
 

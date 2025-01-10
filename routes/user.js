@@ -12,6 +12,8 @@ const orderController = require('../controller/userController/orderController');
 const wishlistController = require('../controller/userController/wishlistController');
 const walletController = require('../controller/userController/walletController');
 const brandController = require('../controller/userController/brandContrller');
+const reviewController = require('../controller/userController/reviewController');
+
 
 const auth = require('../middleware/userSession');
 
@@ -98,6 +100,8 @@ user.post('/verify-payment',checkOutController.verifyPayment);
 
 user.post('/validate-coupon', checkOutController.validateCoupon);
 
+user.post('/cancel-razorpay-order', checkOutController.cancelRazorpayOrder);
+
 
 // ------------------------- order ---------------------------------
 
@@ -108,6 +112,19 @@ user.post('/cancelOrder/:orderId',auth.isCheck,orderController.cancelOrder);
 user.post('/return-order/:orderId', auth.isCheck, orderController.returnOrder);
 
 user.get('/orderDetail/:id',auth.isCheck,orderController.orderDetails);
+
+user.get('/order/:orderId/invoice', auth.isCheck, orderController.generateInvoice);
+
+user.post('/retry-payment', auth.isCheck, orderController.retryPayment);
+
+user.post('/verify-retry-payment', auth.isCheck, orderController.verifyRetryPayment);
+
+user.post('/update-payment-status', orderController.updatePaymentStatus);
+
+
+
+
+
 
 // ------------------------ category -------------------------------
 
@@ -127,22 +144,32 @@ user.get('/allproduct',auth.isCheck,productController.allProduct);
 user.get('/productDetail/:id',auth.isCheck,productController.productDetail);
 
 
+// ------------------------ Review -------------------------------------
+
+// Review routes
+user.post('/product/:productId/review',auth.isCheck,reviewController.addReview);
+
+user.get('/product/:productId/all-reviews', reviewController.getAllReviews);
+
+
+
 // ------------------------- wishlist -------------------------------
 
-user.get('/wishlist',wishlistController.wishlistpage);
+user.get('/wishlist',auth.isCheck,wishlistController.wishlistpage);
 
-user.get('/add-wishlist/:id',wishlistController.addWishlist);
+user.get('/add-wishlist/:id',auth.isCheck,wishlistController.addWishlist);
 
-user.delete('/delete-wish/:id',wishlistController.deleteWishlist );
+user.delete('/delete-wish/:id',auth.isCheck,wishlistController.deleteWishlist );
 
 
 // ------------------------- wallet ------------------------------
 
-user.get('/wallet',walletController.walletPage);
+user.get('/wallet',auth.isCheck,walletController.walletPage);
 
 // ------------------------- logout --------------------------------
 
 user.get('/logout',auth.isCheck,userController.logout);
+
 
 
 module.exports= user ;

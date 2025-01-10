@@ -9,7 +9,6 @@ const getBrandProducts = async (req, res) => {
         const search = req.query.search || "";
         const sort = req.query.sort || "new";
 
-        // Get brand details
         const brand = await brandSchema.findById(brandId);
         if (!brand) {
             return res.status(404).redirect('/category');

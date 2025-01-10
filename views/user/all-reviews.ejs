@@ -1,0 +1,119 @@
+<%- include('navbar') %>
+
+<div class="container mx-auto px-4 py-8">
+    <!-- Product Info -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold mb-2"><%= product.name %></h1>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center">
+                <% for(let i = 1; i <= 5; i++) { %>
+                    <span class="text-2xl <%= i <= product.ratings.average ? 'text-yellow-400' : 'text-gray-300' %>">★</span>
+                <% } %>
+            </div>
+            <span class="text-lg">(<%= product.ratings.total %> reviews)</span>
+        </div>
+    </div>
+
+    <!-- Rating Distribution -->
+    <div class="bg-white rounded-lg shadow p-6 mb-8">
+        <h2 class="text-xl font-semibold mb-4">Rating Distribution</h2>
+        <div class="space-y-2">
+            <% for(let i = 5; i >= 1; i--) { %>
+                <div class="flex items-center gap-4">
+                    <span class="w-12"><%= i %> stars</span>
+                    <div class="flex-1 bg-gray-200 rounded-full h-4">
+                        <% const percentage = (product.ratings.distribution[i] / product.ratings.total) * 100 || 0 %>
+                        <div class="bg-yellow-400 rounded-full h-4" style="width: <%= percentage %>%"></div>
+                    </div>
+                    <span class="w-16 text-right"><%= product.ratings.distribution[i] || 0 %></span>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Reviews List -->
+    <div class="space-y-6">
+        <% if (reviews.length === 0) { %>
+            <div class="text-center py-8">
+                <p class="text-gray-500">No reviews yet</p>
+            </div>
+        <% } else { %>
+            <% reviews.forEach(review => { %>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-start gap-4">
+                        <!-- User Info -->
+                        <div class="flex-shrink-0">
+                            
+                                <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                                    <span class="text-xl text-gray-600">
+                                        <%= review.user.name.charAt(0).toUpperCase() %>
+                                    </span>
+                                </div>
+                        </div>
+
+                        <!-- Review Content -->
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="font-semibold"><%= review.user.name %></h3>
+                                <span class="text-gray-500">
+                                    <%= new Date(review.createdAt).toLocaleDateString() %>
+                                </span>
+                            </div>
+
+                            <!-- Rating Stars -->
+                            <div class="flex items-center mb-2">
+                                <% for(let i = 1; i <= 5; i++) { %>
+                                    <span class="text-xl <%= i <= review.rating ? 'text-yellow-400' : 'text-gray-300' %>">★</span>
+                                <% } %>
+                                <% if (review.isVerifiedPurchase) { %>
+                                    <span class="ml-2 text-green-600 text-sm">Verified Purchase</span>
+                                <% } %>
+                            </div>
+
+                            <!-- Review Text -->
+                            <p class="text-gray-700 mb-4"><%= review.review %></p>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        <% } %>
+    </div>
+
+    <!-- Pagination -->
+    <% if (totalPages > 1) { %>
+        <div class="flex justify-center mt-8 gap-2">
+            <% if (currentPage > 1) { %>
+                <a href="?page=<%= currentPage - 1 %>" 
+                   class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+                    Previous
+                </a>
+            <% } %>
+
+            <% for(let i = 1; i <= totalPages; i++) { %>
+                <a href="?page=<%= i %>" 
+                   class="px-4 py-2 rounded <%= currentPage === i ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300' %>">
+                    <%= i %>
+                </a>
+            <% } %>
+
+            <% if (currentPage < totalPages) { %>
+                <a href="?page=<%= currentPage + 1 %>" 
+                   class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+                    Next
+                </a>
+            <% } %>
+        </div>
+    <% } %>
+</div>
+
+<!-- Image Modal -->
+<div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 hidden items-center justify-center z-50">
+    <div class="max-w-4xl w-full mx-4">
+        <img id="modalImage" src="" alt="Review image" class="w-full">
+        <button onclick="closeImageModal()" 
+                class="absolute top-4 right-4 text-white text-4xl">&times;</button>
+    </div>
+</div>
+
+
+<%- include('footer') %>

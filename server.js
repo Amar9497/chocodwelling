@@ -4,6 +4,7 @@ const app=express();
 const path=require('path');
 require('dotenv').config();
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const flash = require('connect-flash');
 const expressLayouts = require('express-ejs-layouts')
 const multer = require('multer');
@@ -35,6 +36,20 @@ app.set('layout','./layout/layout')
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
+
+// Add this after your routes
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    
+    // Ensure JSON response
+    res.setHeader('Content-Type', 'application/json');
+    
+    res.status(err.status || 500).json({
+        success: false,
+        message: err.message || 'Something went wrong!'
+    });
+});
+
 // Set EJS template engine
 app.set('view engine', 'ejs');
 
@@ -45,14 +60,61 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(nocache());
 
 // session
-app.use(session({
-    secret:'my-secret-key',
-    resave:false,
-    saveUninitialized: false
-}))
+const sessionStore = MongoStore.create({
+    mongoUrl: process.env.MONGODB_URL,
+    ttl: 24 * 60 * 60, // 1 day
+    autoRemove: 'native',
+    touchAfter: 24 * 3600,
+    collectionName: 'sessions'
+});
 
-// flash
-app.use(flash())
+// Session Configuration
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'your-secret-key',
+    resave: true,  // Changed to true
+    saveUninitialized: false,
+    store: sessionStore,
+    cookie: {
+        httpOnly: true,
+        secure: false,  // Set to false in development
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        sameSite: 'lax'
+    },
+    rolling: true  // Refresh cookie on every response
+}));
+
+// Development Mode Hot Reload Handler
+if (process.env.NODE_ENV === 'development') {
+    app.use((req, res, next) => {
+        if (req.session && req.session.user) {
+            // Refresh session on each request in development
+            req.session.touch();
+        }
+        next();
+    });
+}
+
+// Flash messages
+app.use(flash());
+
+// Global variables middleware
+app.use((req, res, next) => {
+    res.locals.user = req.session.user || null;
+    res.locals.admin = req.session.admin || null;
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    next();
+});
+
+// Session Debug Middleware (optional, for development only)
+if (process.env.NODE_ENV === 'development') {
+    app.use((req, res, next) => {
+        console.log('Session ID:', req.sessionID);
+        console.log('Session Data:', req.session);
+        next();
+    });
+}
+
 
 // flash message
 app.use((req,res,next)=>{

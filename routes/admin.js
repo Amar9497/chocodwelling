@@ -28,11 +28,11 @@ admin.get('/home',auth.isAdmin,adminController.loadHome);
 
 // ------------------------- sales --------------------------------
 
-admin.get('/salesReport', saleController.salePage);
+admin.get('/salesReport',auth.isAdmin,saleController.salePage);
 
-admin.post('/sales-report', saleController.generateReport);
+admin.post('/sales-report',auth.isAdmin,saleController.generateReport);
 
-admin.get('/download-report/:format', saleController.downloadReport);
+admin.get('/download-report/:format',auth.isAdmin,saleController.downloadReport);
 
 
 // -------------------- admin products -------------------
@@ -87,23 +87,23 @@ admin.get('/order-view/:id',auth.isAdmin,orderController.orderView);
 
 // ----------------------- offer --------------------------
 
-admin.get('/offer',offerController.getOffer);
+admin.get('/offer',auth.isAdmin,offerController.getOffer);
 
-admin.post('/addOffer',offerController.addOffer);
+admin.post('/addOffer',auth.isAdmin,offerController.addOffer);
 
-admin.post('/editOffer',offerController.editOffer);
+admin.post('/editOffer',auth.isAdmin,offerController.editOffer);
 
-admin.get('/offerStatus',offerController.offerStatus);
+admin.get('/offerStatus',auth.isAdmin,offerController.offerStatus);
 
 // ---------------------- coupon --------------------------
 
-admin.get('/coupons/:id?',couponController.getCoupons);
+admin.get('/coupons/:id?',auth.isAdmin,couponController.getCoupons);
 
-admin.post('/addcoupon',couponController.addCoupon);
+admin.post('/addcoupon',auth.isAdmin,couponController.addCoupon);
 
-admin.post('/editcoupon/:id',couponController.editCoupon);
+admin.post('/editcoupon/:id',auth.isAdmin,couponController.editCoupon);
 
-admin.get('/statuscoupon',couponController.toggleCouponStatus);
+admin.get('/statuscoupon',auth.isAdmin,couponController.toggleCouponStatus);
 
 
 

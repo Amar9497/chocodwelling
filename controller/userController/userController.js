@@ -11,8 +11,6 @@ const sendOTP = require('../../service/emailsender');
 const generateOTP = require('../../service/generateotp')
 
 
-
-
 // ------------- login page render ------------------
 const loadLogin=(req,res)=>{
     try {
@@ -25,7 +23,6 @@ const loadLogin=(req,res)=>{
 // ---------------- login post -------------------
 const loginPost = async (req, res) => {
     try {
-        //console.log(req.body); 
         const user = await userSchema.findOne({ email: req.body.email }); 
 
         if (!user) {
@@ -53,6 +50,7 @@ const loginPost = async (req, res) => {
         res.redirect('/login');
     }
 };
+
 
 //--------------------google login----------------
 
@@ -128,9 +126,7 @@ const singupPost = async(req,res)=>{
             password: await bcrypt.hash(req.body.password,saltround),
             phone:req.body.phone
         }
-        //console.log(details)
         const check = await userSchema.findOne({email:details.email})
-        //console.log(check);
         if(check){
             console.log('User already exists')
             req.flash('error','User already exists');
@@ -192,12 +188,10 @@ const otpPost = async (req, res) => {
         }
 
         if (req.session.otp.toString() === otpEntered.toString()) {
-            //console.log('OTP verified');
+
             req.flash('success', 'OTP Verified');
 
-             // Create a new user and store the returned document
             const user = await userSchema.create(details);
-            //console.log('New user registered successfully:', user);
 
             req.flash('success', 'New user registered successfully');
             
@@ -297,6 +291,10 @@ const logout = (req,res)=>{
         res.status(500).send("Error occured")
     }
 }
+
+
+
+
 
 module.exports={
     loadSignup,

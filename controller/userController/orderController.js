@@ -2,7 +2,17 @@ const orderSchema = require("../../model/orderSchema");
 const productSchema = require('../../model/productSchema');
 const walletSchema = require('../../model/walletSchema');
 const mongoose = require('mongoose');
+const PDFDocument = require('pdfkit');
+const fs = require('fs');
+const path = require('path');
+const Razorpay = require('razorpay');
+const crypto = require('crypto');
 
+// Initialize Razorpay
+const razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET
+});
 
 // ----------------------- user order page -------------------
 
@@ -22,7 +32,6 @@ const orderPage = async (req, res) => {
         // Find total orders 
         const totalOrders = await orderSchema.countDocuments({ userId });
 
-        // 
         const orderDetails = await orderSchema.find({ userId })
             .populate({
                 path: 'products.productId',
@@ -32,6 +41,8 @@ const orderPage = async (req, res) => {
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit);
+            
+        
 
         // Transform the data for the view
         const formattedOrders = orderDetails.map(order => ({
@@ -43,12 +54,15 @@ const orderPage = async (req, res) => {
             finalAmount: order.finalAmount, 
             createdAt: order.createdAt,
             products: order.products.map(product => ({
+                product_id : product.productId,
                 product_name: product.productId.productName,
                 product_image: product.productId.productImage[0],
                 product_quantity: product.quantity,
                 product_price: product.price
             }))
         }));
+
+        
 
         const totalPages = Math.ceil(totalOrders / limit);
 
@@ -156,7 +170,6 @@ const returnOrder = async (req, res) => {
         const orderId = req.params.orderId;
         const userId = req.session.user;
 
-        // Find the order
         const order = await orderSchema.findById(orderId)
             .populate('products.productId');
 
@@ -167,7 +180,7 @@ const returnOrder = async (req, res) => {
             });
         }
 
-        // Check if order is eligible for return (e.g., within 7 days and delivered)
+        // Check if order is eligible for return  within 7 days 
         const deliveryDate = new Date(order.deliveredAt);
         const currentDate = new Date();
         const daysDifference = Math.floor((currentDate - deliveryDate) / (1000 * 60 * 60 * 24));
@@ -250,7 +263,6 @@ const orderDetails = async (req, res) => {
         const userId = req.session.user;
         const orderId = req.params.id;
 
-        // Add validation for orderId
         
         if (!orderId) {
             req.flash('error', 'Invalid order ID');
@@ -326,9 +338,265 @@ const orderDetails = async (req, res) => {
     }
 };
 
+// ------------------------- invoice download -------------------------
+
+const generateInvoice = async (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+        const order = await orderSchema.findById(orderId)
+            .populate('products.productId')
+            .populate('userId', 'name email phone');
+
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        // Create PDF document
+        const doc = new PDFDocument({ margin: 50 });
+
+        // Set response headers
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=invoice-${order._id}.pdf`);
+
+        // Pipe PDF to response
+        doc.pipe(res);
+
+        // Add company details
+        doc.fontSize(20).text('CHOCO DWELLING', 50, 50);
+        doc.fontSize(10).text('Dotspace Business Park', 50, 80);
+        doc.text('Thiruvananthapuram, Kerala, 695582', 50, 95);
+        doc.text('Phone: (123) 456-7890', 50, 110);
+        doc.text('Email: info@chocodwelling.com', 50, 125);
+
+        // Add line
+        doc.moveTo(50, 140).lineTo(550, 140).stroke();
+
+        // Add invoice details
+        doc.fontSize(16).text('INVOICE', 50, 160);
+        doc.fontSize(10)
+            .text(`Invoice Number: ${order._id.toString().slice(-6).toUpperCase()}`, 50, 185)
+            .text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`, 50, 200)
+            .text(`Payment Method: ${order.paymentMethod}`, 50, 215);
+
+        // Add customer details
+        doc.fontSize(12).text('Bill To:', 50, 245);
+        doc.fontSize(10)
+            .text(order.userId.name, 50, 260)
+            .text(order.userId.email, 50, 275)
+            .text(order.userId.phone, 50, 290);
+
+        // Add shipping address
+        doc.fontSize(12).text('Ship To:', 300, 245);
+        doc.fontSize(10)
+            .text(order.shippingAddress.building, 300, 260)
+            .text(order.shippingAddress.street, 300, 275)
+            .text(`${order.shippingAddress.city}, ${order.shippingAddress.state}`, 300, 290)
+            .text(`${order.shippingAddress.pincode}`, 300, 305);
+
+        // Add table headers
+        let y = 350;
+        doc.fontSize(10)
+            .text('Item', 50, y)
+            .text('Quantity', 250, y)
+            .text('Price', 350, y)
+            .text('Total', 450, y);
+
+        // Add line
+        y += 20;
+        doc.moveTo(50, y).lineTo(550, y).stroke();
+
+        // Add items
+        y += 20;
+        order.products.forEach(item => {
+            doc.text(item.productId.productName, 50, y)
+                .text(item.quantity.toString(), 250, y)
+                .text(`${item.price.toFixed(2)}`, 350, y)
+                .text(`${(item.quantity * item.price).toFixed(2)}`, 450, y);
+            y += 20;
+        });
+
+        // Add line
+        doc.moveTo(50, y).lineTo(550, y).stroke();
+        y += 20;
+
+        // Add totals
+        doc.text('Subtotal:', 350, y).text(`${order.totalAmount.toFixed(2)}`, 450, y);
+        y += 20;
+        doc.text('Total:', 350, y).text(`${order.finalAmount.toFixed(2)}`, 450, y);
+
+        // Add footer
+        doc.fontSize(10)
+            .text('Thank you for your business!', 50, 700, { align: 'center' })
+            .text('For any queries, please contact support@chocodwelling.com', 50, 715, { align: 'center' });
+
+        // Finalize PDF
+        doc.end();
+
+    } catch (error) {
+        console.error('Error generating invoice:', error);
+        res.status(500).json({ message: 'Error generating invoice' });
+    }
+};
+
+
+//----------------------------------------------------------
+
+const retryPayment = async (req, res) => {
+    try {
+        const { orderId } = req.body;
+        const userId = req.session.user;
+        
+        // Find the order
+        const order = await orderSchema.findById(orderId);
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order not found'
+            });
+        }
+
+        // Verify order belongs to user
+        if (order.userId.toString() !== userId.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: 'Unauthorized'
+            });
+        }
+
+        // Create Razorpay order
+        const razorpayOrder = await razorpay.orders.create({
+            amount: Math.round(order.finalAmount * 100), // Convert to paise
+            currency: 'INR',
+            receipt: orderId.toString(),
+            notes: {
+                orderId: orderId,
+                userId: userId
+            }
+        });
+
+        console.log('Razorpay order created:', razorpayOrder); // Debug log
+
+        res.json({
+            success: true,
+            key: process.env.RAZORPAY_KEY_ID,
+            amount: razorpayOrder.amount,
+            orderId: razorpayOrder.id,
+            order_id: orderId,
+            currency: 'INR',
+            notes: {
+                orderId: orderId,
+                userId: userId
+            }
+        });
+
+    } catch (error) {
+        console.error('Retry payment error:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Failed to initialize payment'
+        });
+    }
+};
+
+const verifyRetryPayment = async (req, res) => {
+    try {
+        const {
+            orderId,
+            razorpay_order_id,
+            razorpay_payment_id,
+            razorpay_signature
+        } = req.body;
+
+        // Verify signature
+        const sign = razorpay_order_id + "|" + razorpay_payment_id;
+        const expectedSign = crypto
+            .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+            .update(sign.toString())
+            .digest("hex");
+
+        if (razorpay_signature !== expectedSign) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid payment signature'
+            });
+        }
+
+        // Update order status
+        const order = await orderSchema.findById(orderId);
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order not found'
+            });
+        }
+
+        order.paymentStatus = 'Completed';
+        order.paymentDetails = {
+            orderId: razorpay_order_id,
+            paymentId: razorpay_payment_id,
+            signature: razorpay_signature,
+            amount: order.finalAmount,
+            currency: 'INR'
+        };
+        await order.save();
+
+        res.json({
+            success: true,
+            message: 'Payment verified successfully',
+            orderId: order._id
+        });
+
+    } catch (error) {
+        console.error('Verify retry payment error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to verify payment'
+        });
+    }
+};
+
+// Add this new function to update payment status
+const updatePaymentStatus = async (req, res) => {
+    try {
+        const { orderId, status, reason } = req.body;
+        
+        const order = await orderSchema.findById(orderId);
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order not found'
+            });
+        }
+
+        order.paymentStatus = status;
+        if (reason) {
+            order.paymentFailureReason = reason;
+        }
+        await order.save();
+
+        res.json({
+            success: true,
+            message: 'Payment status updated successfully'
+        });
+
+    } catch (error) {
+        console.error('Update payment status error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to update payment status'
+        });
+    }
+};
+
+
+
 module.exports = {
     orderPage,
     cancelOrder,
     orderDetails,
-    returnOrder
+    returnOrder,
+    generateInvoice,
+    retryPayment,
+    verifyRetryPayment,
+    updatePaymentStatus
 }

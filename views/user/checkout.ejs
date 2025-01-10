@@ -673,6 +673,12 @@
       .addEventListener("submit", validateForm);
 </script>
 
+
+
+
+
+
+
 <script>
 
   document
@@ -761,50 +767,104 @@
             },
             handler: async function (response) {
               try {
+                // Show loading state
+                Swal.fire({
+                  title: "Processing Payment...",
+                  text: "Please wait while we verify your payment",
+                  allowOutsideClick: false,
+                  showConfirmButton: false,
+                  didOpen: () => {
+                    Swal.showLoading();
+                  }
+                });
+
+                // Only proceed if we have complete payment details
+                if (!response.razorpay_payment_id || !response.razorpay_order_id || !response.razorpay_signature) {
+                  throw new Error('Payment incomplete');
+                }
+
                 const verifyResponse = await fetch("/verify-payment", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
-                    ...orderData,
+                    addressId: document.querySelector('input[name="addressId"]:checked').value,
+                    paymentMethod: 'Razorpay',
+                    couponCode: document.getElementById('coupon-code').value || null,
                     razorpay_order_id: response.razorpay_order_id,
                     razorpay_payment_id: response.razorpay_payment_id,
-                    razorpay_signature: response.razorpay_signature,
+                    razorpay_signature: response.razorpay_signature
                   }),
                 });
 
                 const result = await verifyResponse.json();
-                const orderId = result.orderId; // Save `orderId` separately
-                console.log(orderId); // This works
+                const orderId = result.orderId;
 
-                if (result.success) {
-                  Swal.fire({
-                    icon: "success",
-                    title: "Payment Successful!",
-                    text: "Your order has been placed successfully",
-                    confirmButtonText: "View Order",
-                  }).then((swalResult) => {
-                    // SweetAlert result
-                    if (swalResult.isConfirmed) {
-                      console.log(orderId); // Use the saved `orderId`
-                      window.location.href = `/orderDetail/${orderId}`;
-                    }
-                  });
-                } else {
-                  throw new Error(result.message);
+                if (!result.success) {
+                  throw new Error(result.message || 'Payment verification failed');
                 }
+
+                // Success case
+                Swal.fire({
+                  icon: "success",
+                  title: "Payment Successful!",
+                  text: "Your order has been placed successfully",
+                  confirmButtonText: "View Order",
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    window.location.href = `/orderDetail/${orderId}`;
+                  }
+                });
+
               } catch (error) {
+                console.error('Payment error:', error);
                 Swal.fire({
                   icon: "error",
                   title: "Payment Failed",
-                  text: error.message,
+                  text: error.message || "Payment could not be completed. No order has been placed.",
+                }).then(() => {
+                  window.location.href = '/cart';
                 });
               }
             },
+            modal: {
+    ondismiss: function() {
+        // Handle payment cancellation
+        console.log('Cancelling order:', razorpayData.orderId);
+        fetch("/cancel-razorpay-order", {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                razorpay_order_id: razorpayData.orderId,
+                addressId: selectedAddress.value,
+                paymentMethod: 'Razorpay',
+                couponCode: document.getElementById('coupon-code').value || null,
+                totalPrice: subtotal,
+                finalAmount: finalTotal
+            })
+        }).then(response => response.json())
+        .then(result => {
+            Swal.fire({
+                icon: "warning",
+                title: "Payment Cancelled",
+                text: "Your payment was cancelled. No order has been placed.",
+            }).then(() => {
+                window.location.href = '/orders';
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            window.location.href = '/orders';
+        });
+    }
+},
             theme: {
               color: "#3B82F6",
-            },
+            }
           };
 
+          // Initialize Razorpay
           const rzp = new Razorpay(options);
           rzp.open();
           Swal.close(); // Close the loading dialog
@@ -866,7 +926,34 @@
         });
       }
     });
+
+
+
+
+// Function to handle payment failures
+async function handlePaymentFailure(reason) {
+    try {
+        Swal.fire({
+            icon: "error",
+            title: "Payment Failed",
+            text: reason || "Payment could not be completed",
+            confirmButtonText: "OK"
+        }).then(() => {
+            window.location.href = '/cart';
+        });
+    } catch (error) {
+        console.error("Error handling payment failure:", error);
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Something went wrong while handling payment failure"
+        });
+    }
+}
+
 </script>
+
+
 
 <script>
 

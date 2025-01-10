@@ -13,20 +13,25 @@ const orderSchema = new mongoose.Schema({
             ref: 'Product',
             required: true
         },
-        quantity: {
+        name: String,  
+        quantity: {    
             type: Number,
             required: true
         },
-        price: {
+        price: {       
             type: Number,
             required: true
         },
-        status: {
-            type: String,
-            enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'],
-            default: 'Pending'
+        image: String, 
+        // status: {
+        //     type: String,
+        //     enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'],
+        //     default: 'Pending'
+        // },
+        isReviewed: {
+            type: Boolean,
+            default: false
         }
-    
     }],
     totalAmount: {
         type: Number,
@@ -59,6 +64,10 @@ const orderSchema = new mongoose.Schema({
         enum: ['Pending', 'Completed', 'Failed'],
         default: 'Pending'
     },
+    paymentFailureReason: String,
+    razorpayOrderId: String,
+    razorpayPaymentId: String,
+    razorpaySignature: String,
     orderStatus: {
         type: String,
         enum: ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled', 'Returned'],

@@ -13,6 +13,7 @@ require('dotenv').config();
 
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
+const { log } = require('console');
 
 // Initialize Razorpay
 const razorpay = new Razorpay({
@@ -48,6 +49,7 @@ const checkout = async (req, res) => {
         const outOfStockProducts = [];
 
         for (const item of cartItems) {
+            
             // Check if product is active
             if (!item.productId.isActive) {
                 unavailableProducts.push(item.productId.productName);
@@ -59,7 +61,7 @@ const checkout = async (req, res) => {
             if (!variant || variant.stock <= 0) {
                 outOfStockProducts.push(item.productId.productName);
             } else if (variant.stock < item.quantity) {
-                // If requested quantity is more than available stock
+
                 outOfStockProducts.push(
                     `${item.productId.productName} (Only ${variant.stock} available)`
                 );
@@ -119,7 +121,7 @@ const checkout = async (req, res) => {
                 discount: finalDiscount,
                 discountedPrice: discountedPrice,
                 subtotal: discountedPrice * item.quantity,
-                originalPrice: basePrice * item.quantity // Original price before discount
+                originalPrice: basePrice * item.quantity 
             };
         }));
 
@@ -241,9 +243,8 @@ const placeOrder = async (req, res) => {
             return {
                 productId: product._id,
                 quantity: item.quantity,
-                price: finalPrice,
-                //originalPrice: basePrice,
-                //discountPercentage: finalDiscount
+                price: finalPrice
+                
             };
         }));
 
@@ -267,16 +268,14 @@ const placeOrder = async (req, res) => {
             couponCode: couponCode || undefined
         });
         
-        console.log('New Order:', {
-            products: newOrder.products.map(p => ({
-                price: p.price,
-                quantity: p.quantity,
-                itemTotal: p.itemTotal,
-                discountPercentage: p.discountPercentage
-            })),
-            totalAmount: newOrder.totalAmount,
-            finalAmount: newOrder.finalAmount
-        });
+
+        if (paymentMethod === 'COD' && finalAmount > 1000) {
+            return res.status(400).json({
+                success: false,
+                message: 'Orders above ₹1000 are not allowed for Cash on Delivery'
+            });
+        }
+         
 
         switch (paymentMethod) {
             case 'COD':
@@ -352,6 +351,10 @@ const placeOrder = async (req, res) => {
 };
 
 
+
+
+
+
 // update stock and clear cart
 async function updateStockAndClearCart(cartItems, userId) {
     try {
@@ -369,7 +372,6 @@ async function updateStockAndClearCart(cartItems, userId) {
         throw new Error('Failed to update stock and clear cart: ' + error.message);
     }
 }
-
 
 
 
@@ -473,6 +475,10 @@ const createRazorpayOrder = async (req, res) => {
     });
   }
 };
+
+
+
+
 
 // ---------------------- vefiy payment ----------------------
 
@@ -642,13 +648,133 @@ const verifyPayment = async (req, res) => {
 
 
 
+// Add this new controller function
+const cancelRazorpayOrder = async (req, res) => {
+    console.log('Cancel order request body:', req.body);
+    try {
+        const { 
+            razorpay_order_id,
+            addressId,
+            paymentMethod,
+            couponCode,
+            totalPrice,
+            finalAmount
+        } = req.body;
+
+        if (isNaN(totalPrice) || isNaN(finalAmount)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid amount values'
+            });
+        }
+
+        const userId = req.session.user;
+
+        const cartItems = await cartSchema.find({ userId })
+            .populate('productId')
+            .exec();
+
+        if (!cartItems || cartItems.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Cart is empty'
+            });
+        }
+
+        const user = await userSchema.findById(userId);
+        const selectedAddress = user.address[parseInt(addressId)];
+
+        if (!selectedAddress) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid address selected'
+            });
+        }
+
+        const orderProducts = await Promise.all(cartItems.map(async (item) => {
+            const product = item.productId;
+            const basePrice = product.productVariants[0].price;
+
+            const [productOffer, categoryOffer] = await Promise.all([
+                offerSchema.findOne({
+                    offerType: 'Product',
+                    referenceId: product._id,
+                    isActive: true
+                }),
+                offerSchema.findOne({
+                    offerType: 'Category',
+                    referenceId: product.category,
+                    isActive: true
+                })
+            ]);
+
+            const productDiscount = product.productDiscount || 0;
+            const offerDiscount = Math.max(
+                productOffer ? productOffer.discountPercent : 0,
+                categoryOffer ? categoryOffer.discountPercent : 0
+            );
+            const finalDiscount = Math.max(productDiscount, offerDiscount);
+            const finalPrice = basePrice - (basePrice * finalDiscount / 100);
+
+            return {
+                productId: product._id,
+                quantity: item.quantity,
+                price: finalPrice
+                
+            };
+        }));
+
+        
+        const newOrder = new orderSchema({
+            userId,
+            products: orderProducts,
+            totalAmount : totalPrice,
+            finalAmount,
+            shippingAddress: {
+                building: selectedAddress.building,
+                street: selectedAddress.street,
+                city: selectedAddress.city,
+                state: selectedAddress.state,
+                pincode: selectedAddress.pincode,
+                phoneNumber: selectedAddress.phoneNumber
+            },
+            paymentMethod,
+            paymentStatus: 'Pending',
+            orderStatus: 'Confirmed',
+            couponCode: couponCode || undefined
+        });
+
+        if(paymentMethod === 'Razorpay'){
+            newOrder.paymentStatus = 'Pending';
+                await newOrder.save();
+                await updateStockAndClearCart(cartItems, userId);
+                
+                return res.status(200).json({
+                    success: true,
+                    message: 'Order cancelled',
+                    orderId: newOrder._id
+                });
+        }
+
+    } catch (error) {
+        console.error('Error cancelling Razorpay order:', error);
+        res.status(500).json({ 
+            success: false,
+            message: 'Failed to cancel order'
+        });
+    }
+};
+
+
+
 module.exports = {
     checkout,
     addAddress,
     placeOrder,
     createRazorpayOrder,
     verifyPayment,
-    validateCoupon
+    validateCoupon,
+    cancelRazorpayOrder
 }
 
 

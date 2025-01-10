@@ -17,7 +17,6 @@ const allProduct = async (req, res) => {
         const maxPrice = req.query.maxPrice ? parseFloat(req.query.maxPrice) : null;
         const sort = req.query.sort || "new"; // Default sort
 
-        // Build filter object
         const productFilter = {
             isActive: true,
             productName: { $regex: search, $options: "i" }
@@ -90,49 +89,115 @@ const allProduct = async (req, res) => {
 
 // ---------------- render product details ------------------
 
-const productDetail = async (req,res)=>{
+// const productDetail = async (req,res)=>{
     
+//     try {
+        
+//         const id = req.params.id;
+        
+
+//         if(!mongoose.Types.ObjectId.isValid(id)) {
+//             req.flash('error','Invalid Product Id');
+//             return res.redirect('/home');
+//         }
+
+//         const product = await productSchema.findById(id);        
+
+//         if(!product){
+            
+//             req.flash('error','Product not found');
+//             return res.redirect('/home')
+//         }
+        
+//         if(product.isActive){
+//             const similarProduct = await productSchema.find({
+//                 productCategory:product.productCategory,
+//                 isActive:true
+//             })
+            
+//             return res.render('user/productDetail',{
+//                         title: product.productName,
+//                         user:req.session.user,
+//                         product,
+//                         similarProduct
+//                     })
+//         } else {
+//             req.flash('error','Product is not available');
+//             return res.redirect('/home');
+//         }
+
+        
+//     }
+//     catch(error){
+//         console.log(`Error in rendering product detail page ${error}`);
+//     }
+// }
+
+
+const productDetail = async (req, res) => {
     try {
-        
         const id = req.params.id;
-        
 
-        if(!mongoose.Types.ObjectId.isValid(id)) {
-            req.flash('error','Invalid Product Id');
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            req.flash('error', 'Invalid Product Id');
             return res.redirect('/home');
         }
 
-        const product = await productSchema.findById(id);        
+        const product = await productSchema.findById(id)
+            .populate({
+                path: 'reviews.user',
+                select: 'name'
+            });
 
-        if(!product){
-            
-            req.flash('error','Product not found');
-            return res.redirect('/home')
+        if (!product) {
+            req.flash('error', 'Product not found');
+            return res.redirect('/home');
         }
-        
-        if(product.isActive){
+
+        if (product.isActive) {
+            // Calculate ratings
+            const totalRating = product.reviews.reduce((sum, review) => sum + review.rating, 0);
+            const averageRating = product.reviews.length > 0 ? totalRating / product.reviews.length : 0;
+
+            // Calculate rating distribution
+            const ratingDistribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+            product.reviews.forEach(review => {
+                ratingDistribution[review.rating]++;
+            });
+
+            // Get similar products
             const similarProduct = await productSchema.find({
-                productCategory:product.productCategory,
-                isActive:true
-            })
-            
-            return res.render('user/productDetail',{
-                        title: product.productName,
-                        user:req.session.user,
-                        product,
-                        similarProduct
-                    })
+                productCategory: product.productCategory,
+                isActive: true,
+                _id: { $ne: product._id } // Exclude current product
+            }).limit(4);
+
+            // Add ratings data to product object
+            const productWithRatings = {
+                ...product.toObject(),
+                ratings: {
+                    average: averageRating,
+                    total: product.reviews.length,
+                    distribution: ratingDistribution
+                }
+            };
+
+            return res.render('user/productDetail', {
+                title: product.productName,
+                user: req.session.user,
+                product: productWithRatings,
+                similarProduct
+            });
         } else {
-            req.flash('error','Product is not available');
+            req.flash('error', 'Product is not available');
             return res.redirect('/home');
         }
-
-        
-    }
-    catch(error){
+    } catch (error) {
         console.log(`Error in rendering product detail page ${error}`);
+        req.flash('error', 'Something went wrong');
+        return res.redirect('/home');
     }
-}
+};
 
 
 module.exports={

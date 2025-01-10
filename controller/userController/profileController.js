@@ -72,7 +72,6 @@ const addAddress = async (req, res) => {
             country: req.body.country.trim(),
         };
 
-        // Basic validation for required fields
         if (!userAddress.building || !userAddress.city || !userAddress.pincode) {
             req.flash('error', 'Building, City, and Pincode are required fields.');
             return res.redirect('/profile');
@@ -187,13 +186,11 @@ const resetPassword = async (req, res) => {
        const userId = req.session.user;
        const { currentPassword, newPassword, confirmPassword } = req.body;
 
-        // Find user
        const user = await userSchema.findById(userId);
        if (!user) {
            req.flash('error', 'User not found');
            return res.redirect('/profile');
        }
-        // Verify current password
        const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
        if (!isPasswordValid) {
            req.flash('error', 'Current password is incorrect');
@@ -212,7 +209,6 @@ const resetPassword = async (req, res) => {
        await userSchema.findByIdAndUpdate(userId, {
            password: hashedPassword
        });
-        // Success message
        req.flash('success', 'Password updated successfully');
        res.redirect('/profile');
     } catch (error) {

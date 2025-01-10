@@ -45,7 +45,6 @@ const forgotPasswordPost = async (req, res) => {
         req.session.otp = OTP;
         req.session.otptimer = Date.now();
 
-        // Redirect to OTP verification page
         res.redirect('/forgotPasswordOtp');
     } catch (error) {
         console.error(`Error in forgot password post method: ${error}`);
@@ -61,7 +60,7 @@ const forgotPasswordOtp = async (req, res) => {
         // Validate session data
         if (!req.session.email || !req.session.otptimer) {
             req.flash('error', 'Session expired. Please try again.');
-            return res.redirect('/forgotpassword'); // Redirect to forgot password page
+            return res.redirect('/forgotpassword'); 
         }
 
         // Render the OTP page with required session data
@@ -107,7 +106,6 @@ const forgotPasswordOtpPost = async (req, res) => {
 const resetPasswordPost = async (req, res) => {
     try {
 
-        // Ensure session email exists
         if (!req.session.email) {
             req.flash('error', 'Session expired. Please try again.');
             return res.redirect('/user/forgot-password');
@@ -143,7 +141,7 @@ const forgotResend = async (req, res) => {
 
         // Generate and send OTP
         const otp = generateOTP();
-        const otpSent = sendOTP(email, otp); // Assuming this is a synchronous function
+        const otpSent = sendOTP(email, otp); 
         if (!otpSent) {
             req.flash('error', 'Failed to send OTP. Please try again later.');
             return res.redirect('/forgotPasswordOtp');

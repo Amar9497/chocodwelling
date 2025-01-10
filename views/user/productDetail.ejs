@@ -6,184 +6,261 @@
 <!-- Breadcrumbs with better visual hierarchy -->
 <nav class="bg-gray-50 border-b">
   <div class="container mx-auto px-4 py-3">
-      <ol class="flex items-center space-x-2 text-sm">
-          <li>
-              <a href="/home" class="text-[#8B7355] hover:text-[#A79277] transition-colors">Home</a>
-          </li>
-          <li class="text-gray-400">/</li>
-          <li>
-              <a href="/allproduct" class="text-[#8B7355] hover:text-[#A79277] transition-colors">Products</a>
-          </li>
-          <li class="text-gray-400">/</li>
-          <li class="text-gray-600 font-medium"><%= product.productName %></li>
-      </ol>
+    <ol class="flex items-center space-x-2 text-sm">
+      <li>
+        <a
+          href="/home"
+          class="text-[#8B7355] hover:text-[#A79277] transition-colors"
+          >Home</a
+        >
+      </li>
+      <li class="text-gray-400">/</li>
+      <li>
+        <a
+          href="/allproduct"
+          class="text-[#8B7355] hover:text-[#A79277] transition-colors"
+          >Products</a
+        >
+      </li>
+      <li class="text-gray-400">/</li>
+      <li class="text-gray-600 font-medium"><%= product.productName %></li>
+    </ol>
   </div>
 </nav>
 
 <!-- Main Product Section -->
 <div class="container mx-auto px-4 py-8">
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-      <!-- Left: Image Gallery -->
-      <div class="flex gap-6">
-          <!-- Thumbnails -->
-          <div class="flex flex-col gap-4">
-              <% product.productImage.forEach((img, index) => { %>
-              <div onclick="changeImage('<%= img %>')" 
-                   class="w-20 h-20 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-[#8B7355] transition-all duration-300">
-                  <img src="<%= img %>" 
-                       alt="Product view <%= index + 1 %>" 
-                       class="w-full h-full object-cover">
-              </div>
-              <% }) %>
-          </div>
-          
-          <!-- Main Image -->
-          <div class="flex-1 rounded-2xl overflow-hidden bg-gray-50 p-4">
-              <div class="main-image relative aspect-square">
-                  <img id="image-view" 
-                       src="<%= product.productImage[0] %>" 
-                       alt="<%= product.productName %>" 
-                       class="w-full h-full object-cover rounded-xl transition-transform duration-300">
-              </div>
-          </div>
-      </div>
-
-      <!-- Right: Product Details -->
-      <div class="flex flex-col gap-8">
-          <!-- Title and Rating -->
-          <div class="space-y-4">
-            <!-- Product Title -->
-            <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 tracking-tight">
-                <%= product.productName %>
-            </h1>
-        
-            <!-- Rating Section -->
-            <div class="flex flex-wrap items-center gap-4">
-                <!-- Stars -->
-                <div class="flex items-center">
-                    <!-- Star Rating -->
-                    <div class="flex gap-1">
-                        <% for(let i = 1; i <= 5; i++) { %>
-                            <% if(i <= 4) { %>
-                                <!-- Filled Star -->
-                                <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                </svg>
-                            <% } else { %>
-                                <!-- Empty Star -->
-                                <svg class="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                </svg>
-                            <% } %>
-                        <% } %>
-                    </div>
-        
-                    <!-- Rating Score -->
-                    <span class="ml-2 text-lg font-semibold text-gray-700">4.0</span>
-                </div>
-        
-                <!-- Divider -->
-                <div class="h-4 w-px bg-gray-300"></div>
-        
-                <!-- Reviews Count -->
-                <div class="flex items-center gap-2">
-                    <span class="text-sm font-medium text-gray-600">
-                        122 verified reviews
-                    </span>
-                    <!-- Optional: Add review button -->
-                    <button class="text-sm font-medium text-[#8B7355] hover:text-[#A79277] transition-colors">
-                        Write a review
-                    </button>
-                </div>
-            </div> 
+    <!-- Left: Image Gallery -->
+    <div class="flex gap-6">
+      <!-- Thumbnails -->
+      <div class="flex flex-col gap-4">
+        <% product.productImage.forEach((img, index) => { %>
+        <div
+          onclick="changeImage('<%= img %>')"
+          class="w-20 h-20 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-[#8B7355] transition-all duration-300"
+        >
+          <img
+            src="<%= img %>"
+            alt="Product view <%= index + 1 %>"
+            class="w-full h-full object-cover"
+          />
         </div>
-
-          <!-- Price Section -->
-          <div class="space-y-2">
-              <div class="flex items-center gap-3">
-                  <% if (product.productDiscount > 0) { %>
-                      <span class="text-3xl font-bold text-gray-900">
-                          ₹<%= (product.productVariants[0].price * (1 - product.productDiscount/100)).toFixed(2) %>
-                      </span>
-                      <span class="text-lg text-gray-500 line-through">
-                          ₹<%= product.productVariants[0].price.toFixed(2) %>
-                      </span>
-                      <span class="px-2 py-1 text-sm font-semibold text-red-600 bg-red-100 rounded-full">
-                          <%= product.productDiscount %>% OFF
-                      </span>
-                  <% } else { %>
-                      <span class="text-3xl font-bold text-gray-900">
-                          ₹<%= product.productVariants[0].price.toFixed(2) %>
-                      </span>
-                  <% } %>
-              </div>
-              <p class="text-sm text-green-600">Inclusive of all taxes</p>
-          </div>
-
-
-          <!-- Quantity Selector -->
-<div class="flex items-center gap-6">
-  <span class="text-gray-700">Quantity</span>
-  <div class="flex flex-col">
-      <div class="flex items-center border rounded-lg">
-          <button id="decrease" 
-                  class="px-4 py-2 text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  onclick="updateQuantity('decrease')">
-              −
-          </button>
-          <span id="quantity" 
-                class="px-4 py-2 text-gray-800 font-medium border-x min-w-[48px] text-center">
-              1
-          </span>
-          <button id="increase" 
-                  class="px-4 py-2 text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  onclick="updateQuantity('increase')">
-              +
-          </button>
+        <% }) %>
       </div>
+
+      <!-- Main Image -->
+      <div class="flex-1 rounded-2xl overflow-hidden bg-gray-50 p-4">
+        <div class="main-image relative aspect-square">
+          <img
+            id="image-view"
+            src="<%= product.productImage[0] %>"
+            alt="<%= product.productName %>"
+            class="w-full h-full object-cover rounded-xl transition-transform duration-300"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Product Details -->
+    <div class="flex flex-col gap-8">
+      <!-- Title and Rating -->
+      <div class="space-y-4">
+        <!-- Product Title -->
+        <h1
+          class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 tracking-tight"
+        >
+          <%= product.productName %>
+        </h1>
+      </div>
+
+      <!-- Price Section -->
+      <div class="space-y-2">
+        <div class="flex items-center gap-3">
+          <% if (product.productDiscount > 0) { %>
+          <span class="text-3xl font-bold text-gray-900">
+            ₹<%= (product.productVariants[0].price * (1 -
+            product.productDiscount/100)).toFixed(2) %>
+          </span>
+          <span class="text-lg text-gray-500 line-through">
+            ₹<%= product.productVariants[0].price.toFixed(2) %>
+          </span>
+          <span
+            class="px-2 py-1 text-sm font-semibold text-red-600 bg-red-100 rounded-full"
+          >
+            <%= product.productDiscount %>% OFF
+          </span>
+          <% } else { %>
+          <span class="text-3xl font-bold text-gray-900">
+            ₹<%= product.productVariants[0].price.toFixed(2) %>
+          </span>
+          <% } %>
+        </div>
+        <p class="text-sm text-green-600">Inclusive of all taxes</p>
+      </div>
+
+      <!-- Quantity Selector -->
+      <div class="flex items-center gap-6">
+        <span class="text-gray-700">Quantity</span>
+        <div class="flex flex-col">
+          <div class="flex items-center border rounded-lg">
+            <button
+              id="decrease"
+              class="px-4 py-2 text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              onclick="updateQuantity('decrease')"
+            >
+              −
+            </button>
+            <span
+              id="quantity"
+              class="px-4 py-2 text-gray-800 font-medium border-x min-w-[48px] text-center"
+            >
+              1
+            </span>
+            <button
+              id="increase"
+              class="px-4 py-2 text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              onclick="updateQuantity('increase')"
+            >
+              +
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stock Status -->
+      <div class="space-y-2">
+        <div class="flex items-center gap-2">
+          <% if (product.productVariants[0].stock <= 0) { %>
+          <span
+            class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800"
+          >
+            Out of Stock
+          </span>
+          <% } else if (product.productVariants[0].stock <= 10) { %>
+          <span
+            class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800"
+          >
+            Only <%= product.productVariants[0].stock %> left
+          </span>
+          <% } else { %>
+          <span
+            class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800"
+          >
+            In Stock
+          </span>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex gap-4">
+        <button
+          onclick="addToCart('<%= product._id %>')"
+          class="flex-1 px-6 py-3 bg-[#8B7355] text-white rounded-lg hover:bg-[#A79277] transition-colors"
+        >
+          Add to Cart
+        </button>
+        <button
+          onclick="addToWishlist('<%= product._id %>')"
+          class="p-3 rounded-lg border border-[#8B7355] hover:bg-gray-50 transition-colors"
+        >
+          <svg
+            class="w-6 h-6 text-[#8B7355]"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Product Description -->
+      <div class="prose prose-sm max-w-none">
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">Description</h3>
+        <p class="text-gray-600"><%= product.productDescription %></p>
+      </div>
+    </div>
   </div>
 </div>
 
-          <!-- Stock Status -->
-          <div class="space-y-2">
-              <div class="flex items-center gap-2">
-                  <% if (product.productVariants[0].stock <= 0) { %>
-                      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
-                          Out of Stock
-                      </span>
-                  <% } else if (product.productVariants[0].stock <= 10) { %>
-                      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
-                          Only <%= product.productVariants[0].stock %> left
-                      </span>
-                  <% } else { %>
-                      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                          In Stock
-                      </span>
-                  <% } %>
-              </div>
-          </div>
+<!-- Ratings and Reviews Section -->
+<div class="bg-white p-6 rounded-lg shadow-md mb-6">
+  <div class="flex items-center justify-between mb-4">
+    <div>
+      <h3 class="text-2xl font-bold">
+        <%= product.ratings?.average ? product.ratings.average.toFixed(1) :
+        '0.0' %> out of 5
+      </h3>
+      <p class="text-gray-600">
+        <%= product.ratings?.total || 0 %> global ratings
+      </p>
+    </div>
 
-          <!-- Action Buttons -->
-          <div class="flex gap-4">
-              <button onclick="addToCart('<%= product._id %>')" 
-                      class="flex-1 px-6 py-3 bg-[#8B7355] text-white rounded-lg hover:bg-[#A79277] transition-colors">
-                  Add to Cart
-              </button>
-              <button onclick="addToWishlist('<%= product._id %>')"
-                      class="p-3 rounded-lg border border-[#8B7355] hover:bg-gray-50 transition-colors">
-                  <svg class="w-6 h-6 text-[#8B7355]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                  </svg>
-              </button>
-          </div>
-
-          <!-- Product Description -->
-          <div class="prose prose-sm max-w-none">
-              <h3 class="text-lg font-semibold text-gray-900 mb-2">Description</h3>
-              <p class="text-gray-600"><%= product.productDescription %></p>
-          </div>
+    <!-- Star Distribution -->
+    <div class="space-y-2 flex-1 ml-8">
+      <% for(let i = 5; i >= 1; i--) { %>
+      <div class="flex items-center">
+        <span class="text-sm w-12"><%= i %> star</span>
+        <div class="flex-1 h-4 mx-2 bg-gray-200 rounded">
+          <% const total = product.ratings?.total || 0; const count =
+          product.ratings?.distribution?.[i] || 0; const percentage = total > 0
+          ? (count / total) * 100 : 0; %>
+          <div
+            class="h-full bg-yellow-400 rounded"
+            style="width: <%= percentage %>%"
+          ></div>
+        </div>
+        <span class="text-sm w-16"><%= percentage.toFixed(0) %>%</span>
       </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Reviews Header -->
+  <div class="flex items-center justify-between mt-6">
+    <h2 class="text-xl font-semibold">Customer Reviews</h2>
+    <% if (product.reviews?.length > 0) { %>
+    <a
+      href="/product/<%= product._id %>/all-reviews"
+      class="text-blue-500 hover:text-blue-600"
+    >
+      View All Reviews (<%= product.reviews.length %>)
+    </a>
+    <% } %>
+  </div>
+
+  <!-- Recent Reviews Preview -->
+  <div class="mt-4 space-y-4">
+    <% if (!product.reviews?.length) { %>
+    <p class="text-gray-500 text-center py-4">No reviews yet</p>
+    <% } else { %> <% product.reviews.slice(0, 3).forEach(review => { %>
+    <div class="border-b pb-4">
+      <div class="flex items-center mb-2">
+        <div class="flex text-yellow-400">
+          <% for(let i = 1; i <= 5; i++) { %>
+          <span
+            class="<%= i <= review.rating ? 'text-yellow-400' : 'text-gray-300' %>"
+            >★</span
+          >
+          <% } %>
+        </div>
+        <% if (review.isVerifiedPurchase) { %>
+        <span class="ml-2 text-green-600 text-sm">Verified Purchase</span>
+        <% } %>
+      </div>
+      <p class="text-gray-700"><%= review.review %></p>
+      <p class="text-sm text-gray-500 mt-1">
+        Reviewed on <%= new Date(review.createdAt).toLocaleDateString() %>
+      </p>
+    </div>
+    <% }) %> <% } %>
   </div>
 </div>
 
@@ -216,17 +293,17 @@
 
   // Quantity Controls
   let currentQuantity = 1;
-const maxQuantity = 4;
+  const maxQuantity = 4;
 
-function updateQuantity(action) {
-    const quantityElement = document.getElementById('quantity');
-    const decreaseButton = document.getElementById('decrease');
-    const increaseButton = document.getElementById('increase');
+  function updateQuantity(action) {
+    const quantityElement = document.getElementById("quantity");
+    const decreaseButton = document.getElementById("decrease");
+    const increaseButton = document.getElementById("increase");
 
-    if (action === 'increase' && currentQuantity < maxQuantity) {
-        currentQuantity++;
-    } else if (action === 'decrease' && currentQuantity > 1) {
-        currentQuantity--;
+    if (action === "increase" && currentQuantity < maxQuantity) {
+      currentQuantity++;
+    } else if (action === "decrease" && currentQuantity > 1) {
+      currentQuantity--;
     }
 
     // Update quantity display
@@ -237,172 +314,170 @@ function updateQuantity(action) {
     increaseButton.disabled = currentQuantity === maxQuantity;
 
     // Show toast message if max quantity is reached
-    if (action === 'increase' && currentQuantity === maxQuantity) {
-        Swal.fire({
-            icon: 'info',
-            title: 'Maximum Quantity Reached',
-            text: 'You can only add up to 4 items',
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            customClass: {
-                popup: 'colored-toast'
-            }
-        });
+    if (action === "increase" && currentQuantity === maxQuantity) {
+      Swal.fire({
+        icon: "info",
+        title: "Maximum Quantity Reached",
+        text: "You can only add up to 4 items",
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        customClass: {
+          popup: "colored-toast",
+        },
+      });
     }
-}
+  }
 
-
-// product add to cart alerts
+  // product add to cart alerts
 
   async function addToCart(productId) {
     const quantity = parseInt(document.getElementById("quantity").textContent);
     console.log("Adding to cart:", { productId, quantity });
 
     try {
-        const response = await fetch("/addToCart", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                productId: productId,
-                quantity: quantity,
-            }),
-        });
-        
-        const data = await response.json();
+      const response = await fetch("/addToCart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productId: productId,
+          quantity: quantity,
+        }),
+      });
 
-        if (response.ok && data.status) { 
-            // Success message
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: data.message || 'Product added to cart successfully',
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 1500,
-                timerProgressBar: true
-            });
+      const data = await response.json();
 
-            // Update cart count
-            if (document.getElementById('cart-count')) {
-                const cartCount = document.getElementById('cart-count');
-                cartCount.textContent = parseInt(cartCount.textContent || 0) + 1;
-            }
-        } else {
-            // Error from server
-            throw new Error(data.message || 'Failed to add to cart');
-        }
-
-    } catch (error) {
-        console.error('Error adding to cart:', error);
-        // Show error message from server
+      if (response.ok && data.status) {
+        // Success message
         Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: error.message || 'Something went wrong!',
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true
+          icon: "success",
+          title: "Success!",
+          text: data.message || "Product added to cart successfully",
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 1500,
+          timerProgressBar: true,
         });
+
+        // Update cart count
+        if (document.getElementById("cart-count")) {
+          const cartCount = document.getElementById("cart-count");
+          cartCount.textContent = parseInt(cartCount.textContent || 0) + 1;
+        }
+      } else {
+        // Error from server
+        throw new Error(data.message || "Failed to add to cart");
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      // Show error message from server
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "Something went wrong!",
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+      });
     }
-}
+  }
 
-// add wishlist
+  // add wishlist
 
-async function addToWishlist(productId) {
+  async function addToWishlist(productId) {
     try {
-        const response = await fetch(`/add-wishlist/${productId}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+      const response = await fetch(`/add-wishlist/${productId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-        const data = await response.json();
+      const data = await response.json();
 
-        if (!response.ok) {
-            // Handle unauthorized (not logged in) case
-            if (response.status === 401) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Please Login',
-                    text: 'You need to login to add items to wishlist',
-                    showCancelButton: true,
-                    confirmButtonText: 'Login',
-                    confirmButtonColor: '#8B7355',
-                    cancelButtonColor: '#d33',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = '/login';
-                    }
-                });
-                return;
+      if (!response.ok) {
+        // Handle unauthorized (not logged in) case
+        if (response.status === 401) {
+          Swal.fire({
+            icon: "warning",
+            title: "Please Login",
+            text: "You need to login to add items to wishlist",
+            showCancelButton: true,
+            confirmButtonText: "Login",
+            confirmButtonColor: "#8B7355",
+            cancelButtonColor: "#d33",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.location.href = "/login";
             }
-            
-            // Handle already in wishlist case
-            if (response.status === 400) {
-                Swal.fire({
-                    icon: 'info',
-                    title: 'Already in Wishlist',
-                    text: 'This item is already in your wishlist',
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    customClass: {
-                        popup: 'colored-toast'
-                    }
-                });
-                return;
-            }
-
-            throw new Error(data.message || 'Failed to add to wishlist');
+          });
+          return;
         }
 
-        // Success case
-        const wishlistIcon = document.getElementById(`wishlist-icon-${productId}`);
-        if (wishlistIcon) {
-            wishlistIcon.setAttribute('fill', 'red');
-        }
-
-        Swal.fire({
-            icon: 'success',
-            title: 'Added to Wishlist!',
-            text: 'Item successfully added to your wishlist',
+        // Handle already in wishlist case
+        if (response.status === 400) {
+          Swal.fire({
+            icon: "info",
+            title: "Already in Wishlist",
+            text: "This item is already in your wishlist",
             toast: true,
-            position: 'top-end',
+            position: "top-end",
             showConfirmButton: false,
             timer: 3000,
             timerProgressBar: true,
             customClass: {
-                popup: 'colored-toast'
-            }
-        });
+              popup: "colored-toast",
+            },
+          });
+          return;
+        }
 
+        throw new Error(data.message || "Failed to add to wishlist");
+      }
+
+      // Success case
+      const wishlistIcon = document.getElementById(
+        `wishlist-icon-${productId}`
+      );
+      if (wishlistIcon) {
+        wishlistIcon.setAttribute("fill", "red");
+      }
+
+      Swal.fire({
+        icon: "success",
+        title: "Added to Wishlist!",
+        text: "Item successfully added to your wishlist",
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        customClass: {
+          popup: "colored-toast",
+        },
+      });
     } catch (error) {
-        console.error('Error adding to wishlist:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: error.message || 'Something went wrong!',
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            customClass: {
-                popup: 'colored-toast'
-            }
-        });
+      console.error("Error adding to wishlist:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: error.message || "Something went wrong!",
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        customClass: {
+          popup: "colored-toast",
+        },
+      });
     }
-}
-
-  </script>
+  }
+</script>
