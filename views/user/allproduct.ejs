@@ -190,6 +190,34 @@
       </div>
       <% }); %>
     </div>
+
+    <!-- Add this after your products grid, before the closing container div -->
+    <div class="mt-8 flex justify-center">
+        <div class="flex items-center gap-2">
+            <% if (currentPage > 1) { %>
+                <a href="?page=<%= currentPage - 1 %>&limit=<%= limit %>&sort=<%= sort %><%= search ? `&search=${search}` : '' %><%= typeof categories !== 'undefined' && categories.length ? `&categories=${categories}` : '' %><%= typeof minPrice !== 'undefined' && minPrice ? `&minPrice=${minPrice}` : '' %><%= typeof maxPrice !== 'undefined' && maxPrice ? `&maxPrice=${maxPrice}` : '' %>"
+                    class="px-3 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 text-gray-700">
+                    Previous
+                </a>
+            <% } %>
+
+            <% for(let i = 1; i <= totalPages; i++) { %>
+                <a href="?page=<%= i %>&limit=<%= limit %>&sort=<%= sort %><%= search ? `&search=${search}` : '' %><%= typeof categories !== 'undefined' && categories.length ? `&categories=${categories}` : '' %><%= typeof minPrice !== 'undefined' && minPrice ? `&minPrice=${minPrice}` : '' %><%= typeof maxPrice !== 'undefined' && maxPrice ? `&maxPrice=${maxPrice}` : '' %>"
+                    class="px-4 py-2 rounded-lg <%= currentPage === i ? 'bg-[#8B7355] text-white' : 'border border-gray-300 hover:bg-gray-50 text-gray-700' %>">
+                    <%= i %>
+                </a>
+            <% } %>
+
+            <% if (currentPage < totalPages) { %>
+                <a href="?page=<%= currentPage + 1 %>&limit=<%= limit %>&sort=<%= sort %><%= search ? `&search=${search}` : '' %><%= typeof categories !== 'undefined' && categories.length ? `&categories=${categories}` : '' %><%= typeof minPrice !== 'undefined' && minPrice ? `&minPrice=${minPrice}` : '' %><%= typeof maxPrice !== 'undefined' && maxPrice ? `&maxPrice=${maxPrice}` : '' %>"
+                    class="px-3 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 text-gray-700">
+                    Next
+                </a>
+            <% } %>
+
+            
+        </div>
+    </div>
   </div>
 </div>
 <!-- Footer -->
@@ -729,5 +757,6 @@ async function addToCart(productId) {
         });
     }
 }
+
 
 </script>

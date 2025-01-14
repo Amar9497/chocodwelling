@@ -281,21 +281,49 @@ const offerStatus = async (req, res) => {
         const offerId = req.query.id;
         const status = !(req.query.status === 'true');
 
-        // Update offer status
-        const offer = await offerSchema.findByIdAndUpdate(offerId, { isActive: status });
-
-        // Check if the offer was found and updated
+        // Find the offer first to get its details
+        const offer = await offerSchema.findById(offerId);
+        
         if (!offer) {
             req.flash('error', 'Offer not found');
             return res.redirect('/admin/offer');
         }
 
+        // Update offer status
+        await offerSchema.findByIdAndUpdate(offerId, { isActive: status });
+
+        // Handle product discounts based on offer type and status
+        if (offer.offerType === 'Product') {
+            // Update single product
+            await productSchema.findByIdAndUpdate(
+                offer.referenceId,
+                { 
+                    productDiscount: status ? offer.discountPercent : 0 
+                }
+            );
+        } else if (offer.offerType === 'Category') {
+            // Update all products in the category
+            const productsToUpdate = await productSchema.find({ 
+                productCategory: offer.referenceId,
+                isActive: true 
+            });
+
+            await Promise.all(productsToUpdate.map(async (product) => {
+                await productSchema.findByIdAndUpdate(
+                    product._id,
+                    { 
+                        productDiscount: status ? offer.discountPercent : 0 
+                    }
+                );
+            }));
+        }
+
         // Flash success message
-        req.flash('success', `Offer status updated successfully to ${status ? 'Active' : 'Inactive'}`);
+        req.flash('success', `Offer ${status ? 'activated' : 'deactivated'} successfully`);
         res.redirect('/admin/offer');
         
     } catch (error) {
-        console.log(`Error from offerStatus: ${error}`);
+        console.error(`Error from offerStatus: ${error}`);
         req.flash('error', 'An error occurred while updating the offer status');
         res.redirect('/admin/offer');
     }

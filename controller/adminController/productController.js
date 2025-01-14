@@ -27,7 +27,8 @@ const loadProduct = async (req, res) => {
       .find(filter)
       .populate("productCategory", "categoryName")
       .skip(skip)
-      .limit(itemsPerPage);
+      .limit(itemsPerPage)
+      .sort({ updatedAt : -1 });
 
     res.render("admin/products", {
       title: "Products",
