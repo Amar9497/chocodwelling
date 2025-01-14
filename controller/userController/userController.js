@@ -12,11 +12,26 @@ const generateOTP = require('../../service/generateotp')
 
 
 // ------------- login page render ------------------
-const loadLogin=(req,res)=>{
+const loadLogin = (req, res) => {
     try {
-        res.render("user/login",{title: 'Login'})
+        // Log the flash messages before rendering
+        const successMsg = req.flash('success');
+        const errorMsg = req.flash('error');
+        
+        console.log('Flash messages before render:', { successMsg, errorMsg });
+
+        res.render("user/login", {
+            title: 'Login',
+            success: successMsg,
+            error: errorMsg
+        });
     } catch (error) {
-        res.status(500).send("error occured")
+        console.error("Error in login page:", error);
+        res.status(500).render("user/login", {
+            title: 'Login',
+            success: [],
+            error: ['An error occurred']
+        });
     }
 }
 
@@ -26,27 +41,40 @@ const loginPost = async (req, res) => {
         const user = await userSchema.findOne({ email: req.body.email }); 
 
         if (!user) {
-            req.flash('error', 'Could not find user, please login again');
+            // Set flash message and log it
+            const msg = 'Could not find user, please login again';
+            req.flash('error', msg);
+            console.log('Setting error flash:', msg);
             return res.redirect('/login'); 
         }
 
         if (!user.isActive) {
-            req.flash('error', 'User is blocked by admin');
+            const msg = 'User is blocked by admin';
+            req.flash('error', msg);
+            console.log('Setting error flash:', msg);
             return res.redirect('/login'); 
         }
 
         const isPasswordValid = await bcrypt.compare(req.body.password, user.password);
         if (!isPasswordValid) {
-            req.flash('error', 'Invalid email ID or password');
+            const msg = 'Invalid email ID or password';
+            req.flash('error', msg);
+            console.log('Setting error flash:', msg);
             return res.redirect('/login'); 
         }
 
-        req.session.user = user.id; 
+        // Login successful
+        req.session.user = user.id;
+        const msg = 'Successfully logged in!';
+        req.flash('success', msg);
+        console.log('Setting success flash:', msg);
         return res.redirect('/home');
         
     } catch (error) {
-        console.error('Error during login:', error); 
-        req.flash('error', 'An unexpected error occurred. Please try again.');
+        console.error('Login error:', error);
+        const msg = 'An unexpected error occurred. Please try again.';
+        req.flash('error', msg);
+        console.log('Setting error flash:', msg);
         res.redirect('/login');
     }
 };

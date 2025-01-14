@@ -55,8 +55,17 @@ const orderStatus = async (req,res) =>{
         if(validStatuses.indexOf(status) <= validStatuses.indexOf(currentOrder.status)){
             return req.flash('error','Invalid status change');
         }
-
+        
+        // Update order status and timestamp
         currentOrder.orderStatus = status;
+        currentOrder.statusUpdatedAt = new Date();
+
+        // If order is delivered, update payment status to completed
+        if (status === 'Delivered') {
+            currentOrder.paymentStatus = 'Completed';
+            currentOrder.deliveredAt = new Date();
+        }
+
         await currentOrder.save();
         res.status(200).send('Order status updated');
         

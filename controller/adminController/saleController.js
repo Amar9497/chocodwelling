@@ -8,9 +8,24 @@ const saleController = {
 
   salePage: async (req, res) => {
     try {
+      // Get pagination parameters
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const skip = (page - 1) * limit;
+
+      // Get total count for pagination
+      const totalOrders = await Order.countDocuments({
+        orderStatus: { $nin: ["Cancelled", "Returned"] },
+      });
+
+      // Get paginated orders
       const orders = await Order.find({
         orderStatus: { $nin: ["Cancelled", "Returned"] },
-      }).populate("userId", "name");
+      })
+        .populate("userId", "name")
+        .sort({ orderDate: -1 })
+        .skip(skip)
+        .limit(limit);
 
       // Calculate total products sold
       const productResult = await Order.aggregate([
@@ -32,12 +47,10 @@ const saleController = {
         },
       ]);
 
-      // Get the total quantity
-      const productCount =
-        productResult.length > 0 ? productResult[0].totalQuantity : 0;
+      const productCount = productResult.length > 0 ? productResult[0].totalQuantity : 0;
 
       const summary = {
-        totalOrders: orders.length,
+        totalOrders: totalOrders,
         finalAmount: orders.reduce((sum, order) => sum + order.finalAmount, 0),
         productCount,
       };
@@ -46,6 +59,12 @@ const saleController = {
         orders,
         summary,
         title: "Sales Report",
+        pagination: {
+          page,
+          limit,
+          totalPages: Math.ceil(totalOrders / limit),
+          totalOrders,
+        },
       });
     } catch (error) {
       console.error("Error in salePage:", error);
@@ -57,118 +76,111 @@ const saleController = {
 
   generateReport: async (req, res) => {
     try {
-      const { reportType, startDate, endDate } = req.body;
-      let dateFilter = {};
+        const { reportType, startDate, endDate } = req.body;
+        let dateFilter = {};
 
-      switch (reportType) {
-        case "daily":
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-          dateFilter = {
-            $gte: today,
-            $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),
-          };
-          break;
+        // Create date filter based on report type
+        const now = new Date();
+        switch (reportType) {
+            case "daily":
+                dateFilter = {
+                    orderDate: {
+                        $gte: new Date(now.setHours(0, 0, 0, 0)),
+                        $lt: new Date(now.setHours(23, 59, 59, 999))
+                    }
+                };
+                break;
 
-        case "weekly":
-          const weekAgo = new Date();
-          weekAgo.setDate(weekAgo.getDate() - 7);
-          dateFilter = {
-            $gte: weekAgo,
-            $lt: new Date(),
-          };
-          break;
+            case "weekly":
+                const weekStart = new Date(now);
+                weekStart.setDate(now.getDate() - 7);
+                dateFilter = {
+                    orderDate: {
+                        $gte: weekStart,
+                        $lt: now
+                    }
+                };
+                break;
 
-        case "monthly":
-          const monthAgo = new Date();
-          monthAgo.setMonth(monthAgo.getMonth() - 1);
-          dateFilter = {
-            $gte: monthAgo,
-            $lt: new Date(),
-          };
-          break;
+            case "monthly":
+                const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+                dateFilter = {
+                    orderDate: {
+                        $gte: monthStart,
+                        $lt: now
+                    }
+                };
+                break;
 
-        case "yearly":
-          const yearAgo = new Date();
-          yearAgo.setFullYear(yearAgo.getFullYear() - 1);
-          dateFilter = {
-            $gte: yearAgo,
-            $lt: new Date(),
-          };
-          break;
+            case "yearly":
+                const yearStart = new Date(now.getFullYear(), 0, 1);
+                dateFilter = {
+                    orderDate: {
+                        $gte: yearStart,
+                        $lt: now
+                    }
+                };
+                break;
 
-        case "custom":
-          if (startDate && endDate) {
-            dateFilter = {
-              $gte: new Date(startDate),
-              $lte: new Date(endDate),
-            };
-          }
-          break;
-      }
+            case "custom":
+                if (startDate && endDate) {
+                    const endDateTime = new Date(endDate);
+                    endDateTime.setHours(23, 59, 59, 999);
+                    dateFilter = {
+                        orderDate: {
+                            $gte: new Date(startDate),
+                            $lte: endDateTime
+                        }
+                    };
+                }
+                break;
+        }
 
-      // Get orders for the selected period
-      const orders = await Order.find({
-        orderStatus: { $nin: ["Cancelled", "Returned"] },
-        orderDate: dateFilter,
-      })
-        .populate("userId", "name")
-        .sort({ orderDate: -1 });
+        // Add status filter to exclude cancelled and returned orders
+        const filter = {
+            ...dateFilter,
+            orderStatus: { $nin: ["Cancelled", "Returned"] }
+        };
 
-      // Calculate product count
-      const productResult = await Order.aggregate([
-        {
-          $match: {
-            orderStatus: { $nin: ["Cancelled", "Returned"] },
-            orderDate: dateFilter,
-          },
-        },
-        {
-          $unwind: "$products",
-        },
-        {
-          $group: {
-            _id: null,
-            totalQuantity: { $sum: "$products.quantity" },
-          },
-        },
-      ]);
+        // Fetch filtered orders
+        const orders = await Order.find(filter)
+            .populate("userId", "name")
+            .sort({ orderDate: -1 });
 
-      // Calculate summary
-      const summary = {
-        totalOrders: orders.length,
-        finalAmount: orders.reduce(
-          (sum, order) => sum + (order.finalAmount || 0),
-          0
-        ),
-        productCount:
-          productResult.length > 0 ? productResult[0].totalQuantity : 0,
-      };
+        // Calculate summary statistics
+        const productCount = orders.reduce((sum, order) => 
+            sum + order.products.reduce((pSum, product) => pSum + product.quantity, 0), 0);
 
-      const formattedOrders = orders.map((order) => ({
-        _id: order._id,
-        orderDate: order.orderDate,
-        userId: {
-          name: order.userId ? order.userId.name : "Unknown",
-        },
-        totalQuantity: order.products.reduce(
-          (sum, product) => sum + product.quantity,
-          0
-        ),
-        paymentMethod: order.paymentMethod,
-        couponCode: order.couponCode || "No Coupon",
-        finalAmount: order.finalAmount,
-        orderStatus: order.orderStatus,
-      }));
+        const summary = {
+            totalOrders: orders.length,
+            productCount,
+            finalAmount: orders.reduce((sum, order) => sum + order.finalAmount, 0)
+        };
 
-      res.json({
-        success: true,
-        orders: formattedOrders,
-        summary,
-      });
+        // Send response
+        res.json({
+            success: true,
+            orders: orders.map(order => ({
+                _id: order._id,
+                orderDate: order.orderDate,
+                userId: {
+                    name: order.userId.name
+                },
+                totalQuantity: order.products.reduce((sum, product) => sum + product.quantity, 0),
+                paymentMethod: order.paymentMethod,
+                couponCode: order.couponCode,
+                finalAmount: order.finalAmount,
+                orderStatus: order.orderStatus
+            })),
+            summary
+        });
+
     } catch (error) {
-      console.error("Error generating report:", error);
-      res.redirect("/admin/salesReport");
+        console.error("Error generating report:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to generate report"
+        });
     }
   },
 

@@ -30,41 +30,57 @@ const checkout = async (req, res) => {
     try {
         const userId = req.session.user;
         const user = await userSchema.findById(userId);
-        if (!user) {
-            return res.status(404).send('User not found');
+        
+        if (!userId || !user) {
+            req.flash('error', 'Please login to continue');
+            return res.redirect('/login');
         }
 
         // Get cart items with populated product details
         const cartItems = await cartSchema.find({ userId })
-            .populate('productId') 
+            .populate('productId')
             .exec();
-            
+
         if (!cartItems || cartItems.length === 0) {
             req.flash('error', 'Your cart is empty');
             return res.redirect('/cart');
         }
 
-        // Check product availability and stock
+        // Filter out invalid cart items and check availability
         const unavailableProducts = [];
         const outOfStockProducts = [];
+        const validCartItems = [];
 
         for (const item of cartItems) {
-            
-            // Check if product is active
-            if (!item.productId.isActive) {
-                unavailableProducts.push(item.productId.productName);
+            // Check if product exists and is valid
+            if (!item.productId || typeof item.productId !== 'object') {
+                // Remove invalid cart item
+                await cartSchema.findByIdAndDelete(item._id);
                 continue;
             }
 
-            // Check if product has sufficient stock
+            // Check if product is active
+            if (!item.productId.isActive) {
+                unavailableProducts.push(item.productId.productName || 'Unknown Product');
+                continue;
+            }
+
+            // Check if product has variants and stock
+            if (!item.productId.productVariants || !item.productId.productVariants[0]) {
+                unavailableProducts.push(item.productId.productName || 'Unknown Product');
+                continue;
+            }
+
+            // Check stock availability
             const variant = item.productId.productVariants[0];
-            if (!variant || variant.stock <= 0) {
+            if (variant.stock <= 0) {
                 outOfStockProducts.push(item.productId.productName);
             } else if (variant.stock < item.quantity) {
-
                 outOfStockProducts.push(
                     `${item.productId.productName} (Only ${variant.stock} available)`
                 );
+            } else {
+                validCartItems.push(item);
             }
         }
 
@@ -86,53 +102,65 @@ const checkout = async (req, res) => {
         }
 
         // Calculate cart totals with discounts and offers
-        const cartDetails = await Promise.all(cartItems.map(async item => {
-            const basePrice = item.productId.productVariants[0].price;
-            
-            // Check for product-specific offer
-            const productOffer = await offerSchema.findOne({
-                offerType: 'Product',
-                referenceId: item.productId._id,
-                isActive: true
-            });
+        const cartDetails = await Promise.all(validCartItems.map(async item => {
+            try {
+                const basePrice = item.productId.productVariants[0].price;
+                
+                // Check for product-specific offer
+                const productOffer = await offerSchema.findOne({
+                    offerType: 'Product',
+                    referenceId: item.productId._id,
+                    isActive: true
+                });
 
-            // Check for category offer
-            const categoryOffer = await offerSchema.findOne({
-                offerType: 'Category',
-                referenceId: item.productId.category,
-                isActive: true
-            });
+                // Check for category offer
+                const categoryOffer = await offerSchema.findOne({
+                    offerType: 'Category',
+                    referenceId: item.productId.category,
+                    isActive: true
+                });
 
-            // Get the highest applicable discount
-            const productDiscount = item.productId.productDiscount || 0;
-            const offerDiscount = Math.max(
-                productOffer ? productOffer.discountPercent : 0,
-                categoryOffer ? categoryOffer.discountPercent : 0
-            );
-            
-            // Use the higher discount between product discount and offer discount
-            const finalDiscount = Math.max(productDiscount, offerDiscount);
-            const discountedPrice = basePrice - (basePrice * finalDiscount / 100);
-            
-            return {
-                product: item.productId,
-                quantity: item.quantity,
-                basePrice: basePrice,
-                discount: finalDiscount,
-                discountedPrice: discountedPrice,
-                subtotal: discountedPrice * item.quantity,
-                originalPrice: basePrice * item.quantity 
-            };
+                // Calculate discounts
+                const productDiscount = item.productId.productDiscount || 0;
+                const offerDiscount = Math.max(
+                    productOffer ? productOffer.discountPercent : 0,
+                    categoryOffer ? categoryOffer.discountPercent : 0
+                );
+                
+                const finalDiscount = Math.max(productDiscount, offerDiscount);
+                const discountedPrice = basePrice - (basePrice * finalDiscount / 100);
+                
+                return {
+                    product: item.productId,
+                    quantity: item.quantity,
+                    basePrice: basePrice,
+                    discount: finalDiscount,
+                    discountedPrice: discountedPrice,
+                    subtotal: discountedPrice * item.quantity,
+                    originalPrice: basePrice * item.quantity 
+                };
+            } catch (error) {
+                console.error('Error processing cart item:', error);
+                return null;
+            }
         }));
 
-        const total = cartDetails.reduce((sum, item) => sum + item.subtotal, 0);
-        const originalTotal = cartDetails.reduce((sum, item) => sum + item.originalPrice, 0);
+        // Filter out any null items from processing errors
+        const validCartDetails = cartDetails.filter(Boolean);
+
+        if (validCartDetails.length === 0) {
+            req.flash('error', 'No valid items in cart');
+            return res.redirect('/cart');
+        }
+
+        const total = validCartDetails.reduce((sum, item) => sum + item.subtotal, 0);
+        const originalTotal = validCartDetails.reduce((sum, item) => sum + item.originalPrice, 0);
         const totalSavings = originalTotal - total;
 
         res.render('user/checkout', {
             title: 'Checkout',
             user,
-            cartItems: cartDetails,
+            cartItems: validCartDetails,
             total,
             originalTotal,
             totalSavings,
@@ -140,8 +168,9 @@ const checkout = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(`error in rendering checkout page from cart ${error}`);
-        res.status(500).send('An error occurred while processing your request');
+        console.error('Error in checkout:', error);
+        req.flash('error', 'An error occurred while processing your checkout');
+        res.redirect('/cart');
     }
 };
 

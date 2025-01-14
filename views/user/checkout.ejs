@@ -847,8 +847,8 @@
         .then(result => {
             Swal.fire({
                 icon: "warning",
-                title: "Payment Cancelled",
-                text: "Your payment was cancelled. No order has been placed.",
+                title: "Payment Failed",
+                text: "Your payment was failed. order has been placed.",
             }).then(() => {
                 window.location.href = '/orders';
             });

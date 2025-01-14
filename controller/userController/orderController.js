@@ -213,7 +213,7 @@ const returnOrder = async (req, res) => {
         }
 
         // Credit wallet if payment was made through Razorpay or Wallet
-        if (order.paymentMethod === 'Razorpay' || order.paymentMethod === 'Wallet') {
+        if (order.paymentMethod === 'Razorpay' || order.paymentMethod === 'Wallet' || order.paymentMethod === 'COD') {
             // Find or create wallet
             let wallet = await walletSchema.findOne({ userID: userId });
             
@@ -531,6 +531,7 @@ const verifyRetryPayment = async (req, res) => {
         }
 
         order.paymentStatus = 'Completed';
+        order.paymentMethod = "Razorpay";
         order.paymentDetails = {
             orderId: razorpay_order_id,
             paymentId: razorpay_payment_id,

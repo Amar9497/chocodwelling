@@ -13,38 +13,51 @@ const cart = async (req, res) => {
   try {
     const userId = req.session.user;
     const user = await userSchema.findById(userId);
+    
     if (!userId) {
       return res.redirect("/login");
     }
 
+    // Fetch cart items and handle potential null products
     const cartItems = await cartSchema
       .find({ userId })
-      .populate("productId")
+      .populate('productId')
       .exec();
 
-    // Calculate total for the cart with discounts
-    const cartDetails = cartItems.map((item) => {
-      const basePrice = item.productId.productVariants[0].price;
-      const discount = item.productId.productDiscount || 0;
-      const discountedPrice = basePrice - (basePrice * discount / 100);
-      
-      return {
-        product: item.productId,
-        quantity: item.quantity,
-        basePrice: basePrice,
-        discount: discount,
-        discountedPrice: discountedPrice,
-        subtotal: discountedPrice * item.quantity,
-        savings: (basePrice - discountedPrice) * item.quantity
-      };
-    });
+    // Filter out invalid products and calculate totals
+    const cartDetails = cartItems
+      .filter(item => item.productId && item.productId.productVariants && item.productId.productVariants.length > 0)
+      .map((item) => {
+        try {
+          const basePrice = item.productId.productVariants[0].price;
+          const discount = item.productId.productDiscount || 0;
+          const discountedPrice = basePrice - (basePrice * discount / 100);
+          
+          return {
+            product: item.productId,
+            quantity: item.quantity,
+            basePrice: basePrice,
+            discount: discount,
+            discountedPrice: discountedPrice,
+            subtotal: discountedPrice * item.quantity,
+            savings: (basePrice - discountedPrice) * item.quantity
+          };
+        } catch (error) {
+          console.error('Error processing cart item:', error);
+          // Remove invalid cart item
+          cartSchema.findByIdAndDelete(item._id).catch(err => 
+            console.error('Error removing invalid cart item:', err)
+          );
+          return null;
+        }
+      })
+      .filter(Boolean); // Remove any null items
 
-    const totals = cartDetails.reduce((acc, item) => {
-      return {
-        total: acc.total + item.subtotal,
-        savings: acc.savings + item.savings
-      };
-    }, { total: 0, savings: 0 });
+    // Calculate totals
+    const totals = cartDetails.reduce((acc, item) => ({
+      total: acc.total + item.subtotal,
+      savings: acc.savings + item.savings
+    }), { total: 0, savings: 0 });
 
     res.render("user/cart", {
       title: "Cart",
@@ -53,9 +66,11 @@ const cart = async (req, res) => {
       totalSavings: totals.savings,
       user,
     });
+
   } catch (error) {
     console.error("Error fetching cart:", error);
-    res.status(500).send("Error loading cart");
+    req.flash('error', 'Error loading cart. Please try again.');
+    res.redirect('/home');
   }
 };
 
@@ -66,15 +81,16 @@ const addToCart = async (req, res) => {
     const userId = req.session.user;
     const { productId, quantity } = req.body;
 
+    // Validate product exists and has variants
     const product = await productSchema.findById(productId);
-    if (!product) {
+    if (!product || !product.productVariants || product.productVariants.length === 0) {
       return res.status(404).json({
         status: false,
-        message: "Product not found",
+        message: "Product not found or invalid product data",
       });
     }
 
-    // Check stock greater than 0
+    // Check stock
     const hasStock = product.productVariants.some(
       (variant) => variant.stock > 0
     );

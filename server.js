@@ -12,7 +12,7 @@ const passport = require('passport');
 const nocache = require('nocache');
 
 //port number
-const port= process.env.PORT ||3000;
+const port= process.env.PORT ||3030;
 
 //admin routes
 const adminRoutes=require("./routes/admin");

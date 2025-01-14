@@ -181,12 +181,57 @@
                     </tbody>
                 </table>
             </div>
+            <div class="px-6 py-4 bg-white border-t border-gray-200">
+                <div class="flex items-center justify-between">
+                    <!-- Results info -->
+                    <div class="text-sm text-gray-500">
+                        Showing <%= (pagination.page - 1) * pagination.limit + 1 %> to 
+                        <%= Math.min(pagination.page * pagination.limit, pagination.totalOrders) %> of 
+                        <%= pagination.totalOrders %> results
+                    </div>
+
+                    <!-- Pagination buttons -->
+                    <div class="flex items-center space-x-2">
+                        <% if (pagination.page > 1) { %>
+                            <a href="?page=<%= pagination.page - 1 %>&limit=<%= pagination.limit %>"
+                               class="px-3 py-1 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm font-medium">
+                                Previous
+                            </a>
+                        <% } %>
+
+                        <% for(let i = 1; i <= pagination.totalPages; i++) { %>
+                            <a href="?page=<%= i %>&limit=<%= pagination.limit %>"
+                               class="px-3 py-1 rounded-md <%= pagination.page === i ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' %> text-sm font-medium">
+                                <%= i %>
+                            </a>
+                        <% } %>
+
+                        <% if (pagination.page < pagination.totalPages) { %>
+                            <a href="?page=<%= pagination.page + 1 %>&limit=<%= pagination.limit %>"
+                               class="px-3 py-1 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm font-medium">
+                                Next
+                            </a>
+                        <% } %>
+
+                        <!-- Items per page selector -->
+                        <select 
+                            onchange="window.location.href='?page=1&limit=' + this.value"
+                            class="ml-4 px-2 py-1 border rounded-md text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="10" <%= pagination.limit === 10 ? 'selected' : '' %>>10 per page</option>
+                            <option value="25" <%= pagination.limit === 25 ? 'selected' : '' %>>25 per page</option>
+                            <option value="50" <%= pagination.limit === 50 ? 'selected' : '' %>>50 per page</option>
+                            <option value="100" <%= pagination.limit === 100 ? 'selected' : '' %>>100 per page</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <%- include('footer') %>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
 document.getElementById('reportType').addEventListener('change', function() {

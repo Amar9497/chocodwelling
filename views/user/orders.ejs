@@ -319,6 +319,8 @@
   </div>
 </div>
 
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
 <script>
 function openReviewModal(productId, productName) {
   document.getElementById('reviewModal').classList.remove('hidden');
@@ -398,35 +400,42 @@ document.getElementById('reviewModal').addEventListener('click', (e) => {
 
 
 <script>
-  // Add this to your existing JavaScript
-  document.querySelectorAll('[data-id]').forEach(button => {
-      button.addEventListener('click', async (e) => {
-          const orderId = e.target.dataset.id;
-          try {
-              // Show loading state
-              e.target.disabled = true;
-              e.target.textContent = 'Generating...';
-  
-              // Fetch invoice
-              window.location.href = `/order/${orderId}/invoice`;
-  
-          } catch (error) {
-              console.error('Error downloading invoice:', error);
-              Swal.fire({
-                  icon: 'error',
-                  title: 'Oops...',
-                  text: 'Failed to download invoice!'
-              });
-          } finally {
-              // Reset button state
-              setTimeout(() => {
-                  e.target.disabled = false;
-                  e.target.textContent = 'Invoice';
-              }, 2000);
-          }
-      });
+  // Invoice button functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    const invoiceButtons = document.querySelectorAll('button:not([onclick])');
+    
+    invoiceButtons.forEach(button => {
+        if (button.textContent.trim() === 'Invoice') {
+            button.addEventListener('click', async (e) => {
+                e.stopPropagation(); // Prevent event bubbling
+                const orderId = e.target.dataset.id;
+                try {
+                    // Show loading state
+                    e.target.disabled = true;
+                    e.target.textContent = 'Generating...';
+        
+                    // Fetch invoice
+                    window.location.href = `/order/${orderId}/invoice`;
+        
+                } catch (error) {
+                    console.error('Error downloading invoice:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Failed to download invoice!'
+                    });
+                } finally {
+                    // Reset button state
+                    setTimeout(() => {
+                        e.target.disabled = false;
+                        e.target.textContent = 'Invoice';
+                    }, 2000);
+                }
+            });
+        }
+    });
   });
-  </script>
+</script>
 
 
 <script>
@@ -622,6 +631,4 @@ document.getElementById('reviewModal').addEventListener('click', (e) => {
       }
   }
   </script>
-
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 

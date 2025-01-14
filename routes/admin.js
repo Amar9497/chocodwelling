@@ -13,7 +13,11 @@ const saleController = require('../controller/adminController/saleController');
 const { upload } = require('../service/cloudinary');
 const auth = require('../middleware/adminSession');
 
-
+admin.use((req, res, next) => {
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    next();
+});
 
 // -------------------- admin login --------------------
 

@@ -17,6 +17,15 @@ const reviewController = require('../controller/userController/reviewController'
 
 const auth = require('../middleware/userSession');
 
+// Add flash middleware for user routes
+user.use((req, res, next) => {
+    res.locals.messages = {
+        success: req.flash('success'),
+        error: req.flash('error')
+    };
+    next();
+});
+
 // -------------------- login --------------------
 user.get('/login',auth.isLogin,userController.loadLogin);
 
@@ -155,11 +164,9 @@ user.get('/product/:productId/all-reviews', reviewController.getAllReviews);
 
 // ------------------------- wishlist -------------------------------
 
-user.get('/wishlist',auth.isCheck,wishlistController.wishlistpage);
-
-user.get('/add-wishlist/:id',auth.isCheck,wishlistController.addWishlist);
-
-user.delete('/delete-wish/:id',auth.isCheck,wishlistController.deleteWishlist );
+user.get('/wishlist', auth.isCheck, wishlistController.wishlistpage);
+user.get('/add-wishlist/:id', auth.isCheck, wishlistController.addWishlist);
+user.delete('/delete-wish/:id', auth.isCheck, wishlistController.deleteWishlist);
 
 
 // ------------------------- wallet ------------------------------
