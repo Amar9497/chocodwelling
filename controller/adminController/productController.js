@@ -7,45 +7,50 @@ const cloudinary = require("cloudinary").v2;
 // ------------ product page rendering -------------
 
 const loadProduct = async (req, res) => {
-  const page = Math.max(parseInt(req.query.page) || 1, 1);
-  const itemsPerPage = 10;
-  const search = req.query.search || "";
-
   try {
-    // search filter
-    const filter = search
-      ? { productName: { $regex: search, $options: "i" } }
+    const page = parseInt(req.query.page) || 1;
+    const itemsPerPage = 10;
+    const search = req.query.search || "";
+
+    // Sanitize search input to allow only letters and spaces
+    const sanitizedSearch = search.replace(/[^a-zA-Z\s]/g, '');
+
+    // Create search filter
+    const filter = sanitizedSearch
+      ? { productName: { $regex: sanitizedSearch, $options: "i" } }
       : {};
 
+    // Get total count with filter
     const totalProduct = await productSchema.countDocuments(filter);
-    const totalPages = Math.max(Math.ceil(totalProduct / itemsPerPage), 1);
-    const currentPage = Math.min(page, totalPages);
+    const totalPages = Math.ceil(totalProduct / itemsPerPage);
 
-    const skip = Math.max((currentPage - 1) * itemsPerPage, 0);
+    // Ensure current page is within valid range
+    const validatedPage = Math.max(1, Math.min(page, totalPages || 1));
+    const skip = (validatedPage - 1) * itemsPerPage;
 
     const products = await productSchema
       .find(filter)
       .populate("productCategory", "categoryName")
+      .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(itemsPerPage)
-      .sort({ updatedAt : -1 });
+      .limit(itemsPerPage);
 
     res.render("admin/products", {
       title: "Products",
       products,
-      currentPage,
+      currentPage: validatedPage,
       totalPages,
-      search,
+      search: sanitizedSearch
     });
   } catch (error) {
     console.error(`Error in loadProduct: ${error}`);
-    req.flash("error", "Failed to load products.");
     res.status(500).render("admin/products", {
       title: "Products",
       products: [],
       currentPage: 1,
       totalPages: 1,
-      messages: req.flash(),
+      search: "",
+      error: "Failed to load products"
     });
   }
 };
@@ -79,7 +84,9 @@ const uploadBase64ImageToCloudinary = async (base64Data) => {
   });
 };
 
-// --------------------- add products -------------
+
+// ------------------------------ add products --------------------------------------
+
 const addProductPost = async (req, res) => {
   try {
     const isArray = [];

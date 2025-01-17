@@ -427,7 +427,7 @@ const validateCoupon = async (req, res) => {
             });
         }
 
-        // Check minimum order amount
+        // Check minimum order amount against subtotal
         if (total < coupon.minimumOrderAmount) {
             return res.status(400).json({
                 success: false,
@@ -441,6 +441,27 @@ const validateCoupon = async (req, res) => {
             discountAmount = (total * coupon.discountValue) / 100;
         } else {
             discountAmount = coupon.discountValue;
+        }
+
+        // Check if discount amount is greater than subtotal
+        if (discountAmount >= total) {
+            return res.status(400).json({
+                success: false,
+                message: 'Coupon discount cannot be greater than or equal to subtotal'
+            });
+        }
+
+        // Check if user has already used this coupon
+        const existingOrder = await orderSchema.findOne({
+            userId: userId,
+            'coupon.code': couponCode
+        });
+
+        if (existingOrder) {
+            return res.status(400).json({
+                success: false,
+                message: 'You have already used this coupon'
+            });
         }
 
         return res.json({

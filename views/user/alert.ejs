@@ -1,6 +1,6 @@
 <!-- Success Alert -->
 <% if (typeof success !== 'undefined' && success && success.length > 0) { %>
-    <script>console.log('Rendering success alert with:', <%= JSON.stringify(success) %>);</script>
+    <!-- <script>console.log('Rendering success alert with:', <%= JSON.stringify(success) %>);</script> -->
     <div class="fixed top-20 right-4 z-50 animate-slide-in" id="success-alert">
         <div class="flex items-center p-4 bg-white border-l-4 border-green-500 rounded-lg shadow-lg">
             <div class="flex-shrink-0">
@@ -24,7 +24,7 @@
 
 <!-- Error Alert -->
 <% if (typeof error !== 'undefined' && error && error.length > 0) { %>
-    <script>console.log('Rendering error alert with:', <%= JSON.stringify(error) %>);</script>
+    <!-- <script>console.log('Rendering error alert with:', <%= JSON.stringify(error) %>);</script> -->
     <div class="fixed top-20 right-4 z-50 animate-slide-in" id="error-alert">
         <div class="flex items-center p-4 bg-white border-l-4 border-red-500 rounded-lg shadow-lg">
             <div class="flex-shrink-0">

@@ -5,36 +5,47 @@ const mongoose = require('mongoose');
 const {objectId} = mongoose.Types
 
 const getOffer = async (req,res)=>{
-    const search = req.query.search || '';
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 8;
     try {
-        const offers = await offerSchema.find({ offerType: { $regex: search, $options: 'i' } })
+        // Sanitize search input to allow only letters
+        const searchInput = req.query.search || '';
+        const search = searchInput.replace(/[^A-Za-z\s]/g, '');
+        
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 8;
+
+        // Update query to be case-insensitive and match offer type
+        const query = search ? {
+            offerType: { 
+                $regex: new RegExp(`^${search}`, 'i') // Start with the search term
+            }
+        } : {};
+
+        const offers = await offerSchema.find(query)
             .populate('referenceId')
             .limit(limit)
             .skip((page - 1) * limit)
-            .sort({ updatedAt : -1 });
+            .sort({ updatedAt: -1 });
 
-        // find in database
-        const count = await offerSchema.countDocuments({ offerType: { $regex: search, $options: 'i' } });
-        const products = await productSchema.find({isActive: true}).sort({createdAt: -1})
-        const categories = await categorySchema.find({isActive: true}).sort({createdAt: -1})
-        
-        // page render
-        res.render('admin/offer',{
+        // Update count query to match the search
+        const count = await offerSchema.countDocuments(query);
+        const products = await productSchema.find({ isActive: true }).sort({ createdAt: -1 });
+        const categories = await categorySchema.find({ isActive: true }).sort({ createdAt: -1 });
+
+        res.render('admin/offer', {
             title: "Offers",
             offers,
             products,
             categories,
             totalPages: Math.ceil(count / limit),
             currentPage: page,
-            search,
-            limit,page
-        })
+            search, // Pass sanitized search term back to view
+            limit,
+            page
+        });
     } catch (error) {
-        console.log(`error while render Offer Page ${error}`)
+        console.log(`Error while rendering Offer Page: ${error}`);
         req.flash('error', 'An error occurred while fetching offers. Please try again.');
-        res.redirect('/admin/home');
+        res.redirect('/admin/offer');
     }
 }
 

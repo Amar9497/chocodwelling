@@ -50,14 +50,35 @@ const getCoupons = async (req, res) => {
 
 
 const addCoupon = async (req, res) => {
-    
     const { code, discountType, discountValue, startDate, endDate, minimumOrderAmount } = req.body;
 
+    // Basic field validation
     if (!code || !discountType || !discountValue || !startDate || !endDate || !minimumOrderAmount) {
         return res.status(400).json({ message: 'All fields are required' });
     }
 
     try {
+        
+
+        // Validate minimum order amount
+        const minAmountNum = Number(minimumOrderAmount);
+        if (isNaN(minAmountNum) || minAmountNum < 500) {
+            return res.status(400).json({ 
+                message: 'Minimum order amount must be at least ₹500' 
+            });
+        }
+
+        // Validate dates
+        const startDateTime = new Date(startDate);
+        const endDateTime = new Date(endDate);
+        
+        if (startDateTime >= endDateTime) {
+            return res.status(400).json({ 
+                message: 'End date must be after start date' 
+            });
+        }
+
+        // Check for existing coupon
         const existingCoupon = await Coupon.findOne({ code });
         if (existingCoupon) {
             return res.status(400).json({ message: 'Coupon code already exists' });
@@ -87,16 +108,55 @@ const addCoupon = async (req, res) => {
 
 const editCoupon = async (req, res) => {
     const { id, code, discountType, discountValue, startDate, endDate, minimumOrderAmount } = req.body;
+    
+    // Basic field validation
     if (!id || !code || !discountType || !discountValue || !startDate || !endDate || minimumOrderAmount === undefined) {
         return res.status(400).json({ message: 'All fields are required' });
     }
+
     try {
+        
+
+        // Validate minimum order amount
+        const minAmountNum = Number(minimumOrderAmount);
+        if (isNaN(minAmountNum) || minAmountNum < 500) {
+            return res.status(400).json({ 
+                message: 'Minimum order amount must be at least ₹500' 
+            });
+        }
+
+        // Validate dates
+        const startDateTime = new Date(startDate);
+        const endDateTime = new Date(endDate);
+        
+        if (startDateTime >= endDateTime) {
+            return res.status(400).json({ 
+                message: 'End date must be after start date' 
+            });
+        }
+
+        // Check for existing coupon code (excluding current coupon)
+        const existingCoupon = await Coupon.findOne({ 
+            code: code, 
+            _id: { $ne: id } 
+        });
+        
+        if (existingCoupon) {
+            return res.status(400).json({ 
+                message: 'Coupon code already exists' 
+            });
+        }
+
         const updatedCoupon = await Coupon.findByIdAndUpdate(
-            id, { code, discountType, discountValue, startDate, endDate, minimumOrderAmount }, { new: true }
+            id, 
+            { code, discountType, discountValue, startDate, endDate, minimumOrderAmount }, 
+            { new: true }
         );
+
         if (!updatedCoupon) {
             return res.status(404).json({ message: 'Coupon not found' });
         }
+
         res.json({ message: 'Coupon updated successfully' });
     } catch (error) {
         console.error('Error edit coupon:', error);

@@ -53,10 +53,7 @@
       
                     <span>Offers</span>
                 </a>
-                <a href="/admin/coupons" class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg">
-      
-                    <span>Banner</span>
-                </a>
+                
             </nav>
           </aside>
 
@@ -68,7 +65,14 @@
                     <button class="bg-[#A79277] text-white px-4 py-2 rounded-lg shadow-md hover:bg-[#E5E7EB] hover:text-black" onclick="toggleModal(true)">Add Category</button>
                     
                     <form action="/admin/category" method="get" class="flex items-center gap-2 w-full sm:w-auto">
-                        <input type="text" name="search" placeholder="Search" class="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-auto">
+                        <input 
+                            type="text" 
+                            name="search" 
+                            placeholder="Search by Category Name" 
+                            value="<%= search %>"
+                            class="border border-gray-300 rounded-lg px-4 py-2"
+                            oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')"
+                        />
                         <input type="submit" value="Search" class="bg-[#A79277] text-white px-4 py-2 rounded-lg cursor-pointer w-full sm:w-auto">
                     </form>
                 </div>
@@ -77,80 +81,111 @@
 
             <!-- Category Table -->
             <div class="rounded-lg shadow-lg overflow-hidden">
-                <table class="w-full border-collapse border border-gray-200 text-sm lg:text-base">
-                    <thead class="bg-[#A79277] text-white">
-                        <tr>
-                            <th class="py-4 px-5">SL.No</th>
-                            <th class="py-4 px-5">Name</th>
-                            <th class="py-4 px-5">Added on</th>
-                            <th class="py-4 px-5">Status</th>
-                            <th class="py-4 px-5">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 bg-white">
-                        <% categories.forEach((category, index) => { %>
-                            <tr class="hover:bg-gray-50">
-                                <td class=" px-4 py-2 text-center"><%= index + 1 %></td>
-                                <td class="-gray-300 px-4 py-2 text-center"><%= category.categoryName %></td>
-                                <td class=" px-4 py-2 text-center">
-                                    <%= category.createdAt.toDateString() %> <!-- Assuming `createdAt` is available -->
-                                </td>
-            
-                                <td class=" px-4 py-2 text-center">
-                                    <% if (category.isActive) { %>
-                                        <span class="inline-block px-4 py-2 text-sm font-medium text-green-700 bg-green-100 rounded">Active</span>
-                                      <% } else { %>
-                                        <span class="inline-block px-4 py-2 text-sm font-medium text-red-700 bg-red-100 rounded">Blocked</span>
-                                      <% } %>
-                                </td>
-                                <td class=" px-4 py-2 text-center">
-                                    <!-- Edit Button -->
-                                    <button 
-                                        class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
-                                        onclick="toggleEditModal('<%= category.id %>', '<%= category.categoryName %>')">
-                                        Edit
-                                    </button>
-            
-                                    <!-- Block/Unblock Button -->
-                                    <form action="/admin/status/<%= category._id %>" method="POST" class="inline">
-                                        <button
-                                        onclick="toggleCategoryStatus(event, this, '<%= category._id %>')" 
-                                            class="px-3 py-1 text-sm font-medium text-white rounded shadow 
-                                            <%= category.isActive ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700' %>">
-                                            <%= category.isActive ? 'Block' : 'Unblock' %>
-                                        </button>
-                                    </form>
-                                    
-            
-                                </td>
+                <% if (categories && categories.length > 0) { %>
+                    <table class="w-full border-collapse border border-gray-200 text-sm lg:text-base">
+                        <thead class="bg-[#A79277] text-white">
+                            <tr>
+                                <th class="py-4 px-5">SL.No</th>
+                                <th class="py-4 px-5">Name</th>
+                                <th class="py-4 px-5">Added on</th>
+                                <th class="py-4 px-5">Status</th>
+                                <th class="py-4 px-5">Action</th>
                             </tr>
-                        <% }) %>
-                    </tbody>
-                    
-                </table>   
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 bg-white">
+                            <% categories.forEach((category, index) => { %>
+                                <tr class="hover:bg-gray-50">
+                                    <td class=" px-4 py-2 text-center"><%= index + 1 %></td>
+                                    <td class="-gray-300 px-4 py-2 text-center"><%= category.categoryName %></td>
+                                    <td class=" px-4 py-2 text-center">
+                                        <%= category.createdAt.toDateString() %> <!-- Assuming `createdAt` is available -->
+                                    </td>
+                
+                                    <td class=" px-4 py-2 text-center">
+                                        <% if (category.isActive) { %>
+                                            <span class="inline-block px-4 py-2 text-sm font-medium text-green-700 bg-green-100 rounded">Active</span>
+                                          <% } else { %>
+                                            <span class="inline-block px-4 py-2 text-sm font-medium text-red-700 bg-red-100 rounded">Blocked</span>
+                                          <% } %>
+                                    </td>
+                                    <td class=" px-4 py-2 text-center">
+                                        <!-- Edit Button -->
+                                        <button 
+                                            class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                                            onclick="toggleEditModal('<%= category.id %>', '<%= category.categoryName %>')">
+                                            Edit
+                                        </button>
+                
+                                        <!-- Block/Unblock Button -->
+                                        <form action="/admin/status/<%= category._id %>" method="POST" class="inline">
+                                            <button
+                                            onclick="toggleCategoryStatus(event, this, '<%= category._id %>')" 
+                                                class="px-3 py-1 text-sm font-medium text-white rounded shadow 
+                                                <%= category.isActive ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700' %>">
+                                                <%= category.isActive ? 'Block' : 'Unblock' %>
+                                            </button>
+                                        </form>
+                                        
+                
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                <% } else { %>
+                    <div class="flex flex-col items-center justify-center py-12 bg-white">
+                        <svg class="w-16 h-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                        </svg>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">No Categories Found</h3>
+                        <p class="text-gray-500 text-center mb-4">
+                            <%= search ? `No categories found matching "${search}"` : 'No categories have been added yet.' %>
+                        </p>
+                        <% if (search) { %>
+                            <a href="/admin/category" class="text-[#8B7355] hover:text-[#A79277] font-medium transition-colors duration-300">
+                                View All Categories
+                            </a>
+                        <% } %>
+                    </div>
+                <% } %>
             </div>
 
             <!-- Pagination -->
-           
-            <div class="flex justify-center mt-6">
-                <div class="flex space-x-2">
-                    <!-- Previous Page Button -->
-                    <a href="/admin/category?page=<%= currentPage - 1 %>" class="px-3 py-1 bg-gray-200 rounded-md text-sm text-gray-600 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed" <%= currentPage <= 1 ? 'disabled' : '' %>>
-                        Prev
-                    </a>
-            
-                    <!-- Page Numbers -->
+            <div class="pagination-controls flex justify-center mt-10">
+                <ul class="flex space-x-2">
+                    <% if (currentPage > 1) { %>
+                    <li>
+                        <a
+                            href="/admin/category?page=<%= currentPage - 1 %>&search=<%= search %>"
+                            class="px-4 py-2 text-sm lg:text-base bg-[#D2691E] text-white border border-[#A0522D] rounded hover:bg-[#A0522D] transition"
+                        >
+                            Previous
+                        </a>
+                    </li>
+                    <% } %>
+                    
                     <% for (let i = 1; i <= totalPages; i++) { %>
-                        <a href="/admin/category?page=<%= i %>" class="px-3 py-1 bg-gray-200 rounded-md text-sm text-gray-600 hover:bg-blue-600 hover:text-white <%= i === currentPage ? 'bg-blue-600 text-white' : '' %>">
+                    <li>
+                        <a
+                            href="/admin/category?page=<%= i %>&search=<%= search %>"
+                            class="px-4 py-2 text-sm lg:text-base border border-[#A0522D] rounded <%= currentPage == i ? 'bg-[#4E2C0A] text-white' : 'bg-[#FFF8E1] text-[#4E2C0A] hover:bg-[#D2691E] hover:text-white transition' %>"
+                        >
                             <%= i %>
                         </a>
+                    </li>
                     <% } %>
-            
-                    <!-- Next Page Button -->
-                    <a href="/admin/category?page=<%= currentPage + 1 %>" class="px-3 py-1 bg-gray-200 rounded-md text-sm text-gray-600 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed" <%= currentPage >= totalPages ? 'disabled' : '' %>>
-                        Next
-                    </a>
-                </div>
+                    
+                    <% if (currentPage < totalPages) { %>
+                    <li>
+                        <a
+                            href="/admin/category?page=<%= currentPage + 1 %>&search=<%= search %>"
+                            class="px-4 py-2 text-sm lg:text-base bg-[#D2691E] text-white border border-[#A0522D] rounded hover:bg-[#A0522D] transition"
+                        >
+                            Next
+                        </a>
+                    </li>
+                    <% } %>
+                </ul>
             </div>
             
 
@@ -328,6 +363,12 @@ function validateAddCategoryForm() {
         return false; // Prevent form submission
     }
 
+    if (categoryName.length > 20) {
+        categoryErrorDiv.textContent = "Category name must have contain only 20 characters.";
+        categoryErrorDiv.classList.remove("hidden");
+        return false; // Prevent form submission
+    }
+
     // Hide error message if validation passes
     categoryErrorDiv.classList.add("hidden");
     return true; // Allow form submission
@@ -365,6 +406,14 @@ function validateEditCategoryForm() {
         categoryErrorDiv.classList.remove("hidden");
         return false; // Prevent form submission
     }
+
+    // Validation: Check for length
+    if (categoryName.length > 20) {
+        categoryErrorDiv.textContent = "Category name must have contain only 20 characters.";
+        categoryErrorDiv.classList.remove("hidden");
+        return false; // Prevent form submission
+    }
+    
 
     // Hide error message if validation passes
     categoryErrorDiv.classList.add("hidden");

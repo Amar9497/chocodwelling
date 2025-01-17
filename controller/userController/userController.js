@@ -15,16 +15,13 @@ const generateOTP = require('../../service/generateotp')
 const loadLogin = (req, res) => {
     try {
         // Log the flash messages before rendering
-        const successMsg = req.flash('success');
-        const errorMsg = req.flash('error');
         
-        console.log('Flash messages before render:', { successMsg, errorMsg });
 
         res.render("user/login", {
             title: 'Login',
-            success: successMsg,
-            error: errorMsg
+            
         });
+        
     } catch (error) {
         console.error("Error in login page:", error);
         res.status(500).render("user/login", {
@@ -44,14 +41,12 @@ const loginPost = async (req, res) => {
             // Set flash message and log it
             const msg = 'Could not find user, please login again';
             req.flash('error', msg);
-            console.log('Setting error flash:', msg);
             return res.redirect('/login'); 
         }
 
         if (!user.isActive) {
             const msg = 'User is blocked by admin';
             req.flash('error', msg);
-            console.log('Setting error flash:', msg);
             return res.redirect('/login'); 
         }
 
@@ -59,7 +54,6 @@ const loginPost = async (req, res) => {
         if (!isPasswordValid) {
             const msg = 'Invalid email ID or password';
             req.flash('error', msg);
-            console.log('Setting error flash:', msg);
             return res.redirect('/login'); 
         }
 
@@ -67,7 +61,6 @@ const loginPost = async (req, res) => {
         req.session.user = user.id;
         const msg = 'Successfully logged in!';
         req.flash('success', msg);
-        console.log('Setting success flash:', msg);
         return res.redirect('/home');
         
     } catch (error) {
@@ -253,7 +246,7 @@ const otpResend = (req,res)=>{
         sendOTP(email,OTP);
 
         req.session.otp = OTP;
-        req.session.otpTime = Date.now();
+        req.session.otptime = Date.now();
 
         req.flash('success','OTP resend successfully');
         res.redirect('/otp');

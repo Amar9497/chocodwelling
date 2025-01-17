@@ -4,11 +4,11 @@
 />
 <style>
   #imagePreview img {
-    max-width: 100%; 
-    height: auto; 
-    object-fit: cover; 
-    max-height: 200px; 
-    border-radius: 8px; 
+    max-width: 100%;
+    height: auto;
+    object-fit: cover;
+    max-height: 200px;
+    border-radius: 8px;
   }
 
   .close-button {
@@ -342,9 +342,9 @@
     const stock = document.querySelector('input[name="stock"]').value.trim();
 
     // Validate Product Name
-    if (!/^[A-Za-z\s]{3,}$/.test(productName)) {
+    if (!/^[A-Za-z\s]{3,40}$/.test(productName)) {
       errors.push(
-        "Product name must contain only letters and be at least 3 characters long."
+        "Product name must contain only letters and be between 3 and 40 characters long."
       );
     }
 
@@ -364,35 +364,38 @@
     }
 
     // Validate Weight, Price, and Stock
-if (!/^\d{1,4}$/.test(weight)) {
-  errors.push("Weight must be a valid number with up to 4 digits.");
-}
-if (!/^\d{1,6}$/.test(price)) {
-  errors.push("Price must be a valid number with up to 6 digits.");
-}
-if (!/^\d{1,6}$/.test(stock)) {
-  errors.push("Stock must be a valid number with up to 6 digits.");
-}
-
+    if (!/^\d{1,4}$/.test(weight)) {
+      errors.push("Weight must be a valid number with up to 4 digits.");
+    }
+    if (!/^\d{1,6}$/.test(price)) {
+      errors.push("Price must be a valid number with up to 6 digits.");
+    }
+    if (!/^\d{1,6}$/.test(stock)) {
+      errors.push("Stock must be a valid number with up to 6 digits.");
+    }
 
     // Validate Images
-const uploadedFiles = imageUpload.files;
-const validImageTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+    const uploadedFiles = imageUpload.files;
+    const validImageTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+    ];
 
-if (uploadedFiles.length < 3) {
-  errors.push("Please select at least 3 images.");
-} else if (uploadedFiles.length > 5) {
-  errors.push("You can upload a maximum of 5 images.");
-} else {
-  for (const file of uploadedFiles) {
-    if (!validImageTypes.includes(file.type)) {
-      errors.push(
-        `Invalid file type: ${file.name}. Only JPEG, PNG, GIF, and WEBP images are allowed.`
-      );
+    if (uploadedFiles.length < 3) {
+      errors.push("Please select at least 3 images.");
+    } else if (uploadedFiles.length > 5) {
+      errors.push("You can upload a maximum of 5 images.");
+    } else {
+      for (const file of uploadedFiles) {
+        if (!validImageTypes.includes(file.type)) {
+          errors.push(
+            `Invalid file type: ${file.name}. Only JPEG, PNG, GIF, and WEBP images are allowed.`
+          );
+        }
+      }
     }
-  }
-}
-
 
     // Display Errors
     if (errors.length > 0) {

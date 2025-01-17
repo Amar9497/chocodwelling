@@ -57,12 +57,7 @@
         >
           <span>Offers</span>
         </a>
-        <a
-          href="#"
-          class="flex items-center space-x-4 py-2 px-3 hover:bg-white hover:shadow-lg rounded-lg transition-all"
-        >
-          <span>Banner</span>
-        </a>
+        
       </nav>
     </aside>
 
@@ -79,8 +74,10 @@
             <input
               type="text"
               name="search"
-              placeholder="Search"
-              class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring focus:ring-[#A79277]"
+              placeholder="Search by Coupon Code"
+              value="<%= search %>"
+              class="border border-gray-300 rounded-lg px-4 py-2"
+              oninput="this.value = this.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase()"
             />
             <input
               type="submit"
@@ -101,67 +98,84 @@
 
       <!-- Coupons Table -->
       <div class="rounded-lg shadow-lg bg-white overflow-hidden">
-        <table class="w-full text-left text-base border-collapse">
-          <thead class="bg-[#A79277] text-white">
-            <tr>
-              <th class="py-4 px-5 text-center">SL.No</th>
-              <th class="py-4 px-5 text-center">Coupon Code</th>
-              <th class="py-4 px-5 text-center">Discount Type</th>
-              <th class="py-4 px-5 text-center">Discount Value</th>
-              <th class="py-4 px-5 text-center">Min Amount</th>
-              <th class="py-4 px-5 text-center">Start Date</th>
-              <th class="py-4 px-5 text-center">End Date</th>
-              <th class="py-4 px-5 text-center">Status</th>
-              <th class="py-4 px-5 text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% coupons.forEach((coupon, index) => { %>
-            <tr class="hover:bg-gray-100 transition-all">
-              <td class="px-4 py-2 text-center">
-                <%= index + 1 + ((page - 1) * 8) %>
-              </td>
-              <td class="px-4 py-2 text-center"><%= coupon.code %></td>
-              <td class="px-4 py-2 text-center"><%= coupon.discountType %></td>
-              <td class="px-4 py-2 text-center"><%= coupon.discountValue %></td>
-              <td class="px-4 py-2 text-center">
-                <%= coupon.minimumOrderAmount %>
-              </td>
-              <td class="px-4 py-2 text-center">
-                <%= new Date(coupon.startDate).toLocaleDateString() %>
-              </td>
-              <td class="px-4 py-2 text-center">
-                <%= new Date(coupon.endDate).toLocaleDateString() %>
-              </td>
-              <td class="px-4 py-2 text-center">
-                <span
-                  class="<%= coupon.isActive ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold' %>"
-                >
-                  <%= coupon.isActive ? 'Active' : 'Blocked' %>
-                </span>
-              </td>
-              <td class="py-3 px-5 flex space-x-2 items-center">
-                <a
-                  href="#"
-                  id="edit-collection-modal"
-                  data-bs-toggle="modal"
-                  data-bs-target="#editCollection"
-                  class="text-blue-500 hover:underline"
-                  onclick="editCoupon('<%= coupon.id %>')"
-                  >✏️</a
-                >
-                
-                <a
-                  href="javascript:void(0);"
-                  class="text-red-500 hover:text-red-700"
-                  onclick="confirmStatusChange('<%= coupon.id %>', '<%= coupon.isActive %>')"
-                  >❌</a
-                >
-              </td>
-            </tr>
-            <% }) %>
-          </tbody>
-        </table>
+        <% if (coupons && coupons.length > 0) { %>
+          <table class="w-full text-left text-base border-collapse">
+            <thead class="bg-[#A79277] text-white">
+              <tr>
+                <th class="py-4 px-5 text-center">SL.No</th>
+                <th class="py-4 px-5 text-center">Coupon Code</th>
+                <th class="py-4 px-5 text-center">Discount Type</th>
+                <th class="py-4 px-5 text-center">Discount Value</th>
+                <th class="py-4 px-5 text-center">Min Amount</th>
+                <th class="py-4 px-5 text-center">Start Date</th>
+                <th class="py-4 px-5 text-center">End Date</th>
+                <th class="py-4 px-5 text-center">Status</th>
+                <th class="py-4 px-5 text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% coupons.forEach((coupon, index) => { %>
+              <tr class="hover:bg-gray-100 transition-all">
+                <td class="px-4 py-2 text-center">
+                  <%= index + 1 + ((page - 1) * 8) %>
+                </td>
+                <td class="px-4 py-2 text-center"><%= coupon.code %></td>
+                <td class="px-4 py-2 text-center"><%= coupon.discountType %></td>
+                <td class="px-4 py-2 text-center"><%= coupon.discountValue %></td>
+                <td class="px-4 py-2 text-center">
+                  <%= coupon.minimumOrderAmount %>
+                </td>
+                <td class="px-4 py-2 text-center">
+                  <%= new Date(coupon.startDate).toLocaleDateString() %>
+                </td>
+                <td class="px-4 py-2 text-center">
+                  <%= new Date(coupon.endDate).toLocaleDateString() %>
+                </td>
+                <td class="px-4 py-2 text-center">
+                  <span
+                    class="<%= coupon.isActive ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold' %>"
+                  >
+                    <%= coupon.isActive ? 'Active' : 'Blocked' %>
+                  </span>
+                </td>
+                <td class="py-3 px-5 flex space-x-2 items-center">
+                  <a
+                    href="#"
+                    id="edit-collection-modal"
+                    data-bs-toggle="modal"
+                    data-bs-target="#editCollection"
+                    class="text-blue-500 hover:underline"
+                    onclick="editCoupon('<%= coupon.id %>')"
+                    >✏️</a
+                  >
+                  
+                  <a
+                    href="javascript:void(0);"
+                    class="text-red-500 hover:text-red-700"
+                    onclick="confirmStatusChange('<%= coupon.id %>', '<%= coupon.isActive %>')"
+                    >❌</a
+                  >
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        <% } else { %>
+          <div class="flex flex-col items-center justify-center py-12">
+            <svg class="w-16 h-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+            </svg>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">No Coupons Found</h3>
+            <p class="text-gray-500 text-center mb-4">
+              <%= search ? `No coupons matching "${search}" were found.` : 'No coupons have been created yet.' %>
+            </p>
+            <% if (search) { %>
+              <a href="/admin/coupons" class="text-[#8B7355] hover:text-[#A79277] font-medium">
+                View All Coupons
+              </a>
+            <% } %>
+          </div>
+        <% } %>
       </div>
 
       <!-- Pagination -->
@@ -179,7 +193,7 @@
           <li>
             <a
               href="/admin/coupons?page=<%= i %>&limit=<%= limit %>&search=<%= search %>"
-              class="px-4 py-2 rounded <%= currentPage == i ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %>"
+              class="px-4 py-2 rounded <%= currentPage == i ? 'bg-[#A0522D] text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %>"
             >
               <%= i %>
             </a>
@@ -456,13 +470,62 @@
   }
   //-----------------------------------Add Coupon-------------------------------------
 
+  function validateCouponForm(formData) {
+    const discountType = formData.get('discountType');
+    const discountValue = Number(formData.get('discountValue'));
+    const minAmount = Number(formData.get('minimumOrderAmount'));
+    const startDate = new Date(formData.get('startDate'));
+    const endDate = new Date(formData.get('endDate'));
+
+    // Validate discount value based on type
+    if (discountType === 'Percentage') {
+        if (isNaN(discountValue) || discountValue <= 0 || discountValue > 90) {
+            throw new Error('Percentage discount must be between 1 and 90%');
+        }
+    } else if (discountType === 'Fixed') {
+        if (isNaN(discountValue) || discountValue <= 0 || discountValue > 1000) {
+            throw new Error('Fixed discount must be between ₹1 and ₹1000');
+        }
+    }
+
+    // Validate minimum order amount
+    if (isNaN(minAmount) || minAmount < 500) {
+        throw new Error('Minimum order amount must be at least ₹500');
+    }
+
+    // Validate dates
+    if (startDate >= endDate) {
+        throw new Error('End date must be after start date');
+    }
+
+    return true;
+  }
+
+  
+
+  // Same for edit form
+  document.getElementById('editDiscountType').addEventListener('change', function(e) {
+    const discountValueInput = document.getElementById('editDiscountValue');
+    if (e.target.value === 'Percentage') {
+        discountValueInput.max = "90";
+        discountValueInput.placeholder = "Enter percentage (1-90)";
+    } else {
+        discountValueInput.max = "1000";
+        discountValueInput.placeholder = "Enter amount (1-1000)";
+    }
+  });
+
   document
     .getElementById("addCouponForm")
     .addEventListener("submit", async function (e) {
       e.preventDefault();
       const formData = new FormData(this);
-      const data = Object.fromEntries(formData.entries());
+
       try {
+        // Validate form data before submission
+        validateCouponForm(formData);
+
+        const data = Object.fromEntries(formData.entries());
         const response = await fetch("/admin/addcoupon", {
           method: "POST",
           headers: {
@@ -491,8 +554,8 @@
         console.error("Error:", error);
         Swal.fire({
           icon: "error",
-          title: "Error",
-          text: "An error occurred while adding the coupon.",
+          title: "Validation Error",
+          text: error.message || "An error occurred while adding the coupon.",
         });
       }
     });
@@ -547,13 +610,12 @@
       .addEventListener("submit", async (event) => {
         event.preventDefault();
         const formData = new FormData(event.target);
-        const data = Object.fromEntries(formData.entries());
-
-        // Log the data being sent
-        console.log("Submitting data:", data);
 
         try {
-          const response = await fetch(`/admin/editcoupon/${data.id}`, {
+          // Validate form data before submission
+          validateCouponForm(formData);
+
+          const response = await fetch(`/admin/editcoupon/${formData.get('id')}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -563,14 +625,13 @@
               discountValue: document.getElementById("editDiscountValue").value,
               startDate: document.getElementById("editStartDate").value,
               endDate: document.getElementById("editEndDate").value,
-              minimumOrderAmount: document.getElementById(
-                "editMinimumOrderAmount"
-              ).value,
+              minimumOrderAmount: document.getElementById("editMinimumOrderAmount").value,
             }),
           });
 
           if (!response.ok) {
-            throw new Error("Network response was not ok");
+            const result = await response.json();
+            throw new Error(result.message || 'Failed to update coupon');
           }
 
           const result = await response.json();
@@ -586,7 +647,7 @@
           console.error("Error:", error);
           Swal.fire({
             title: "Error",
-            text: "Failed to update coupon.",
+            text: error.message || "Failed to update coupon.",
             icon: "error",
             confirmButtonText: "OK",
           });
@@ -615,3 +676,92 @@
     }
 </script>
 
+<script>
+  // Input validation for Add Coupon form
+  document.getElementById('code').addEventListener('input', function(e) {
+    const input = e.target;
+    const value = input.value;
+    
+    // Remove any characters that aren't letters or numbers
+    const sanitizedValue = value.replace(/[^A-Za-z0-9]/g, '');
+    
+    // Limit to 10 characters
+    const truncatedValue = sanitizedValue.slice(0, 10);
+    
+    // Convert to uppercase
+    const upperValue = truncatedValue.toUpperCase();
+    
+    // Update input value if it changed
+    if (value !== upperValue) {
+        input.value = upperValue;
+    }
+
+    // Visual feedback
+    if (value.length > 10) {
+        input.classList.add('border-red-500');
+    } else {
+        input.classList.remove('border-red-500');
+    }
+  });
+
+  // Input validation for Edit Coupon form
+  document.getElementById('editCode').addEventListener('input', function(e) {
+    const input = e.target;
+    const value = input.value;
+    
+    // Remove any characters that aren't letters or numbers
+    const sanitizedValue = value.replace(/[^A-Za-z0-9]/g, '');
+    
+    // Limit to 10 characters
+    const truncatedValue = sanitizedValue.slice(0, 10);
+    
+    // Convert to uppercase
+    const upperValue = truncatedValue.toUpperCase();
+    
+    // Update input value if it changed
+    if (value !== upperValue) {
+        input.value = upperValue;
+    }
+
+    // Visual feedback
+    if (value.length > 10) {
+        input.classList.add('border-red-500');
+    } else {
+        input.classList.remove('border-red-500');
+    }
+  });
+
+  // Add form submission validation
+  document.getElementById('addCouponForm').addEventListener('submit', function(e) {
+    const codeInput = document.getElementById('code');
+    const code = codeInput.value;
+    const codeRegex = /^[A-Za-z0-9]{1,10}$/;
+
+    if (!codeRegex.test(code)) {
+        e.preventDefault();
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid Coupon Code',
+            text: 'Coupon code must be 1-10 characters and contain only letters and numbers'
+        });
+        return false;
+    }
+  });
+
+  // Edit form submission validation
+  document.getElementById('editCouponForm').addEventListener('submit', function(e) {
+    const codeInput = document.getElementById('editCode');
+    const code = codeInput.value;
+    const codeRegex = /^[A-Za-z0-9]{1,10}$/;
+
+    if (!codeRegex.test(code)) {
+        e.preventDefault();
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid Coupon Code',
+            text: 'Coupon code must be 1-10 characters and contain only letters and numbers'
+        });
+        return false;
+    }
+  });
+</script>

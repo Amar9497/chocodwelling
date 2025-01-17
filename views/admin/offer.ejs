@@ -1,6 +1,8 @@
 <div class="min-h-screen flex flex-col">
     <!-- Navbar -->
-    <%- include('navbar') %> <%- include('alert') %>
+    <%- include('navbar') %> 
+    
+    <%- include('alert') %>
   
     <!-- Header Section -->
     <!-- Main Layout -->
@@ -58,12 +60,7 @@
       >
         <span class="poppins-semibold">Offers</span>
       </a>
-      <a
-        href="#"
-        class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg"
-      >
-        <span>Banner</span>
-      </a>
+      
     </nav>
   </aside>
   
@@ -76,8 +73,12 @@
               <input
                 type="text"
                 name="search"
-                placeholder="Search"
+                placeholder="Search by offer type"
                 class="border border-gray-300 rounded-lg px-4 py-2"
+                pattern="[A-Za-z\s]+"
+                title="Only letters are allowed"
+                onkeypress="return /[A-Za-z\s]/i.test(event.key)"
+                value="<%= search %>"
               />
               <input
                 type="submit"
@@ -98,57 +99,74 @@
   
         <!-- Offers Table -->
         <div class="rounded-lg shadow-lg overflow-x-auto bg-white">
-          <table class="w-full text-left text-base border-collapse">
-            <thead class="bg-[#A79277] text-white">
-              <tr>
-                <th class="py-4 px-5 text-center w-1/12">SL.No</th>
-                <th class="py-4 px-5 text-center w-1/12 ">Offer Type</th>
-                <th class="py-4 px-5 text-center w-1/12">Offer For</th>
-                <th class="py-4 px-5 text-center w-1/12">Discount Percent</th>
-                <th class="py-4 px-5 text-center w-1/12">Status</th>
-                <th class="py-4 px-5 text-center w-1/12">Action</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200 bg-white">
-              <% offers.forEach((offer, index) => { %>
-              <tr class="hover:bg-gray-50">
-                <td class="px-4 py-2 text-center"><%= index + 1 %></td>
-                <td class="px-4 py-2 text-center"><%= offer.offerType %></td>
-                <td class="px-4 py-2 text-center"><%= offer.offerType === "Product" ? offer.referenceId.productName : offer.referenceId.categoryName %></td>
-                <td class="px-4 py-2 text-center"><%= offer.discountPercent %></td>
-                <td class="px-4 py-2 text-center">
-                  <% if(offer.isActive) { %>
-                  <span class="text-green-500 font-semibold">Active</span>
-                  <% } else { %>
-                  <span class="text-red-500 font-semibold">Disabled</span>
-                  <% } %>
-                </td>
-                <td class="py-5 px-5  flex space-x-2 items-center justify-center">
-                    <a href="#" class="text-blue-500 hover:underline"
-                    onclick="editOffer({
-                       id: '<%= offer._id %>',
-                       type: '<%= offer.offerType %>',
-                       reference: '<%= offer.offerType === 'Product' ? offer.referenceId.productName : offer.referenceId.categoryName %>',
-                       discount: '<%= offer.discountPercent %>'
-                    })">
-                    ✏️
-                 </a>
-                 
-                  <!-- <a
-                    href="/admin/offerStatus?id=<%= offer._id %>&status=<%= offer.isActive %>"
-                    class="text-red-500 hover:underline"
-                    >❌</a> -->
-                    <a
+          <% if (offers && offers.length > 0) { %>
+            <table class="w-full text-left text-base border-collapse">
+              <thead class="bg-[#A79277] text-white">
+                <tr>
+                  <th class="py-4 px-5 text-center w-1/12">SL.No</th>
+                  <th class="py-4 px-5 text-center w-1/12 ">Offer Type</th>
+                  <th class="py-4 px-5 text-center w-1/12">Offer For</th>
+                  <th class="py-4 px-5 text-center w-1/12">Discount Percent</th>
+                  <th class="py-4 px-5 text-center w-1/12">Status</th>
+                  <th class="py-4 px-5 text-center w-1/12">Action</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200 bg-white">
+                <% offers.forEach((offer, index) => { %>
+                <tr class="hover:bg-gray-50">
+                  <td class="px-4 py-2 text-center"><%= index + 1 %></td>
+                  <td class="px-4 py-2 text-center"><%= offer.offerType %></td>
+                  <td class="px-4 py-2 text-center"><%= offer.offerType === "Product" ? offer.referenceId.productName : offer.referenceId.categoryName %></td>
+                  <td class="px-4 py-2 text-center"><%= offer.discountPercent %></td>
+                  <td class="px-4 py-2 text-center">
+                    <% if(offer.isActive) { %>
+                    <span class="text-green-500 font-semibold">Active</span>
+                    <% } else { %>
+                    <span class="text-red-500 font-semibold">Disabled</span>
+                    <% } %>
+                  </td>
+                  <td class="py-5 px-5  flex space-x-2 items-center justify-center">
+                      <a href="#" class="text-blue-500 hover:underline"
+                      onclick="editOffer({
+                         id: '<%= offer._id %>',
+                         type: '<%= offer.offerType %>',
+                         reference: '<%= offer.offerType === 'Product' ? offer.referenceId.productName : offer.referenceId.categoryName %>',
+                         discount: '<%= offer.discountPercent %>'
+                      })">
+                      ✏️
+                   </a>
+                   
+                    <!-- <a
+                      href="/admin/offerStatus?id=<%= offer._id %>&status=<%= offer.isActive %>"
+                      class="text-red-500 hover:underline"
+                      >❌</a> -->
+                      <a
     href="/admin/offerStatus?id=<%= offer._id %>&status=<%= offer.isActive %>"
     class="text-red-500 hover:underline delete-offer"
     data-id="<%= offer._id %>"
     data-status="<%= offer.isActive %>"
 >❌</a>
-                </td>
-              </tr>
-              <% }) %>
-            </tbody>
-          </table>
+                  </td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          <% } else { %>
+            <div class="flex flex-col items-center justify-center py-12">
+              <svg class="w-16 h-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <h3 class="text-lg font-medium text-gray-900 mb-2">No Offers Found</h3>
+              <p class="text-gray-500 text-center mb-4">
+                <%= search ? `No offers found matching type "${search}"` : 'No offers have been created yet.' %>
+              </p>
+              <% if (search) { %>
+                <a href="/admin/offer" class="text-[#8B7355] hover:text-[#A79277] font-medium transition-colors duration-300">
+                  View All Offers
+                </a>
+              <% } %>
+            </div>
+          <% } %>
         </div>
   
         <!-- Pagination -->
@@ -166,7 +184,7 @@
             <li>
               <a
                 href="/admin/offer?page=<%= i %>&limit=<%= limit %>&search=<%= search %>"
-                class="page-link px-4 py-2 rounded-md transition <%= currentPage == i ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %>"
+                class="page-link px-4 py-2 rounded-md transition <%= currentPage == i ? 'bg-[#A0522D] text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %>"
                 ><%= i %></a
               >
             </li>

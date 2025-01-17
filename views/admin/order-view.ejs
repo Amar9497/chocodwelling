@@ -106,8 +106,78 @@
         Back to Orders
       </a>
     </div>
+
+    <!-- Add this where you want to show the return details -->
+    <% if (orderDetails.returnReason && orderDetails.returnReason.status === 'Pending') { %>
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
+            <h3 class="text-lg font-semibold mb-2">Return Request</h3>
+            <div class="space-y-2">
+                <p><strong>Reason:</strong> <%= orderDetails.returnReason.reason %></p>
+                <p><strong>Description:</strong> <%= orderDetails.returnReason.description %></p>
+                <p><strong>Requested At:</strong> <%= new Date(orderDetails.returnReason.requestedAt).toLocaleString() %></p>
+                
+                <div class="flex gap-2 mt-4">
+                    <button 
+                        onclick="handleReturnRequest('<%= orderDetails._id %>', 'Approved')"
+                        class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                        Approve Return
+                    </button>
+                    <button 
+                        onclick="handleReturnRequest('<%= orderDetails._id %>', 'Rejected')"
+                        class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                        Reject Return
+                    </button>
+                </div>
+            </div>
+        </div>
+    <% } %>
   </div>
 </div>
 
 <!-- footer -->
 <%- include('footer') %>
+
+<!-- Add this script at the bottom of the file -->
+<script>
+function handleReturnRequest(orderId, status) {
+    Swal.fire({
+        title: `${status === 'Approved' ? 'Approve' : 'Reject'} Return Request`,
+        text: `Are you sure you want to ${status.toLowerCase()} this return request?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: `Yes, ${status.toLowerCase()} it`,
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/admin/return-request/${orderId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: `Return request ${status.toLowerCase()} successfully`,
+                        icon: 'success'
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    throw new Error(data.message);
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    title: 'Error!',
+                    text: error.message || 'Failed to process return request',
+                    icon: 'error'
+                });
+            });
+        }
+    });
+}
+</script>

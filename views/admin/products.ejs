@@ -66,17 +66,12 @@
         >
           <span>Offers</span>
         </a>
-        <a
-          href="#"
-          class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg"
-        >
-          <span>Banner</span>
-        </a>
+        
       </nav>
     </aside>
 
     <!-- Products Section -->
-    <main class="flex-1 p-6 bg-white overflow-auto">
+    <main class="flex-1 p-6 bg-white overflow-auto ">
       <div
         class="flex flex-col lg:flex-row justify-between items-center mb-6 gap-4"
       >
@@ -97,8 +92,10 @@
             <input
               type="text"
               name="search"
-              placeholder="Search"
+              placeholder="Search by Product Name"
+              value="<%= search %>"
               class="border border-gray-300 rounded-lg px-4 py-2 w-full lg:w-auto"
+              oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')"
             />
             <input
               type="submit"
@@ -109,117 +106,131 @@
         </div>
       </div>
 
+      <!-- Products Table -->
       <div class="rounded-lg shadow-lg overflow-hidden">
-        <table
-          class="w-full border-collapse border border-gray-200 text-sm lg:text-base"
-        >
-          <thead class="bg-[#A79277] text-white">
-            <tr>
-              <th class="py-4 px-5">SL.No</th>
-              <th class="py-4 px-5">Product</th>
-              <th class="py-4 px-5">Price</th>
-              <th class="py-4 px-5">Stock</th>
-              <th class="py-4 px-5">Category</th>
-              <th class="py-4 px-5">Status</th>
-              <th class="py-4 px-5">Action</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200 bg-white">
-            <% products.forEach((product, index) => { %>
-            <tr class="hover:bg-gray-50">
-              <td class="px-5 py-3 text-center"><%= index + 1 %></td>
-              <td class="px-5 py-3 text-center"><%= product.productName %></td>
-              <td class="px-5 py-3 text-center">
-                <% product.productVariants.forEach(variant => { %>
-                <p><%= variant.price %></p>
-                <% }) %>
-              </td>
-              <td class="px-5 py-3 text-center">
-                <% product.productVariants.forEach(variant => { %>
-                <p><%= variant.stock %></p>
-                <% }) %>
-              </td>
-              <td class="px-5 py-3 text-center">
-                <%= product.productCategory.categoryName %>
-              </td>
-              <td class="px-5 py-3 text-center">
-                <% if (product.isActive) { %>
-                <span
-                  class="inline-block px-4 py-2 text-sm font-medium text-green-700 bg-green-100 rounded"
-                  >Active</span
-                >
-                <% } else { %>
-                <span
-                  class="inline-block px-4 py-2 text-sm font-medium text-red-700 bg-red-100 rounded"
-                  >Blocked</span
-                >
-                <% } %>
-              </td>
-              <td class="px-5 py-3 text-center">
-                <a href="/admin/editproduct/<%= product.id %>">
-                  <button
-                    class="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
+        <% if (products && products.length > 0) { %>
+          <table class="w-full border-collapse border border-gray-200 text-sm lg:text-base">
+            <thead class="bg-[#A79277] text-white">
+              <tr>
+                <th class="py-4 px-5">SL.No</th>
+                <th class="py-4 px-5">Product</th>
+                <th class="py-4 px-5">Price</th>
+                <th class="py-4 px-5">Stock</th>
+                <th class="py-4 px-5">Category</th>
+                <th class="py-4 px-5">Status</th>
+                <th class="py-4 px-5">Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 bg-white">
+              <% products.forEach((product, index) => { %>
+              <tr class="hover:bg-gray-50">
+                <td class="px-5 py-3 text-center"><%= index + 1 %></td>
+                <td class="px-5 py-3 text-center"><%= product.productName %></td>
+                <td class="px-5 py-3 text-center">
+                  <% product.productVariants.forEach(variant => { %>
+                  <p><%= variant.price %></p>
+                  <% }) %>
+                </td>
+                <td class="px-5 py-3 text-center">
+                  <% product.productVariants.forEach(variant => { %>
+                  <p><%= variant.stock %></p>
+                  <% }) %>
+                </td>
+                <td class="px-5 py-3 text-center">
+                  <%= product.productCategory.categoryName %>
+                </td>
+                <td class="px-5 py-3 text-center">
+                  <% if (product.isActive) { %>
+                  <span
+                    class="inline-block px-4 py-2 text-sm font-medium text-green-700 bg-green-100 rounded"
+                    >Active</span
                   >
-                    Edit
-                  </button>
-                </a>
-                <form
-                  action="/admin/statusproduct/<%= product._id %>"
-                  method="POST"
-                  class="inline"
-                >
-                  <button
-                    onclick="toggleProductStatus(event, this, '<%= product._id %>')"
-                    class="px-3 py-1 text-sm font-medium text-white rounded shadow <%= product.isActive ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700' %>"
+                  <% } else { %>
+                  <span
+                    class="inline-block px-4 py-2 text-sm font-medium text-red-700 bg-red-100 rounded"
+                    >Blocked</span
                   >
-                    <%= product.isActive ? 'Block' : 'Unblock' %>
-                  </button>
-                </form>
-              </td>
-            </tr>
-            <% }) %>
-          </tbody>
-        </table>
+                  <% } %>
+                </td>
+                <td class="px-5 py-3 text-center">
+                  <a href="/admin/editproduct/<%= product.id %>">
+                    <button
+                      class="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
+                    >
+                      Edit
+                    </button>
+                  </a>
+                  <form
+                    action="/admin/statusproduct/<%= product._id %>"
+                    method="POST"
+                    class="inline"
+                  >
+                    <button
+                      onclick="toggleProductStatus(event, this, '<%= product._id %>')"
+                      class="px-3 py-1 text-sm font-medium text-white rounded shadow <%= product.isActive ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700' %>"
+                    >
+                      <%= product.isActive ? 'Block' : 'Unblock' %>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        <% } else { %>
+          <div class="flex flex-col items-center justify-center py-12 bg-white">
+            <svg class="w-16 h-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+            </svg>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">No Products Found</h3>
+            <p class="text-gray-500 text-center mb-4">
+              <%= search ? `No products found matching "${search}"` : 'No products have been added yet.' %>
+            </p>
+            <% if (search) { %>
+              <a href="/admin/products" class="text-[#8B7355] hover:text-[#A79277] font-medium transition-colors duration-300">
+                View All Products
+              </a>
+            <% } %>
+          </div>
+        <% } %>
       </div>
 
       <!-- Pagination -->
-      <div class="flex justify-center mt-6">
-        <div class="flex space-x-2">
+      <div class="pagination-controls flex justify-center mt-10">
+        <ul class="flex space-x-2">
           <% if (currentPage > 1) { %>
-          <a
-            href="/admin/products?page=<%= currentPage - 1 %>&search=<%= search %>"
-            class="px-3 py-1 bg-gray-200 rounded-md text-sm text-gray-600 hover:bg-gray-300"
-          >
-            Prev
-          </a>
-          <% } else { %>
-          <span
-            class="px-3 py-1 bg-gray-200 rounded-md text-sm text-gray-400 cursor-not-allowed"
-          >
-            Prev
-          </span>
-          <% } %> <% for (let i = 1; i <= totalPages; i++) { %>
-          <a
-            href="/admin/products?page=<%= i %>&search=<%= search %>"
-            class="px-3 py-1 rounded-md text-sm <%= i === currentPage ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600 hover:bg-blue-600 hover:text-white' %>"
-          >
-            <%= i %>
-          </a>
-          <% } %> <% if (currentPage < totalPages) { %>
-          <a
-            href="/admin/products?page=<%= currentPage + 1 %>&search=<%= search %>"
-            class="px-3 py-1 bg-gray-200 rounded-md text-sm text-gray-600 hover:bg-gray-300"
-          >
-            Next
-          </a>
-          <% } else { %>
-          <span
-            class="px-3 py-1 bg-gray-200 rounded-md text-sm text-gray-400 cursor-not-allowed"
-          >
-            Next
-          </span>
+          <li>
+            <a
+              href="/admin/products?page=<%= currentPage - 1 %>&search=<%= search %>"
+              class="px-4 py-2 text-sm lg:text-base bg-[#D2691E] text-white border border-[#A0522D] rounded hover:bg-[#A0522D] transition"
+            >
+              Previous
+            </a>
+          </li>
           <% } %>
-        </div>
+          
+          <% for (let i = 1; i <= totalPages; i++) { %>
+          <li>
+            <a
+              href="/admin/products?page=<%= i %>&search=<%= search %>"
+              class="px-4 py-2 text-sm lg:text-base border border-[#A0522D] rounded <%= currentPage == i ? 'bg-[#4E2C0A] text-white' : 'bg-[#FFF8E1] text-[#4E2C0A] hover:bg-[#D2691E] hover:text-white transition' %>"
+            >
+              <%= i %>
+            </a>
+          </li>
+          <% } %>
+          
+          <% if (currentPage < totalPages) { %>
+          <li>
+            <a
+              href="/admin/products?page=<%= currentPage + 1 %>&search=<%= search %>"
+              class="px-4 py-2 text-sm lg:text-base bg-[#D2691E] text-white border border-[#A0522D] rounded hover:bg-[#A0522D] transition"
+            >
+              Next
+            </a>
+          </li>
+          <% } %>
+        </ul>
       </div>
     </main>
   </div>

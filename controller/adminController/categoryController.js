@@ -3,32 +3,43 @@ const mongoose = require('mongoose');
 
 // category page render
 const loadCategory= async(req,res)=>{
-    const page = parseInt(req.query.page) || 1; 
-    const itemsPerPage = 10; 
-    const skip = (page - 1) * itemsPerPage;
-    const search = req.query.search || '';
-
     try {
-        // search 
-        const filter = search
-        ? { categoryName: { $regex: search, $options: 'i' } } 
-        : {};
-        const totalCategories = await categorySchema.countDocuments(); 
-        const categories = await categorySchema.find(filter)
-            .skip(skip) 
-            .limit(itemsPerPage); 
+        const page = parseInt(req.query.page) || 1; 
+        const itemsPerPage = 10; 
+        const search = req.query.search || '';
 
-        const totalPages = Math.ceil(totalCategories / itemsPerPage); 
-        
+        // Sanitize search input to allow only letters and spaces
+        const sanitizedSearch = search.replace(/[^a-zA-Z\s]/g, '');
+
+        // Create search filter
+        const filter = sanitizedSearch
+            ? { categoryName: { $regex: sanitizedSearch, $options: 'i' } } 
+            : {};
+
+        // Get total count with filter
+        const totalCategories = await categorySchema.countDocuments(filter); 
+        const totalPages = Math.ceil(totalCategories / itemsPerPage);
+
+        // Ensure current page is within valid range
+        const validatedPage = Math.max(1, Math.min(page, totalPages || 1));
+        const skip = (validatedPage - 1) * itemsPerPage;
+
+        // Fetch categories with pagination
+        const categories = await categorySchema.find(filter)
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(itemsPerPage);
+
         res.render('admin/category', { 
-            title:'category',
+            title: 'category',
             categories, 
-            currentPage: page, 
-            totalPages 
+            currentPage: validatedPage, 
+            totalPages,
+            search: sanitizedSearch
         });
         
     } catch (error) {
-        console.error(err);
+        console.error('Error in category page:', error);
         res.status(500).send('Server Error');
     }
 }

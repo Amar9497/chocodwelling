@@ -1,6 +1,6 @@
 
 
-<body class=" min-h-screen flex flex-col">
+<body class=" min-h-screen flex flex-colz">
 
     <!-- Header -->
     <%- include('navbar') %>
@@ -46,10 +46,6 @@
       
                     <span>Offers</span>
                 </a>
-                <a href="#" class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg">
-      
-                    <span>Banner</span>
-                </a>
             </nav>
           </aside>
 
@@ -61,7 +57,14 @@
                 <button class="bg-[#A79277] text-white px-4 py-2 rounded-lg shadow-md hover:bg-[#E5E7EB] hover:text-black" onclick="toggleModal(true)">Add Brand</button>
                 
                 <form action="/admin/brand" method="get" class="flex items-center gap-2 w-full sm:w-auto">
-                    <input type="text" name="search" placeholder="Search" class="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-auto">
+                    <input
+                        type="text"
+                        name="search"
+                        placeholder="Search by Brand Name"
+                        value="<%= search %>"
+                        class="border border-gray-300 rounded-lg px-4 py-2"
+                        oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')"
+                    />
                     <input type="submit" value="Search" class="bg-[#A79277] text-white px-4 py-2 rounded-lg cursor-pointer w-full sm:w-auto">
                 </form>
             </div>
@@ -73,88 +76,120 @@
   
   <!-- Products Table -->
   <div class="bg-[#A79277] rounded-lg shadow-lg overflow-hidden">
-    <table class="w-full text-left text-base border-collapse">
-      <thead class="bg-[#A79277] text-white">
-        <tr>
-          <th class="py-4 px-5 text-center w-1/12">SL.No</th>
-          <th class="py-4 px-5 text-center w-1/12">Name</th>
-          <th class="py-4 px-5 text-center w-1/12">Image</th>
-          <th class="py-4 px-5 text-center w-1/12">Added On</th>
-          <th class="py-4 px-5 text-center w-1/12">Status</th>
-          <th class="py-4 px-5 text-center w-1/12">Action</th>
-        </tr>
-      </thead>
-      <tbody  class="divide-y divide-gray-200 bg-white ">
-        <% brands.forEach((brand, index) => { %>
+    <% if (brands && brands.length > 0) { %>
+      <table class="w-full text-left text-base border-collapse">
+        <thead class="bg-[#A79277] text-white">
           <tr>
-            <td class=" px-4 py-2 text-center"><%= index + 1 %></td>
-            <td class=" px-4 py-2 text-center"><%= brand.brandName %></td>
-            <td class=" px-4 py-2 text-center"><img src="<%= brand.brandImage %>" alt="<%= brand.brandName %>" width="100"></td>
-            <td class=" px-4 py-2 text-center">
-                <%= brand.createdAt.toDateString() %> <!-- Assuming `createdAt` is available -->
-            </td>
-            <td class=" px-4 py-2 text-center">
-              <% if (brand.isActive) { %>
-                <span class="inline-block px-4 py-2 text-sm font-medium text-green-700 bg-green-100 rounded">Active</span>
-              <% } else { %>
-                <span class="inline-block px-4 py-2 text-sm font-medium text-red-700 bg-red-100 rounded">Blocked</span>
-              <% } %>
-            </td>
-            <td class=" px-4 py-2 text-center">
-                <!-- Edit Button -->
-                <button 
-                    class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
-                    onclick="showEditModal('<%= brand._id %>', '<%= brand.brandName %>','<%= brand.brandImage %>')">
-                    Edit
-                </button>
-                <!-- Block/Unblock Button -->
-                <form action="/admin/statusbrand/<%= brand._id %>" method="POST" class="inline">
-                  <button
-                      onclick="toggleBrandStatus(event, this, '<%= brand._id %>')" 
-                      class="px-3 py-1 text-sm font-medium text-white rounded shadow 
-                      <%= brand.isActive ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700' %>">
-                      <%= brand.isActive ? 'Block' : 'Unblock' %>
-                  </button>
-                </form>
-              
-            </td>
+            <th class="py-4 px-5 text-center w-1/12">SL.No</th>
+            <th class="py-4 px-5 text-center w-1/12">Name</th>
+            <th class="py-4 px-5 text-center w-1/12">Image</th>
+            <th class="py-4 px-5 text-center w-1/12">Added On</th>
+            <th class="py-4 px-5 text-center w-1/12">Status</th>
+            <th class="py-4 px-5 text-center w-1/12">Action</th>
           </tr>
-        <% }) %>
-      </tbody>
-      
-    </table>
+        </thead>
+        <tbody  class="divide-y divide-gray-200 bg-white ">
+          <% brands.forEach((brand, index) => { %>
+            <tr>
+              <td class=" px-4 py-2 text-center"><%= index + 1 %></td>
+              <td class=" px-4 py-2 text-center"><%= brand.brandName %></td>
+              <td class=" px-4 py-2 text-center"><img src="<%= brand.brandImage %>" alt="<%= brand.brandName %>" width="100"></td>
+              <td class=" px-4 py-2 text-center">
+                  <%= brand.createdAt.toDateString() %> <!-- Assuming `createdAt` is available -->
+              </td>
+              <td class=" px-4 py-2 text-center">
+                <% if (brand.isActive) { %>
+                  <span class="inline-block px-4 py-2 text-sm font-medium text-green-700 bg-green-100 rounded">Active</span>
+                <% } else { %>
+                  <span class="inline-block px-4 py-2 text-sm font-medium text-red-700 bg-red-100 rounded">Blocked</span>
+                <% } %>
+              </td>
+              <td class=" px-4 py-2 text-center">
+                  <!-- Edit Button -->
+                  <button 
+                      class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                      onclick="showEditModal('<%= brand._id %>', '<%= brand.brandName %>','<%= brand.brandImage %>')">
+                      Edit
+                  </button>
+                  <!-- Block/Unblock Button -->
+                  <form action="/admin/statusbrand/<%= brand._id %>" method="POST" class="inline">
+                    <button
+                        onclick="toggleBrandStatus(event, this, '<%= brand._id %>')" 
+                        class="px-3 py-1 text-sm font-medium text-white rounded shadow 
+                        <%= brand.isActive ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700' %>">
+                        <%= brand.isActive ? 'Block' : 'Unblock' %>
+                    </button>
+                  </form>
+                
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+        
+      </table>
+    <% } else { %>
+      <div class="flex flex-col items-center justify-center py-12 bg-white">
+        <svg class="w-16 h-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No Brands Found</h3>
+        <p class="text-gray-500 text-center mb-4">
+          <%= search ? `No brands found matching "${search}"` : 'No brands have been added yet.' %>
+        </p>
+        <% if (search) { %>
+          <a href="/admin/brand" class="text-[#8B7355] hover:text-[#A79277] font-medium transition-colors duration-300">
+            View All Brands
+          </a>
+        <% } %>
+      </div>
+    <% } %>
   </div>
      <!-- Pagination -->
-           
-     <div class="flex justify-center mt-6">
-      <div class="flex space-x-2">
-          <!-- Previous Page Button -->
-          <a href="/admin/brand?page=<%= currentPage - 1 %>" 
-             class="px-3 py-1 bg-gray-200 rounded-md text-sm text-gray-600 hover:bg-gray-300 <%= currentPage <= 1 ? 'opacity-50 cursor-not-allowed' : '' %>" 
-             <%= currentPage <= 1 ? 'disabled' : '' %>>
-              Prev
-          </a>
-  
-          <!-- Page Numbers -->
-          <% for (let i = 1; i <= totalPages; i++) { %>
-              <a href="/admin/brand?page=<%= i %>" 
-                 class="px-3 py-1 bg-gray-200 rounded-md text-sm text-gray-600 hover:bg-blue-600 hover:text-white <%= i === currentPage ? 'bg-blue-600 text-white' : '' %>">
-                  <%= i %>
-              </a>
-          <% } %>
-  
-          <!-- Next Page Button -->
-          <a href="/admin/brand?page=<%= currentPage + 1 %>" 
-             class="px-3 py-1 bg-gray-200 rounded-md text-sm text-gray-600 hover:bg-gray-300 <%= currentPage >= totalPages ? 'opacity-50 cursor-not-allowed' : '' %>" 
-             <%= currentPage >= totalPages ? 'disabled' : '' %>>
-              Next
-          </a>
-      </div>
-  </div>
+     <div class="pagination-controls flex justify-center mt-10 mb-6">
+       <ul class="flex space-x-2">
+         <% if (currentPage > 1) { %>
+         <li>
+           <a
+             href="/admin/brand?page=<%= currentPage - 1 %>&search=<%= search %>"
+             class="px-4 py-2 text-sm lg:text-base bg-[#D2691E] text-white border border-[#A0522D] rounded hover:bg-[#A0522D] transition"
+           >
+             Previous
+           </a>
+         </li>
+         <% } %>
+         
+         <% for (let i = 1; i <= totalPages; i++) { %>
+         <li>
+           <a
+             href="/admin/brand?page=<%= i %>&search=<%= search %>"
+             class="px-4 py-2 text-sm lg:text-base border border-[#A0522D] rounded <%= currentPage == i ? 'bg-[#4E2C0A] text-white' : 'bg-[#FFF8E1] text-[#4E2C0A] hover:bg-[#D2691E] hover:text-white transition' %>"
+           >
+             <%= i %>
+           </a>
+         </li>
+         <% } %>
+         
+         <% if (currentPage < totalPages) { %>
+         <li>
+           <a
+             href="/admin/brand?page=<%= currentPage + 1 %>&search=<%= search %>"
+             class="px-4 py-2 text-sm lg:text-base bg-[#D2691E] text-white border border-[#A0522D] rounded hover:bg-[#A0522D] transition"
+           >
+             Next
+           </a>
+         </li>
+         <% } %>
+       </ul>
+     </div>
           
         </main>
 
     </div>
+
+    <!-- Footer -->
+    <%- include('footer') %>
+
+</body>
 
 
     <!-- add brand modal -->
@@ -323,8 +358,7 @@
 </body>
 
     
-    <!-- Footer -->
-    <%- include('footer') %>
+    
     <script>
 
         // -------------------------- add brand modal visibility button --------------------
@@ -360,6 +394,11 @@
     brandErrorDiv.textContent = "Brand name must have at least 3 characters.";
     return false;
   }
+  if (brandName.length > 20) {
+    brandErrorDiv.classList.remove("hidden");
+    brandErrorDiv.textContent = "Brand name must have contain 20 characters.";
+    return false;
+  }
   brandErrorDiv.classList.add("hidden");
 
   // Validate image upload
@@ -387,6 +426,24 @@ function validateEditBrandForm() {
     return false; // Prevent form submission
   }
 
+  const nameRegex = /^[A-Za-z\s]+$/; // Allows only letters and spaces
+        if (!nameRegex.test(editBrandName)) {
+          brandErrorDiv.classList.remove("hidden");
+          brandErrorDiv.textContent = "Brand name must contain only letters and spaces.";
+          return false;
+        }
+  if (editBrandName.length < 3) {
+    brandErrorDiv.classList.remove("hidden");
+    brandErrorDiv.textContent = "Brand name must have at least 3 characters.";
+    return false;
+  }
+  if (editBrandName.length > 20) {
+    brandErrorDiv.classList.remove("hidden");
+    brandErrorDiv.textContent = "Brand name must have contain 20 characters.";
+    return false;
+
+  }
+
   editBrandError.classList.add('hidden');
   return true; // Allow form submission
 }
@@ -395,10 +452,7 @@ function validateEditBrandForm() {
 // --------------- edit toggle ----------------
 
 function showEditModal(brandId = '', brandName = '', brandLogo = '') {
-    // console.log(brandId);
-    // console.log(brandName);
-    // console.log(brandLogo);
-
+   
     const modal = document.getElementById('editBrandModal');
     const editBrandId = document.getElementById('editBrandId');
     const editBrandName = document.getElementById('editBrandName');

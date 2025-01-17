@@ -13,11 +13,6 @@ const saleController = require('../controller/adminController/saleController');
 const { upload } = require('../service/cloudinary');
 const auth = require('../middleware/adminSession');
 
-admin.use((req, res, next) => {
-    res.locals.success = req.flash('success');
-    res.locals.error = req.flash('error');
-    next();
-});
 
 // -------------------- admin login --------------------
 
@@ -36,7 +31,7 @@ admin.get('/salesReport',auth.isAdmin,saleController.salePage);
 
 admin.post('/sales-report',auth.isAdmin,saleController.generateReport);
 
-admin.get('/download-report/:format',auth.isAdmin,saleController.downloadReport);
+admin.post('/download-report', auth.isAdmin, saleController.downloadReport);
 
 
 // -------------------- admin products -------------------
@@ -89,6 +84,10 @@ admin.post('/order/:orderId/status',auth.isAdmin,orderController.orderStatus);
 
 admin.get('/order-view/:id',auth.isAdmin,orderController.orderView);
 
+admin.get('/orders/:orderId/return-details', auth.isAdmin, orderController.getReturnDetails);
+
+admin.post('/orders/:orderId/return-status', auth.isAdmin, orderController.updateReturnStatus);
+
 // ----------------------- offer --------------------------
 
 admin.get('/offer',auth.isAdmin,offerController.getOffer);
@@ -113,7 +112,7 @@ admin.get('/statuscoupon',auth.isAdmin,couponController.toggleCouponStatus);
 
 //-------------------------Logout--------------------------
 
-admin.get('/logout',auth.isAdmin,adminController.logout);
+admin.get('/logout',adminController.logout);
 
 
 module.exports=admin;

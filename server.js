@@ -37,7 +37,6 @@ app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
 
-// Add this after your routes
 app.use((err, req, res, next) => {
     console.error(err.stack);
     
@@ -52,6 +51,9 @@ app.use((err, req, res, next) => {
 
 // Set EJS template engine
 app.set('view engine', 'ejs');
+
+// Flash messages
+app.use(flash());
 
 // Define the views directory (optional, defaults to './views')
 app.set('views', path.join(__dirname, 'views'));
@@ -94,8 +96,7 @@ if (process.env.NODE_ENV === 'development') {
     });
 }
 
-// Flash messages
-app.use(flash());
+
 
 // Global variables middleware
 app.use((req, res, next) => {
@@ -106,22 +107,8 @@ app.use((req, res, next) => {
     next();
 });
 
-// Session Debug Middleware (optional, for development only)
-if (process.env.NODE_ENV === 'development') {
-    app.use((req, res, next) => {
-        console.log('Session ID:', req.sessionID);
-        console.log('Session Data:', req.session);
-        next();
-    });
-}
 
 
-// flash message
-app.use((req,res,next)=>{
-    res.locals.success = req.flash('success');
-    res.locals.error = req.flash('error')
-    next();
-})
 
 // Example middleware to differentiate sessions
 app.use((req, res, next) => {
@@ -157,6 +144,14 @@ app.get('/',(req,res)=>{
 app.use("*",(req,res)=>{
     res.render('pageNotFound',{title:"Page not found"})
 })
+
+app.use((req, res, next) => {
+    console.log('Flash Messages:', {
+        success: req.flash('success'),
+        error: req.flash('error')
+    });
+    next();
+});
 
 app.listen(port,()=>{
     console.log(`Server is running on http://localhost:${port}`)

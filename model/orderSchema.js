@@ -1,4 +1,3 @@
-
 const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
@@ -90,6 +89,16 @@ const orderSchema = new mongoose.Schema({
     couponDiscount: {
         type: Number,
         default: 0
+    },
+    returnReason: {
+        reason: String,
+        description: String,
+        status: {
+            type: String,
+            enum: ['Pending','Request', 'Approved', 'Rejected'],
+            default: 'Pending'
+        },
+        requestedAt: Date
     }
 }, { timestamps: true });
 

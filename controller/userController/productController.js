@@ -15,11 +15,20 @@ const allProduct = async (req, res) => {
         const categories = req.query.categories?.split(',') || [];
         const minPrice = req.query.minPrice ? parseFloat(req.query.minPrice) : null;
         const maxPrice = req.query.maxPrice ? parseFloat(req.query.maxPrice) : null;
-        const sort = req.query.sort || "new"; // Default sort
+        const sort = req.query.sort || "new";
+
+        // Enhanced search filter
+        const searchFilter = search ? {
+            $or: [
+                { productName: { $regex: search, $options: "i" } },
+                { productDescription: { $regex: search, $options: "i" } },
+                { 'productCategory.name': { $regex: search, $options: "i" } }
+            ]
+        } : {};
 
         const productFilter = {
             isActive: true,
-            productName: { $regex: search, $options: "i" }
+            ...searchFilter
         };
 
         // Add category filter if categories are selected
@@ -59,9 +68,10 @@ const allProduct = async (req, res) => {
         const activeCategories = await categorySchema.find({ isActive: true });
         const activeBrands = await brandSchema.find({ isActive: true });
 
-        // Fetch filtered and sorted products
+        // Fetch filtered and sorted products with populate
         const products = await productSchema
             .find(productFilter)
+            .populate('productCategory')
             .sort(sortOption)
             .skip((page - 1) * limit)
             .limit(limit);
@@ -69,7 +79,7 @@ const allProduct = async (req, res) => {
         const count = await productSchema.countDocuments(productFilter);
 
         res.render('user/allproduct', {
-            title: "All Products",
+            title: search ? `Search Results for "${search}"` : "All Products",
             user: req.session.user,
             product: products,
             category: activeCategories,
@@ -78,7 +88,8 @@ const allProduct = async (req, res) => {
             totalPages: Math.ceil(count / limit),
             currentPage: page,
             limit,
-            sort 
+            sort,
+            searchQuery: search // Add this to preserve search term
         });
     } catch (error) {
         console.error('Error in all products rendering:', error);

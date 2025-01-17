@@ -168,10 +168,10 @@ const cancelOrder = async (req, res) => {
 const returnOrder = async (req, res) => {
     try {
         const orderId = req.params.orderId;
+        const { reason, description } = req.body;
         const userId = req.session.user;
 
-        const order = await orderSchema.findById(orderId)
-            .populate('products.productId');
+        const order = await orderSchema.findById(orderId);
 
         if (!order) {
             return res.status(404).json({
@@ -180,7 +180,7 @@ const returnOrder = async (req, res) => {
             });
         }
 
-        // Check if order is eligible for return  within 7 days 
+        // Check if order is eligible for return (within 7 days)
         const deliveryDate = new Date(order.deliveredAt);
         const currentDate = new Date();
         const daysDifference = Math.floor((currentDate - deliveryDate) / (1000 * 60 * 60 * 24));
@@ -192,63 +192,26 @@ const returnOrder = async (req, res) => {
             });
         }
 
-        if (order.orderStatus !== 'Delivered') {
-            return res.status(400).json({
-                success: false,
-                message: 'Order must be delivered before returning'
-            });
-        }
+        // Update order with return request
+        order.returnReason = {
+            reason,
+            description,
+            status: 'Request',
+            requestedAt: new Date()
+        };
 
-        // Update order status
-        order.orderStatus = 'Returned';
         await order.save();
-
-        // Update product stock
-        for (const item of order.products) {
-            const product = await productSchema.findById(item.productId);
-            if (product) {
-                product.productVariants[0].stock += item.quantity;
-                await product.save();
-            }
-        }
-
-        // Credit wallet if payment was made through Razorpay or Wallet
-        if (order.paymentMethod === 'Razorpay' || order.paymentMethod === 'Wallet' || order.paymentMethod === 'COD') {
-            // Find or create wallet
-            let wallet = await walletSchema.findOne({ userID: userId });
-            
-            if (!wallet) {
-                wallet = new walletSchema({
-                    userID: userId,
-                    balance: 0,
-                    transaction: []
-                });
-            }
-
-            // Add refund transaction
-            wallet.transaction.push({
-                wallet_amount: order.finalAmount,
-                order_id: orderId,
-                transactionType: 'Credited',
-                transaction_date: new Date()
-            });
-
-            // Update wallet balance
-            wallet.balance += order.finalAmount;
-            
-            await wallet.save();
-        }
 
         return res.status(200).json({
             success: true,
-            message: 'Order returned successfully'
+            message: 'Return request submitted successfully'
         });
 
     } catch (error) {
-        console.error('Error returning order:', error);
+        console.error('Error submitting return request:', error);
         return res.status(500).json({
             success: false,
-            message: 'Failed to process return'
+            message: 'Failed to submit return request'
         });
     }
 };
@@ -439,7 +402,7 @@ const generateInvoice = async (req, res) => {
 };
 
 
-//----------------------------------------------------------
+// ===--------------------- retrypayment -------------------------------------
 
 const retryPayment = async (req, res) => {
     try {
@@ -497,6 +460,10 @@ const retryPayment = async (req, res) => {
         });
     }
 };
+
+
+// --------------- verify retrypayment -----------------------
+
 
 const verifyRetryPayment = async (req, res) => {
     try {

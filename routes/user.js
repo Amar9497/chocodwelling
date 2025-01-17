@@ -17,14 +17,6 @@ const reviewController = require('../controller/userController/reviewController'
 
 const auth = require('../middleware/userSession');
 
-// Add flash middleware for user routes
-user.use((req, res, next) => {
-    res.locals.messages = {
-        success: req.flash('success'),
-        error: req.flash('error')
-    };
-    next();
-});
 
 // -------------------- login --------------------
 user.get('/login',auth.isLogin,userController.loadLogin);
@@ -103,13 +95,13 @@ user.post('/checkout-address',auth.isCheck,checkOutController.addAddress);
 
 user.post('/place-order',auth.isCheck,checkOutController.placeOrder);
 
-user.post('/create-razorpay-order',checkOutController.createRazorpayOrder);
+user.post('/create-razorpay-order',auth.isCheck,checkOutController.createRazorpayOrder);
 
-user.post('/verify-payment',checkOutController.verifyPayment);
+user.post('/verify-payment',auth.isCheck,checkOutController.verifyPayment);
 
-user.post('/validate-coupon', checkOutController.validateCoupon);
+user.post('/validate-coupon',auth.isCheck,checkOutController.validateCoupon);
 
-user.post('/cancel-razorpay-order', checkOutController.cancelRazorpayOrder);
+user.post('/cancel-razorpay-order',auth.isCheck,checkOutController.cancelRazorpayOrder);
 
 
 // ------------------------- order ---------------------------------
@@ -118,17 +110,17 @@ user.get('/orders',auth.isCheck,orderController.orderPage);
 
 user.post('/cancelOrder/:orderId',auth.isCheck,orderController.cancelOrder);
 
-user.post('/return-order/:orderId', auth.isCheck, orderController.returnOrder);
+user.post('/return-order/:orderId',auth.isCheck, orderController.returnOrder);
 
 user.get('/orderDetail/:id',auth.isCheck,orderController.orderDetails);
 
-user.get('/order/:orderId/invoice', auth.isCheck, orderController.generateInvoice);
+user.get('/order/:orderId/invoice',auth.isCheck, orderController.generateInvoice);
 
 user.post('/retry-payment', auth.isCheck, orderController.retryPayment);
 
-user.post('/verify-retry-payment', auth.isCheck, orderController.verifyRetryPayment);
+user.post('/verify-retry-payment',auth.isCheck, orderController.verifyRetryPayment);
 
-user.post('/update-payment-status', orderController.updatePaymentStatus);
+user.post('/update-payment-status',auth.isCheck,orderController.updatePaymentStatus);
 
 
 
@@ -139,12 +131,12 @@ user.post('/update-payment-status', orderController.updatePaymentStatus);
 
 user.get('/category',auth.isCheck,categoryController.categoryget);
 
-user.get('/category/:id', categoryController.getCategoryProducts);
+user.get('/category/:id',auth.isCheck,categoryController.getCategoryProducts);
 
 
 // ----------------------- brand -----------------------------------
 
-user.get('/brand/:id', brandController.getBrandProducts);
+user.get('/brand/:id',auth.isCheck,brandController.getBrandProducts);
 
 // ------------------------- product -------------------------------
 
@@ -155,17 +147,18 @@ user.get('/productDetail/:id',auth.isCheck,productController.productDetail);
 
 // ------------------------ Review -------------------------------------
 
-// Review routes
 user.post('/product/:productId/review',auth.isCheck,reviewController.addReview);
 
-user.get('/product/:productId/all-reviews', reviewController.getAllReviews);
+user.get('/product/:productId/all-reviews', auth.isCheck,reviewController.getAllReviews);
 
 
 
 // ------------------------- wishlist -------------------------------
 
 user.get('/wishlist', auth.isCheck, wishlistController.wishlistpage);
+
 user.get('/add-wishlist/:id', auth.isCheck, wishlistController.addWishlist);
+
 user.delete('/delete-wish/:id', auth.isCheck, wishlistController.deleteWishlist);
 
 

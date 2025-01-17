@@ -9,19 +9,22 @@ const loadCustomers = async (req,res)=>{
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 8;
 
-        const user = await userSchema.find({name: {$regex: search, $options: 'i'}})
+        // Sanitize search input to allow only letters
+        const sanitizedSearch = search.replace(/[^a-zA-Z\s]/g, '');
+
+        const user = await userSchema.find({name: {$regex: sanitizedSearch, $options: 'i'}})
             .sort({createdAt: -1})
             .limit(limit)
             .skip((page - 1) * limit);
         
-        const count = await userSchema.countDocuments({name: {$regex: search, $options: 'i'}});
+        const count = await userSchema.countDocuments({name: {$regex: sanitizedSearch, $options: 'i'}});
 
         res.render('admin/customers',{
             title:'Customers',
             user,
             totalPages: Math.ceil(count / limit),
             currentPage: page,
-            search,
+            search: sanitizedSearch,
             limit,
             page
         })

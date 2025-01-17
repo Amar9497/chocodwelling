@@ -326,23 +326,28 @@ function validateForm() {
   const brand = document.getElementById("brand").value;
   const category = document.getElementById("category").value;
   const description = document.getElementById("description").value.trim();
-  const variantInputs = document.querySelectorAll(".variant-input");
+  const weight = document.querySelector('input[name="weight"]').value.trim();
+  const price = document.querySelector('input[name="price"]').value.trim();
+  const stock = document.querySelector('input[name="stock"]').value.trim();
 
-  // Regex for letters only
-  const lettersOnly = /^[a-zA-Z\s]{3,}$/;
+  // Regex patterns
+  const lettersOnly = /^[a-zA-Z\s]{3,40}$/;
+  const weightPattern = /^\d{1,4}$/;
+  const pricePattern = /^\d{1,6}$/;
+  const stockPattern = /^\d{1,6}$/;
 
   // Validate Product Name
   if (!lettersOnly.test(productName)) {
     Swal.fire({
       icon: "error",
       title: "Invalid Product Name",
-      text: "Product Name must contain at least 3 letters and no numbers.",
+      text: "Product name must contain only letters and be between 3 and 40 characters long."
     });
     return false;
   }
 
   // Validate Brand
-  if (brand === "") {
+  if (!brand) {
     Swal.fire({
       icon: "error",
       title: "Brand Not Selected",
@@ -352,7 +357,7 @@ function validateForm() {
   }
 
   // Validate Category
-  if (category === "") {
+  if (!category) {
     Swal.fire({
       icon: "error",
       title: "Category Not Selected",
@@ -362,25 +367,69 @@ function validateForm() {
   }
 
   // Validate Description
-  if (description.length === 0) {
+  if (!description.length) {
     Swal.fire({
       icon: "error",
       title: "Description Required",
-      text: "Product description cannot be empty.",
+      text: "Description cannot be empty.",
     });
     return false;
   }
 
-  // Validate Product Variants (Weight, Price, Stock must be numbers)
-  for (const input of variantInputs) {
-    if (isNaN(input.value) || input.value.trim() === "") {
-      Swal.fire({
-        icon: "error",
-        title: "Invalid Product Variant",
-        text: "Product variants (Weight, Price, and Stock) must be valid numbers.",
-      });
-      return false;
-    }
+  // Validate Weight
+  if (!weightPattern.test(weight)) {
+    Swal.fire({
+      icon: "error",
+      title: "Invalid Weight",
+      text: "Weight must be a number between 1 and 9999.",
+    });
+    return false;
+  }
+
+  // Validate Price
+  if (!pricePattern.test(price)) {
+    Swal.fire({
+      icon: "error",
+      title: "Invalid Price",
+      text: "Price must be a number between 1 and 999999.",
+    });
+    return false;
+  }
+
+  // Validate Stock
+  if (!stockPattern.test(stock)) {
+    Swal.fire({
+      icon: "error",
+      title: "Invalid Stock",
+      text: "Stock must be a number between 1 and 999999.",
+    });
+    return false;
+  }
+
+  // Validate Images
+  const imagePreview = document.getElementById('image-upload-preview');
+  const existingImages = imagePreview.querySelectorAll('.product-image-box').length;
+  const deletedImages = JSON.parse(document.getElementById('deletedImages').value || '[]').length;
+  const croppedImages = JSON.parse(document.getElementById('croppedImages').value || '[]').length;
+  
+  const totalImages = existingImages + croppedImages - deletedImages;
+
+  if (totalImages < 3) {
+    Swal.fire({
+      icon: "error",
+      title: "Insufficient Images",
+      text: "Please upload at least 3 images for the product.",
+    });
+    return false;
+  }
+
+  if (totalImages > 5) {
+    Swal.fire({
+      icon: "error",
+      title: "Too Many Images",
+      text: "Maximum 5 images are allowed per product.",
+    });
+    return false;
   }
 
   // If all validations pass

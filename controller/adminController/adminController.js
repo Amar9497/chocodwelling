@@ -10,18 +10,14 @@ const loadLogin = (req, res) => {
       res.redirect('/admin/home');
     } else {
       res.render('admin/login', {
-        title: 'Admin Login',
-        success: req.flash('success'),
-        error: req.flash('error')
+        title: 'Admin Login'
       });
     }
   } catch (error) {
     console.log(error);
     req.flash("error", "Error Occurred");
     res.render('admin/login', {
-      title: 'Admin Login',
-      success: [],
-      error: ['Error occurred']
+      title: 'Admin Login'
     });
   }
 };
@@ -37,9 +33,11 @@ const loadLoginPost = (req, res) => {
       req.session.admin = req.body.email;
       req.flash("success", "Login Successful");
       res.redirect("/admin/home");
+      // console.log(req.flash('success'))
     } else {
       req.flash("error", "Invalid Credentials");
       res.redirect("/admin/login");
+      // console.log(req.flash('error'))
     }
   } catch (error) {
     console.log(`Error in login post: ${error}`);
@@ -239,10 +237,12 @@ const loadHome = async(req, res) => {
 const logout = (req, res) => {
   try {
     req.session.admin = null;
-    res.redirect("/admin/logout");
+    req.flash("success", "Logged out successfully");
+    res.redirect("/admin/login");
   } catch (error) {
     console.log(error);
-    res.flash("error","Error Occured")
+    req.flash("error", "Error Occurred");
+    res.redirect("/admin/login");
   }
 };
 

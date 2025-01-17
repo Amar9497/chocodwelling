@@ -57,12 +57,7 @@
           >
             <span>Offers</span>
           </a>
-          <a
-            href="#"
-            class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg"
-          >
-            <span>Banner</span>
-          </a>
+          
         </nav>
       </aside>
 
@@ -78,8 +73,10 @@
             <input
               type="text"
               name="search"
-              placeholder="Search"
+              placeholder="Search by Name"
+              value="<%= search %>"
               class="border border-gray-300 rounded-lg px-4 py-2"
+              oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')"
             />
             <input
               type="submit"
@@ -91,67 +88,82 @@
 
         <!-- Customers Table -->
         <div class="rounded-lg shadow-lg overflow-hidden">
-          <table
-            class="w-full border-collapse border border-gray-200 text-sm lg:text-base"
-          >
-            <thead class="bg-[#A79277] text-white">
-              <tr>
-                <th class="py-4 px-5">SL.No</th>
-                <th class="py-4 px-5">Name</th>
-                <th class="py-4 px-5">Email</th>
-                <th class="py-4 px-5">Phone</th>
-                <th class="py-4 px-5">Status</th>
-                <th class="py-4 px-5">Action</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200 bg-white">
-              <% user.forEach((user, index) => { %>
-              <tr class="hover:bg-gray-50">
-                <td class="px-5 py-3 text-center">
-                  <%= index + 1 + ((page - 1) * 8) %>
-                </td>
-                <td class="px-5 py-3 text-center"><%= user.name %></td>
-                <td class="px-5 py-3 text-center"><%= user.email %></td>
-                <td class="px-5 py-3 text-center"><%= user.phone %></td>
-                <td class="px-5 py-3 text-center">
-                  <% if (user.isActive) { %>
-                  <span
-                    class="inline-block px-4 py-2 text-sm font-medium text-green-700 bg-green-100 rounded"
-                    >Active</span
-                  >
-                  <% } else { %>
-                  <span
-                    class="inline-block px-4 py-2 text-sm font-medium text-red-700 bg-red-100 rounded"
-                    >Blocked</span
-                  >
-                  <% } %>
-                </td>
-                <td class="px-5 py-3 text-center text-center">
-                  <a
-                    href="javascript:void(0);"
-                    onclick="confirmAction('/admin/customerstatus?id=<%= user.id %>&status=<%= user.isActive %>')"
-                    class="text-red-600 hover:text-red-800"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-6 w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      stroke-width="1.7"
+          <% if (user && user.length > 0) { %>
+            <table class="w-full border-collapse border border-gray-200 text-sm lg:text-base">
+              <thead class="bg-[#A79277] text-white">
+                <tr>
+                  <th class="py-4 px-5">SL.No</th>
+                  <th class="py-4 px-5">Name</th>
+                  <th class="py-4 px-5">Email</th>
+                  <th class="py-4 px-5">Phone</th>
+                  <th class="py-4 px-5">Status</th>
+                  <th class="py-4 px-5">Action</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200 bg-white">
+                <% user.forEach((user, index) => { %>
+                <tr class="hover:bg-gray-50">
+                  <td class="px-5 py-3 text-center">
+                    <%= index + 1 + ((page - 1) * 8) %>
+                  </td>
+                  <td class="px-5 py-3 text-center"><%= user.name %></td>
+                  <td class="px-5 py-3 text-center"><%= user.email %></td>
+                  <td class="px-5 py-3 text-center"><%= user.phone %></td>
+                  <td class="px-5 py-3 text-center">
+                    <% if (user.isActive) { %>
+                    <span
+                      class="inline-block px-4 py-2 text-sm font-medium text-green-700 bg-green-100 rounded"
+                      >Active</span
                     >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2.29 6.29a1 1 0 00-1.42 1.42l2.3 2.29-2.3 2.29a1 1 0 001.42 1.42l2.29-2.29 2.29 2.29a1 1 0 001.42-1.42l-2.29-2.29 2.29-2.29a1 1 0 00-1.42-1.42l-2.29 2.29-2.29-2.29z"
-                      />
-                    </svg>
-                  </a>
-                </td>
-              </tr>
-              <% }) %>
-            </tbody>
-          </table>
+                    <% } else { %>
+                    <span
+                      class="inline-block px-4 py-2 text-sm font-medium text-red-700 bg-red-100 rounded"
+                      >Blocked</span
+                    >
+                    <% } %>
+                  </td>
+                  <td class="px-5 py-3 text-center text-center">
+                    <a
+                      href="javascript:void(0);"
+                      onclick="confirmAction('/admin/customerstatus?id=<%= user.id %>&status=<%= user.isActive %>')"
+                      class="text-red-600 hover:text-red-800"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2.29 6.29a1 1 0 00-1.42 1.42l2.3 2.29-2.3 2.29a1 1 0 001.42 1.42l2.29-2.29 2.29 2.29a1 1 0 001.42-1.42l-2.29-2.29 2.29-2.29a1 1 0 00-1.42-1.42l-2.29 2.29-2.29-2.29z"
+                        />
+                      </svg>
+                    </a>
+                  </td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          <% } else { %>
+            <div class="flex flex-col items-center justify-center py-12 bg-white">
+              <svg class="w-16 h-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              </svg>
+              <h3 class="text-lg font-medium text-gray-900 mb-2">No Customers Found</h3>
+              <p class="text-gray-500 text-center mb-4">
+                <%= search ? `No customers found matching "${search}"` : 'No customers registered yet.' %>
+              </p>
+              <% if (search) { %>
+                <a href="/admin/customers" class="text-[#8B7355] hover:text-[#A79277] font-medium transition-colors duration-300">
+                  View All Customers
+                </a>
+              <% } %>
+            </div>
+          <% } %>
         </div>
         <!-- Pagination -->
         <div class="pagination-controls flex justify-center mt-10">

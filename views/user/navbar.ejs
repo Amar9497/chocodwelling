@@ -140,6 +140,9 @@
           class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 
                  focus:outline-none focus:ring-2 focus:ring-white/30 focus:bg-white/20
                  placeholder-white/70 transition-all duration-300"
+          onkeypress="return /[a-zA-Z0-9\s]/.test(event.key)"
+          oninput="this.value = this.value.replace(/[^a-zA-Z0-9\s]/g, '')"
+          style="text-transform: capitalize;"
         />
         <button
           type="submit"
@@ -199,6 +202,25 @@
   window.addEventListener('resize', () => {
     if (window.innerWidth >= 768) { // md breakpoint
       mobileMenu.classList.add('hidden');
+    }
+  });
+
+  // Function to handle search
+  async function handleSearch(event) {
+    event.preventDefault();
+    const searchInput = document.getElementById('searchInput');
+    const searchTerm = searchInput.value.trim();
+
+    if (searchTerm) {
+      // Redirect to all products page with search query
+      window.location.href = `/allproduct?search=${encodeURIComponent(searchTerm)}`;
+    }
+  }
+
+  // Add event listener for search input
+  document.getElementById('searchInput').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+      handleSearch(event);
     }
   });
 </script>

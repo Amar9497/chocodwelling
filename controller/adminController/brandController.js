@@ -4,35 +4,44 @@ const { storage } = require("../../service/cloudinary");
 
 // -------------- brand page rendering ---------------
 const loadBrand = async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const itemsPerPage = 10;
-  const skip = (page - 1) * itemsPerPage;
-  const search = req.query.search || "";
-
   try {
-    // Get total number of brands
-    const totalBrand = await brandSchema.countDocuments();
+    const page = parseInt(req.query.page) || 1;
+    const itemsPerPage = 10;
+    const search = req.query.search || "";
 
-    // search
-    const filter = search
-      ? { brandName: { $regex: search, $options: "i" } }
+    // Sanitize search input to allow only letters
+    const sanitizedSearch = search.replace(/[^a-zA-Z\s]/g, '');
+
+    // Create search filter
+    const filter = sanitizedSearch
+      ? { brandName: { $regex: sanitizedSearch, $options: "i" } }
       : {};
+
+    // Get total number of filtered brands
+    const totalBrand = await brandSchema.countDocuments(filter);
+
+    // Calculate total pages
+    const totalPages = Math.ceil(totalBrand / itemsPerPage);
+
+    // Ensure current page is within valid range
+    const validatedPage = Math.max(1, Math.min(page, totalPages));
+    const skip = (validatedPage - 1) * itemsPerPage;
 
     // Fetch paginated brands
     const brands = await brandSchema
       .find(filter)
+      .sort({ createdAt: -1 })  // Add sorting if needed
       .skip(skip)
       .limit(itemsPerPage);
-
-    // Calculate total pages
-    const totalPages = Math.ceil(totalBrand / itemsPerPage);
 
     // Render the page
     res.render("admin/brand", {
       title: "Brand",
       brands,
-      currentPage: page,
+      currentPage: validatedPage,
       totalPages,
+      search: sanitizedSearch,
+      itemsPerPage
     });
   } catch (error) {
     console.error("Error rendering brand page:", error);

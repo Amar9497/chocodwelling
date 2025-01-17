@@ -58,12 +58,7 @@
         >
           <span>Offers</span>
         </a>
-        <a
-          href="#"
-          class="flex items-center space-x-4 py-2 px-3 hover:bg-white rounded-lg"
-        >
-          <span>Banner</span>
-        </a>
+        
       </nav>
     </aside>
 
@@ -79,8 +74,10 @@
           <input
             type="text"
             name="search"
-            placeholder="Search"
+            placeholder="Search by Order ID"
+            value="<%= search %>"
             class="border border-gray-300 rounded-lg px-4 py-2"
+            oninput="this.value = this.value.replace(/[^A-Za-z0-9]/g, '')"
           />
           <input
             type="submit"
@@ -92,64 +89,90 @@
 
       <!-- Orders Table -->
       <div class="rounded-lg shadow-lg overflow-hidden">
-        <table class="w-full text-left text-base">
-          <!-- Increased text size to "text-base" -->
-          <thead class="bg-[#A79277] text-white">
-            <tr>
-              <th class="py-4 px-5">SL.No</th>
-              <th class="py-4 px-5">OrderID</th>
-              <th class="py-4 px-5">Date</th>
-              <th class="py-4 px-5">Amount</th>
-              <th class="py-4 px-5">Payment</th>
-              <th class="py-4 px-5">Status</th>
-              <th class="py-4 px-5">Action</th>
-              <th class="py-4 px-5">Details</th>
-            </tr>
-          </thead>
-          <tbody class="">
-            <% let slNo=(currentPage - 1) * limit + 1; %> <%
-            orders.forEach((order, index) => { %>
-            <tr class="border-b hover:bg-gray-100">
-              <!-- Serial Number -->
-              <td class="px-5 py-3 text-center">
-                <!-- Increased padding and text size -->
-                <%= slNo %>
-              </td>
-              <!-- Order ID -->
-              <td class="px-5 py-3"><%= order._id.toString().slice(-6) %></td>
-              <!-- Date -->
-              <td class="px-5 py-3"><%= order.createdAt.toDateString() %></td>
-              <!-- Price -->
-              <td class="px-5 py-3"><%= order.finalAmount %></td>
-              <!-- PaymentMethod -->
-              <td class="px-5 py-3"><%= order.paymentMethod %></td>
-              <!-- OrdrStatus -->
-              <td class="px-5 py-3"><%= order.orderStatus %></td>
-              <!-- Action -->
-              <td class="px-5 py-3 border-b border-gray-200 text-sm">
-                <% if (order.orderStatus !== 'Cancelled' && order.orderStatus !== 'Returned' && order.orderStatus !== 'Delivered') { %>
-                  <select
-                    class="status-dropdown block w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                    onchange="updateOrderStatus('<%= order._id %>', this.value)"
-                  >
-                    <option value="Confirmed" <%= order.orderStatus === 'Confirmed' ? 'selected' : '' %>>Confirmed</option>
-                    <option value="Shipped" <%= order.orderStatus === 'Shipped' ? 'selected' : '' %>>Shipped</option>
-                    <option value="Delivered" <%= order.orderStatus === 'Delivered' ? 'selected' : '' %>>Delivered</option>
-                    <option value="Cancelled" <%= order.orderStatus === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
-                    <option value="Returned" <%= order.orderStatus === 'Returned' ? 'selected' : '' %>>Returned</option>
-                  </select>
-                <% } %>
-              </td>
-              
+        <% if (orders && orders.length > 0) { %>
+          <table class="w-full text-left text-base">
+            <!-- Increased text size to "text-base" -->
+            <thead class="bg-[#A79277] text-white">
+              <tr>
+                <th class="py-4 px-5">SL.No</th>
+                <th class="py-4 px-5">OrderID</th>
+                <th class="py-4 px-5">Date</th>
+                <th class="py-4 px-5">Amount</th>
+                <th class="py-4 px-5">Payment</th>
+                <th class="py-4 px-5">Status</th>
+                <th class="py-4 px-5">Action</th>
+                <th class="py-4 px-5">Details</th>
+              </tr>
+            </thead>
+            <tbody class="">
+              <% let slNo=(currentPage - 1) * limit + 1; %> <%
+              orders.forEach((order, index) => { %>
+              <tr class="border-b hover:bg-gray-100">
+                <!-- Serial Number -->
+                <td class="px-5 py-3 text-center">
+                  <!-- Increased padding and text size -->
+                  <%= slNo %>
+                </td>
+                <!-- Order ID -->
+                <td class="px-5 py-3"><%= order._id.toString().slice(-6) %></td>
+                <!-- Date -->
+                <td class="px-5 py-3"><%= order.createdAt.toDateString() %></td>
+                <!-- Price -->
+                <td class="px-5 py-3"><%= order.finalAmount %></td>
+                <!-- PaymentMethod -->
+                <td class="px-5 py-3"><%= order.paymentMethod %></td>
+                <!-- OrdrStatus -->
+                <td class="px-5 py-3"><%= order.orderStatus %></td>
+                <!-- Action -->
+                <td class="px-5 py-3 border-b border-gray-200 text-sm">
+                  <% if (order.returnReason && order.returnReason.status === 'Request') { %>
+                    <!-- Return Request Pending -->
+                    <button
+                      onclick="handleReturnRequest('<%= order._id %>')"
+                      class="px-3 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 w-full text-sm mb-2"
+                    >
+                      Return Request
+                    </button>
+                  <% } else if (order.orderStatus !== 'Delivered' && order.orderStatus !== 'Cancelled' && order.orderStatus !== 'Returned') { %>
+                    <!-- Default Status Dropdown - Only show if not Delivered or Cancelled -->
+                    <select
+                      class="status-dropdown block w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                      onchange="updateOrderStatus('<%= order._id %>', this.value)"
+                    >
+                      <option value="Confirmed" <%= order.orderStatus === 'Confirmed' ? 'selected' : '' %>>Confirmed</option>
+                      <option value="Shipped" <%= order.orderStatus === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                      <option value="Delivered" <%= order.orderStatus === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                      <option value="Cancelled" <%= order.orderStatus === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                      
+                    </select>
+                  <% } %>
+                </td>
+                
 
-              <!-- Action -->
-              <td class="px-5 py-3 text-center text-lg">
-                <a href="/admin/order-view/<%= order._id %>"> 📝 </a>
-              </td>
-            </tr>
-            <% slNo++; %> <% }) %>
-          </tbody>
-        </table>
+                <!-- Action -->
+                <td class="px-5 py-3 text-center text-lg">
+                  <a href="/admin/order-view/<%= order._id %>"> 📝 </a>
+                </td>
+              </tr>
+              <% slNo++; %> <% }) %>
+            </tbody>
+          </table>
+        <% } else { %>
+          <div class="flex flex-col items-center justify-center py-12 bg-white">
+            <svg class="w-16 h-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+            </svg>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">No Orders Found</h3>
+            <p class="text-gray-500 text-center mb-4">
+              <%= search ? `No orders found matching "${search}"` : 'No orders available' %>
+            </p>
+            <% if (search) { %>
+              <a href="/admin/orders" class="text-[#8B7355] hover:text-[#A79277] font-medium">
+                View All Orders
+              </a>
+            <% } %>
+          </div>
+        <% } %>
       </div>
       <!------------------------------- Pagination ---------------------->
       <div class="pagination-controls flex mt-3 justify-center">
@@ -167,7 +190,7 @@
           <li>
             <a
               href="/admin/orders?page=<%= i %>&limit=<%= limit %>&search=<%= search %>"
-              class="px-4 py-2 rounded <%= currentPage == i ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %>"
+              class="px-4 py-2 rounded <%= currentPage == i ? 'bg-[#A0522D] text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %>"
             >
               <%= i %>
             </a>
@@ -217,5 +240,68 @@
         }
       })
       .catch((error) => console.error("Error:", error));
+  }
+
+  function handleReturnRequest(orderId) {
+    fetch(`/admin/orders/${orderId}/return-details`)
+        .then(response => response.json())
+        .then(data => {
+            Swal.fire({
+                title: 'Return Request Details',
+                html: `
+                    <div class="text-left">
+                        <p><strong>Reason:</strong> ${data.reason}</p>
+                        <p><strong>Description:</strong> ${data.description}</p>
+                        <p><strong>Requested At:</strong> ${new Date(data.requestedAt).toLocaleString()}</p>
+                    </div>
+                `,
+                showCancelButton: true,
+                showDenyButton: true,
+                confirmButtonText: 'Approve',
+                denyButtonText: 'Reject',
+                cancelButtonText: 'Close',
+                confirmButtonColor: '#10B981',
+                denyButtonColor: '#EF4444'
+            }).then((result) => {
+                if (result.isConfirmed || result.isDenied) {
+                    const status = result.isConfirmed ? 'Approved' : 'Rejected';
+                    fetch(`/admin/orders/${orderId}/return-status`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ status })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                title: 'Success!',
+                                text: `Return request ${status.toLowerCase()} successfully`,
+                                icon: 'success'
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            throw new Error(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: error.message || 'Failed to process return request',
+                            icon: 'error'
+                        });
+                    });
+                }
+            });
+        })
+        .catch(error => {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Failed to load return request details',
+                icon: 'error'
+            });
+        });
   }
 </script>

@@ -43,13 +43,12 @@
         </button>
       </form>
       <p class="text-center text-gray-700 mt-4">
-        Didn’t get the OTP?
+        Didn't get the OTP?
         <a
           href="/resendotp"
-          class="text-[#A79277] hover:underline"
+          class="text-[#A79277] hover:underline hidden"
           id="resend-btn"
-          >Resend</a
-        >
+        >Resend</a>
       </p>
     </div>
   </main>
@@ -61,11 +60,11 @@
 <script>
   const otpInputs = document.querySelectorAll(".otp-input");
   const hiddenOtpInput = document.getElementById("otp");
-  const otpTimer = document.getElementById("otpTimer");
+  const otpTimer = document.getElementById("timer");
   const otpTime = parseInt(document.getElementById("otpTime").value);
   const duration = 60 * 2 * 1000; // 2 minutes in milliseconds
-  const verifybtn = document.getElementById("verify-btn");
-  const resendbtn = document.getElementById("resend-btn");
+  const verifyBtn = document.getElementById("verify-btn");
+  const resendBtn = document.getElementById("resend-btn");
 
   // Go to next input when current OTP input is filled
   otpInputs.forEach((input, index) => {
@@ -105,31 +104,104 @@
   function enableSubmitButton() {
     const allFilled = [...otpInputs].every((input) => input.value.length === 1);
     if (allFilled) {
-      verifybtn.disabled = false;
+      verifyBtn.disabled = false;
     } else {
-      verifybtn.disabled = true;
+      verifyBtn.disabled = true;
     }
   }
 
-  // Countdown timer for OTP expiration
+  // Updated countdown timer function
   function countDown() {
     const interval = setInterval(() => {
       const now = Date.now();
       let remain = duration - (now - otpTime);
 
       if (remain <= 0) {
-        otpTimer.remove();
-        verifybtn.disabled = true;
+        // Timer expired
+        otpTimer.textContent = "Time Expired!";
+        verifyBtn.disabled = true;
+        verifyBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        resendBtn.classList.remove('hidden');
         clearInterval(interval);
+
+        // Clear OTP inputs
+        otpInputs.forEach(input => {
+          input.value = '';
+          input.disabled = true;
+        });
+        hiddenOtpInput.value = '';
+
       } else {
+        // Timer still running
         const min = Math.floor((remain % (1000 * 60 * 60)) / (1000 * 60));
         const sec = Math.floor((remain % (1000 * 60)) / 1000);
-        otpTimer.innerHTML = `Time remaining: ${min}:${
-          sec < 10 ? "0" : ""
-        }${sec}`;
+        otpTimer.textContent = `${min}:${sec < 10 ? "0" : ""}${sec}`;
+        
+        // Hide resend button while timer is active
+        resendBtn.classList.add('hidden');
+        
+        // Enable inputs and verify button if not already enabled
+        otpInputs.forEach(input => {
+          input.disabled = false;
+        });
+        verifyBtn.disabled = false;
+        verifyBtn.classList.remove('opacity-50', 'cursor-not-allowed');
       }
     }, 1000);
+
+    // Store interval ID in window object to clear it if needed
+    window.otpTimerInterval = interval;
   }
 
+  // Start countdown when page loads
   countDown();
+
+  // Add event listener for resend button
+  resendBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    // Clear existing timer if any
+    if (window.otpTimerInterval) {
+      clearInterval(window.otpTimerInterval);
+    }
+
+    // Reset UI elements
+    otpInputs.forEach(input => {
+      input.value = '';
+      input.disabled = false;
+    });
+    hiddenOtpInput.value = '';
+    verifyBtn.disabled = false;
+    verifyBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    resendBtn.classList.add('hidden');
+
+    // Make the resend request
+    window.location.href = '/resendotp';
+  });
+
+  // Form submission validation
+  document.getElementById('otpForm').addEventListener('submit', function(e) {
+    const now = Date.now();
+    const remain = duration - (now - otpTime);
+    
+    if (remain <= 0) {
+      e.preventDefault();
+      Swal.fire({
+        title: 'Error',
+        text: 'OTP has expired. Please request a new one.',
+        icon: 'error'
+      });
+    }
+  });
 </script>
+
+<style>
+  /* Add styles for disabled state */
+  .cursor-not-allowed {
+    cursor: not-allowed;
+  }
+  
+  .opacity-50 {
+    opacity: 0.5;
+  }
+</style>

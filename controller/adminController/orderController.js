@@ -1,4 +1,5 @@
 const orderSchema = require('../../model/orderSchema');
+const walletSchema = require('../../model/walletSchema');
 
 //-------------------order page rendering---------------
 
@@ -8,28 +9,63 @@ const orderPage = async (req,res) =>{
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 8;
 
+        // Sanitize search input to allow only letters and numbers
+        const sanitizedSearch = search.replace(/[^a-zA-Z0-9]/g, '');
+
         let query = {};
 
-        if(search){
-            const searchNumber = Number(search);
-            if(!isNaN(searchNumber)) {
-                query.order_id = searchNumber;
-            }
+        if (sanitizedSearch) {
+            // Search by order ID using string match
+            query = {
+                $or: [
+                    { _id: { $regex: sanitizedSearch, $options: 'i' } },
+                    { 'orderIdString': { $regex: sanitizedSearch, $options: 'i' } }
+                ]
+            };
         }
 
-        const orders = await orderSchema.find(query)
-            .sort({ createdAt: -1})
-            .limit(limit)
-            .skip((page - 1) * limit);
+        const orders = await orderSchema.aggregate([
+            {
+                $addFields: {
+                    orderIdString: { $toString: "$_id" }
+                }
+            },
+            {
+                $match: query
+            },
+            {
+                $sort: { createdAt: -1 }
+            },
+            {
+                $skip: (page - 1) * limit
+            },
+            {
+                $limit: limit
+            }
+        ]);
 
-        const count = await orderSchema.countDocuments(query);
+        const count = await orderSchema.aggregate([
+            {
+                $addFields: {
+                    orderIdString: { $toString: "$_id" }
+                }
+            },
+            {
+                $match: query
+            },
+            {
+                $count: 'total'
+            }
+        ]);
 
-        res.render('admin/order',{
-            title:"Order Details",
+        const total = count.length > 0 ? count[0].total : 0;
+
+        res.render('admin/order', {
+            title: "Order Details",
             orders,
-            totalPages: Math.ceil(count / limit),
+            totalPages: Math.ceil(total / limit),
             currentPage: page,
-            search,
+            search: sanitizedSearch,
             limit
         });
     }
@@ -75,7 +111,7 @@ const orderStatus = async (req,res) =>{
     }
 }
 
-//---------------------------Single order details------------------------
+//--------------------------- order details------------------------
 
 const orderView = async (req, res) => {
     try {
@@ -139,8 +175,98 @@ const orderView = async (req, res) => {
     }
 };
 
+
+// ------------------- return details --------------------------
+
+
+const getReturnDetails = async (req, res) => {
+    try {
+        const order = await orderSchema.findById(req.params.orderId);
+        if (!order || !order.returnReason) {
+            return res.status(404).json({ success: false, message: 'Return request not found' });
+        }
+        
+        res.json({
+            success: true,
+            reason: order.returnReason.reason,
+            description: order.returnReason.description,
+            requestedAt: order.returnReason.requestedAt
+        });
+    } catch (error) {
+        console.error('Error fetching return details:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
+
+// -------------------------- update return status --------------------------------
+
+
+const updateReturnStatus = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const { status } = req.body;
+
+        const order = await orderSchema.findById(orderId);
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+
+        // Update return request status
+        order.returnReason.status = status;
+
+        // If approved, update order status to Returned and process refund
+        if (status === 'Approved') {
+            order.orderStatus = 'Returned';
+            
+            // Process refund if payment was made through Razorpay or Wallet or COD
+            if (order.paymentMethod === 'Razorpay' || order.paymentMethod === 'Wallet' || order.paymentMethod === 'COD') {
+                // Find or create wallet for the order's user
+                let wallet = await walletSchema.findOne({ userID: order.userId });
+                
+                if (!wallet) {
+                    wallet = new walletSchema({
+                        userID: order.userId,
+                        balance: 0,
+                        transaction: []
+                    });
+                }
+
+                // Add refund transaction
+                wallet.transaction.push({
+                    wallet_amount: order.finalAmount,
+                    order_id: orderId,
+                    transactionType: 'Credited',
+                    transaction_date: new Date()
+                });
+
+                // Update wallet balance
+                wallet.balance += order.finalAmount;
+                
+                await wallet.save();
+            }
+        }
+
+        await order.save();
+
+        res.json({
+            success: true,
+            message: `Return request ${status.toLowerCase()} successfully`
+        });
+
+    } catch (error) {
+        console.error('Error updating return status:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to update return status'
+        });
+    }
+};
+
 module.exports = {
     orderPage,
     orderStatus,
-    orderView
+    orderView,
+    getReturnDetails,
+    updateReturnStatus
 }
