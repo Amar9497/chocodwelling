@@ -31,7 +31,7 @@ app.use('/public',express.static(path.join(__dirname,'public')));
 //set layout
 app.use(expressLayouts);
 app.set('layout','./layout/layout')
-
+    
 //url encoded data
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
