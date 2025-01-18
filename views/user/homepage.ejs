@@ -398,19 +398,28 @@ async function addToWishlist(productId) {
             }
         });
 
-        const data = await response.json();
+        // Check if response is redirect to login page
+        if (response.redirected) {
+            window.location.href = response.url;
+            return;
+        }
 
-        if (!response.ok) {
-            // Handle unauthorized (not logged in) case
+        // Try to parse JSON response
+        let data;
+        try {
+            data = await response.json();
+        } catch (error) {
+            // If response is not JSON, handle accordingly
             if (response.status === 401) {
                 Swal.fire({
-                    icon: 'warning',
                     title: 'Please Login',
                     text: 'You need to login to add items to wishlist',
+                    icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonText: 'Login',
                     confirmButtonColor: '#8B7355',
                     cancelButtonColor: '#d33',
+                    confirmButtonText: 'Login Now',
+                    cancelButtonText: 'Cancel'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         window.location.href = '/login';
@@ -418,50 +427,41 @@ async function addToWishlist(productId) {
                 });
                 return;
             }
-            
-            // Handle already in wishlist case
-            if (response.status === 400) {
+            throw new Error('Invalid response from server');
+        }
+
+        if (!data.success) {
+            // Handle case where item is already in wishlist
+            if (data.exists) {
                 Swal.fire({
                     icon: 'info',
                     title: 'Already in Wishlist',
-                    text: 'This item is already in your wishlist',
+                    text: data.message,
                     toast: true,
                     position: 'top-end',
                     showConfirmButton: false,
                     timer: 3000,
-                    timerProgressBar: true,
-                    customClass: {
-                        popup: 'colored-toast'
-                    }
+                    timerProgressBar: true
                 });
                 return;
             }
-
-            throw new Error(data.message || 'Failed to add to wishlist');
+            throw new Error(data.message);
         }
 
-        // Success case
-        const wishlistIcon = document.getElementById(`wishlist-icon-${productId}`);
-        if (wishlistIcon) {
-            wishlistIcon.setAttribute('fill', 'red');
-        }
-
+        // Success message
         Swal.fire({
             icon: 'success',
             title: 'Added to Wishlist!',
-            text: 'Item successfully added to your wishlist',
+            text: data.message,
             toast: true,
             position: 'top-end',
             showConfirmButton: false,
             timer: 3000,
-            timerProgressBar: true,
-            customClass: {
-                popup: 'colored-toast'
-            }
+            timerProgressBar: true
         });
 
     } catch (error) {
-        console.error('Error adding to wishlist:', error);
+        console.error('Error:', error);
         Swal.fire({
             icon: 'error',
             title: 'Oops...',
@@ -469,11 +469,7 @@ async function addToWishlist(productId) {
             toast: true,
             position: 'top-end',
             showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            customClass: {
-                popup: 'colored-toast'
-            }
+            timer: 3000
         });
     }
 }
@@ -490,23 +486,32 @@ async function addToCart(productId) {
             },
             body: JSON.stringify({
                 productId: productId,
-                quantity: 1, // Default to 1 for direct add-to-cart from listing
+                quantity: 1
             }),
         });
 
-        const data = await response.json();
+        // Check if response is redirect to login page
+        if (response.redirected) {
+            window.location.href = response.url;
+            return;
+        }
 
-        if (!response.ok) {
-            // Handle unauthorized (not logged in) case
+        // Try to parse JSON response
+        let data;
+        try {
+            data = await response.json();
+        } catch (error) {
+            // If response is not JSON, handle accordingly
             if (response.status === 401) {
                 Swal.fire({
-                    icon: 'warning',
                     title: 'Please Login',
                     text: 'You need to login to add items to cart',
+                    icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonText: 'Login',
                     confirmButtonColor: '#8B7355',
                     cancelButtonColor: '#d33',
+                    confirmButtonText: 'Login Now',
+                    cancelButtonText: 'Cancel'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         window.location.href = '/login';
@@ -514,23 +519,23 @@ async function addToCart(productId) {
                 });
                 return;
             }
-            
+            throw new Error('Invalid response from server');
+        }
+
+        if (!data.status) {
             throw new Error(data.message || 'Failed to add to cart');
         }
 
-        // Success case
+        // Success message
         Swal.fire({
             icon: 'success',
             title: 'Added to Cart!',
-            text: data.message || 'Item successfully added to your cart',
+            text: data.message,
             toast: true,
             position: 'top-end',
             showConfirmButton: false,
             timer: 3000,
-            timerProgressBar: true,
-            customClass: {
-                popup: 'colored-toast'
-            }
+            timerProgressBar: true
         });
 
         // Update cart count if it exists
@@ -541,7 +546,7 @@ async function addToCart(productId) {
         }
 
     } catch (error) {
-        console.error('Error adding to cart:', error);
+        console.error('Error:', error);
         Swal.fire({
             icon: 'error',
             title: 'Oops...',
@@ -549,11 +554,7 @@ async function addToCart(productId) {
             toast: true,
             position: 'top-end',
             showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            customClass: {
-                popup: 'colored-toast'
-            }
+            timer: 3000
         });
     }
 }

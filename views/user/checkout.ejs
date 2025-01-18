@@ -621,58 +621,69 @@
 
   // Function to validate the form
   function validateForm(event) {
-      event.preventDefault(); // Prevent form submission
+    event.preventDefault(); // Prevent form submission
 
-      // Get form fields
-      const building = document.getElementById("building");
-      const street = document.getElementById("street");
-      const city = document.getElementById("city");
-      const phonenumber = document.getElementById("phonenumber");
-      const pincode = document.getElementById("pincode");
-      const landmark = document.getElementById("landmark");
-      const state = document.getElementById("state");
-      const country = document.getElementById("country");
+    // Get form fields
+    const building = document.getElementById("building");
+    const street = document.getElementById("street");
+    const city = document.getElementById("city");
+    const phonenumber = document.getElementById("phonenumber");
+    const pincode = document.getElementById("pincode");
+    const landmark = document.getElementById("landmark");
+    const state = document.getElementById("state");
+    const country = document.getElementById("country");
 
-      let isValid = true;
+    let isValid = true;
 
-      // Reset any previous error messages
-      document.querySelectorAll(".error").forEach((error) => error.remove());
+    // Reset any previous error messages
+    document.querySelectorAll(".error").forEach((error) => error.remove());
 
-      // Helper function to display error message
-      function showError(input, message) {
-          const error = document.createElement("div");
-          error.className = "error text-red-500 text-sm mt-1";
-          error.textContent = message;
-          input.insertAdjacentElement("afterend", error);
-          isValid = false;
-      }
+    // Helper function to display error message
+    function showError(input, message) {
+        const error = document.createElement("div");
+        error.className = "error text-red-500 text-sm mt-1";
+        error.textContent = message;
+        input.insertAdjacentElement("afterend", error);
+        isValid = false;
+    }
 
-      // Validate each field
-      if (!building.value.trim())
-          showError(building, "Building information is required.");
-      if (!street.value.trim())
-          showError(street, "Street information is required.");
-      if (!city.value.trim()) showError(city, "City is required.");
-      if (!phonenumber.value.trim() || !/^\d{10}$/.test(phonenumber.value)) {
-          showError(phonenumber, "Enter a valid 10-digit phone number.");
-      }
-      if (!pincode.value.trim() || !/^\d{6}$/.test(pincode.value)) {
-          showError(pincode, "Enter a valid 6-digit pincode.");
-      }
-      if (!landmark.value.trim()) showError(landmark, "Landmark is required.");
-      if (!state.value.trim()) showError(state, "State is required.");
-      if (!country.value.trim()) showError(country, "Country is required.");
+    // Validate each field
+    if (!building.value.trim() || building.value.trim().length > 30 || /[^a-zA-Z0-9 ]/.test(building.value)) {
+        showError(building, "Building must be up to 30 characters (letters/numbers only).");
+    }
+    if (!street.value.trim() || street.value.trim().length > 20 || /[^a-zA-Z0-9 ]/.test(street.value)) {
+        showError(street, "Street must be up to 20 characters (letters/numbers only).");
+    }
+    if (!city.value.trim() || city.value.trim().length > 20 || /[^a-zA-Z ]/.test(city.value)) {
+        showError(city, "City must be up to 20 characters (letters only).");
+    }
+    if (!phonenumber.value.trim() || !/^\d{10}$/.test(phonenumber.value)) {
+        showError(phonenumber, "Enter a valid 10-digit phone number.");
+    }
+    if (!pincode.value.trim() || !/^\d{6}$/.test(pincode.value)) {
+        showError(pincode, "Enter a valid 6-digit pincode.");
+    }
+    if (!landmark.value.trim() || landmark.value.trim().length > 20 || /[^a-zA-Z0-9 ]/.test(landmark.value)) {
+        showError(landmark, "Landmark must be up to 20 characters (letters/numbers only).");
+    }
+    if (!state.value.trim() || state.value.trim().length > 20 || /[^a-zA-Z ]/.test(state.value)) {
+        showError(state, "State must be up to 20 characters (letters only).");
+    }
+    if (!country.value.trim() || country.value.trim().length > 20 || /[^a-zA-Z ]/.test(country.value)) {
+        showError(country, "Country must be up to 20 characters (letters only).");
+    }
 
-      // If all validations pass, submit the form
-      if (isValid) {
-          document.getElementById("addressForm").submit();
-      }
-  }
+    // If all validations pass, submit the form
+    if (isValid) {
+        document.getElementById("addressForm").submit();
+    }
+}
 
-  // Attach the validation function to the form
-  document
-      .getElementById("addressForm")
-      .addEventListener("submit", validateForm);
+// Attach the validation function to the form
+document
+    .getElementById("addressForm")
+    .addEventListener("submit", validateForm);
+
 </script>
 
 

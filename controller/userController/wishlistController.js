@@ -18,6 +18,16 @@ const wishlistController = {
     addWishlist: async (req, res) => {
         try {
             const userId = req.session.user;
+            
+            // Check if user is logged in
+            if (!userId) {
+                return res.status(401).json({ 
+                    success: false, 
+                    message: 'Please login to add items to wishlist',
+                    requireLogin: true
+                });
+            }
+
             const productId = req.params.id;
 
             // Check if product exists

@@ -79,6 +79,13 @@ const cart = async (req, res) => {
 const addToCart = async (req, res) => {
   try {
     const userId = req.session.user;
+
+    // Check if user is logged in
+    if (!userId) {
+      // Instead of JSON response, redirect to login
+      return res.redirect('/login');
+    }
+
     const { productId, quantity } = req.body;
 
     // Validate product exists and has variants

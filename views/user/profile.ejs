@@ -261,7 +261,7 @@
       </button>
     </div>
     <div class="px-6 py-4">
-      <form id="addressForm" method="post" action="/add-address">
+      <form id="addressForm" method="post" action="/add-address" onsubmit="return validateForm()" >
         <div class="mb-4">
           <label
             for="building"
@@ -866,52 +866,83 @@
         .getElementById("editPhoneNumber")
         .value.trim();
       const pincode = document.getElementById("editPincode").value.trim();
+      const landmark = document.getElementById("editLandmark")?.value.trim();
+      const state = document.getElementById("editState")?.value.trim();
+      const country = document.getElementById("editCountry")?.value.trim();
 
       // Validation rules
-      if (!building || building.length < 3) {
-        Swal.fire({
-          title: "Error",
-          text: "Building/House No. must be at least 3 characters long",
-          icon: "error",
-        });
-        return;
-      }
+    if (!building || !/^[a-zA-Z0-9\s]{1,30}$/.test(building)) {
+      Swal.fire({
+        title: "Error",
+        text: "Building/House No. must be alphanumeric and up to 30 characters",
+        icon: "error",
+      });
+      return;
+    }
 
-      if (!street || street.length < 3) {
-        Swal.fire({
-          title: "Error",
-          text: "Street address must be at least 3 characters long",
-          icon: "error",
-        });
-        return;
-      }
+    if (!street || !/^[a-zA-Z0-9\s]{1,20}$/.test(street)) {
+      Swal.fire({
+        title: "Error",
+        text: "Street address must be alphanumeric and up to 20 characters",
+        icon: "error",
+      });
+      return;
+    }
 
-      if (!city || city.length < 2) {
-        Swal.fire({
-          title: "Error",
-          text: "City name must be at least 2 characters long",
-          icon: "error",
-        });
-        return;
-      }
+    if (!city || !/^[a-zA-Z\s]{1,20}$/.test(city)) {
+      Swal.fire({
+        title: "Error",
+        text: "City name must be alphabetic and up to 20 characters",
+        icon: "error",
+      });
+      return;
+    }
 
-      if (!/^\d{10}$/.test(phoneNumber)) {
-        Swal.fire({
-          title: "Error",
-          text: "Please enter a valid 10-digit phone number",
-          icon: "error",
-        });
-        return;
-      }
+    if (!/^[0-9]{10}$/.test(phoneNumber) || /^0{10}$/.test(phoneNumber)) {
+  Swal.fire({
+    title: "Error",
+    text: "Please enter a valid 10-digit phone number (not all zeros)",
+    icon: "error",
+  });
+  return;
+}
 
-      if (!/^\d{6}$/.test(pincode)) {
-        Swal.fire({
-          title: "Error",
-          text: "Please enter a valid 6-digit pincode",
-          icon: "error",
-        });
-        return;
-      }
+if (!/^[0-9]{6}$/.test(pincode) || /^0{6}$/.test(pincode)) {
+  Swal.fire({
+    title: "Error",
+    text: "Please enter a valid 6-digit pincode (not all zeros)",
+    icon: "error",
+  });
+  return;
+}
+
+
+    if (landmark && !/^[a-zA-Z0-9\s]{1,20}$/.test(landmark)) {
+      Swal.fire({
+        title: "Error",
+        text: "Landmark must be alphanumeric and up to 20 characters",
+        icon: "error",
+      });
+      return;
+    }
+
+    if (state && !/^[a-zA-Z\s]{1,20}$/.test(state)) {
+      Swal.fire({
+        title: "Error",
+        text: "State must be alphabetic and up to 20 characters",
+        icon: "error",
+      });
+      return;
+    }
+
+    if (country && !/^[a-zA-Z\s]{1,20}$/.test(country)) {
+      Swal.fire({
+        title: "Error",
+        text: "Country must be alphabetic and up to 20 characters",
+        icon: "error",
+      });
+      return;
+    }
 
       // If validation passes, submit the form
       this.submit();
@@ -987,98 +1018,110 @@
       }
     });
 
-  //------------------- validation for modal --------------------
-
-  document.addEventListener("DOMContentLoaded", (event) => {
-    const addressForm = document.getElementById("addressForm");
-    const building = document.getElementsByName("building")[0];
-    const street = document.getElementsByName("street")[0];
-    const city = document.getElementsByName("city")[0];
-    const phone = document.getElementsByName("phonenumber")[0];
-    const pincode = document.getElementsByName("pincode")[0];
-    const landmark = document.getElementsByName("landmark")[0];
-    const state = document.getElementsByName("state")[0];
-    const country = document.getElementsByName("country")[0];
-
-    function validatePhone(phone) {
-      const phoneRe = /^\d{10}$/;
-      return phoneRe.test(phone);
-    }
-    function validatePincode(pincode) {
-      const pincodeRe = /^\d{6}$/;
-      return pincodeRe.test(pincode);
-    }
-    addressForm.addEventListener("submit", (e) => {
+  document.getElementById("addressForm").addEventListener("submit", function(e) {
       e.preventDefault();
-      if (building.value.trim() === "" || !isNaN(building.value)) {
-        Swal.fire({
-          title: "Error",
-          text: "Building field must not be empty and Not a Number.",
-          icon: "error",
-        });
-      } else if (building.value.length > 50 || building.value.length < 4) {
-        Swal.fire({
-          title: "Error",
-          text: "Building field must be Greater than 4 letters and less than 50 letters.",
-          icon: "error",
-        });
-      } else if (street.value.trim() === "" || !isNaN(street.value)) {
-        Swal.fire({
-          title: "Error",
-          text: "Street field must not be empty and Not a Number.",
-          icon: "error",
-        });
-      } else if (street.value.length > 50 || street.value.length < 4) {
-        Swal.fire({
-          title: "Error",
-          text: "Street Field Must be Greater than 4 Letters and less than 50 letters.",
-          icon: "error",
-        });
-      } else if (city.value.trim() === "" || !isNaN(city.value)) {
-        Swal.fire({
-          title: "Error",
-          text: "City field must not be empty and Not a Number.",
-          icon: "error",
-        });
-      } else if (city.value.length > 25 || city.value.length < 4) {
-        Swal.fire({
-          title: "Error",
-          text: "City field must be Greater than 4 Words and less than 25 Words.",
-          icon: "error",
-        });
-      } else if (!validatePhone(phone.value)) {
-        Swal.fire({
-          title: "Error",
-          text: "Phone number must be 10 digits.",
-          icon: "error",
-        });
-      } else if (!validatePincode(pincode.value)) {
-        Swal.fire({
-          title: "Error",
-          text: "Pincode must be 6 digits.",
-          icon: "error",
-        });
-      } else if (landmark.value.trim() === "" || !isNaN(landmark.value)) {
-        Swal.fire({
-          title: "Error",
-          text: "Landmark field must not be empty.",
-          icon: "error",
-        });
-      } else if (state.value.trim() === "" || !isNaN(state.value)) {
-        Swal.fire({
-          title: "Error",
-          text: "State field must not be empty.",
-          icon: "error",
-        });
-      } else if (country.value.trim() === "" || !isNaN(country.value)) {
-        Swal.fire({
-          title: "Error",
-          text: "Country field must not be empty.",
-          icon: "error",
-        });
-      } else {
-        addressForm.submit();
+  
+      // Get form values using getElementsByName and selecting the first element [0]
+      const building = document.getElementsByName("building")[0].value.trim();
+      const street = document.getElementsByName("street")[0].value.trim();
+      const city = document.getElementsByName("city")[0].value.trim();
+      const phoneNumber = document.getElementsByName("phonenumber")[0].value.trim();
+      const pincode = document.getElementsByName("pincode")[0].value.trim();
+      const landmark = document.getElementsByName("landmark")[0].value.trim();
+      const state = document.getElementsByName("state")[0].value.trim();
+      const country = document.getElementsByName("country")[0].value.trim();
+  
+      // Building validation
+      if (!building || !/^[a-zA-Z0-9\s]{1,30}$/.test(building)) {
+          Swal.fire({
+              title: "Error",
+              text: "Building/House No. must be alphanumeric and up to 30 characters",
+              icon: "error",
+          });
+          return false;
       }
-    });
+  
+      // Street validation
+      if (!street || !/^[a-zA-Z0-9\s]{1,20}$/.test(street)) {
+          Swal.fire({
+              title: "Error",
+              text: "Street address must be alphanumeric and up to 20 characters",
+              icon: "error",
+          });
+          return false;
+      }
+  
+      // City validation
+      if (!city || !/^[a-zA-Z\s]{1,20}$/.test(city)) {
+          Swal.fire({
+              title: "Error",
+              text: "City name must be alphabetic and up to 20 characters",
+              icon: "error",
+          });
+          return false;
+      }
+  
+      // Phone number validation
+      if (!/^[1-9][0-9]{9}$/.test(phoneNumber)) {
+          Swal.fire({
+              title: "Error",
+              text: "Please enter a valid 10-digit phone number (not starting with 0)",
+              icon: "error",
+          });
+          return false;
+      }
+  
+      // Pincode validation
+      if (!/^[1-9][0-9]{5}$/.test(pincode)) {
+          Swal.fire({
+              title: "Error",
+              text: "Please enter a valid 6-digit pincode (not starting with 0)",
+              icon: "error",
+          });
+          return false;
+      }
+  
+      // Landmark validation
+      if (!landmark || !/^[a-zA-Z0-9\s]{1,20}$/.test(landmark)) {
+          Swal.fire({
+              title: "Error",
+              text: "Landmark must be alphanumeric and up to 20 characters",
+              icon: "error",
+          });
+          return false;
+      }
+  
+      // State validation
+      if (!state || !/^[a-zA-Z\s]{1,20}$/.test(state)) {
+          Swal.fire({
+              title: "Error",
+              text: "State must be alphabetic and up to 20 characters",
+              icon: "error",
+          });
+          return false;
+      }
+  
+      // Country validation
+      if (!country || !/^[a-zA-Z\s]{1,20}$/.test(country)) {
+          Swal.fire({
+              title: "Error",
+              text: "Country must be alphabetic and up to 20 characters",
+              icon: "error",
+          });
+          return false;
+      }
+  
+      // If all validations pass, submit the form
+      this.submit();
   });
-</script>
+  
+  // Modal functions
+  function openModal() {
+      document.getElementById("addressModal").classList.remove("hidden");
+  }
+  
+  function closeModal() {
+      document.getElementById("addressModal").classList.add("hidden");
+      document.getElementById("addressForm").reset();
+  }
+  </script>
