@@ -128,47 +128,49 @@
               </div>
           </section>
 
-          <!-- Order Summary -->
-          <aside class="w-full lg:w-80">
-              <div class="bg-white rounded-xl shadow-sm p-6 sticky top-4">
-                  <h2 class="text-lg font-semibold text-gray-900 mb-6">Order Summary</h2>
-                  
-                  <div class="space-y-4">
-                      <div class="flex justify-between text-sm">
-                          <span class="text-gray-600">Subtotal</span>
-                          <span id="cart-subtotal" class="font-medium">₹<%= total.toFixed(2) %></span>
+          <!-- Order Summary - Only show if cart has items -->
+          <% if (cartItems.length > 0) { %>
+              <aside class="w-full lg:w-80">
+                  <div class="bg-white rounded-xl shadow-sm p-6 sticky top-4">
+                      <h2 class="text-lg font-semibold text-gray-900 mb-6">Order Summary</h2>
+                      
+                      <div class="space-y-4">
+                          <div class="flex justify-between text-sm">
+                              <span class="text-gray-600">Subtotal</span>
+                              <span id="cart-subtotal" class="font-medium">₹<%= total.toFixed(2) %></span>
+                          </div>
+
+                          <div class="flex justify-between text-sm">
+                              <span class="text-gray-600">Delivery Charge</span>
+                              <span id="delivery-charge" class="font-medium">
+                                  <%= total < 500 ? `₹100.00` : 'Free' %>
+                              </span>
+                          </div>
+
+                          <div class="flex justify-between text-sm text-green-600">
+                              <span>Total Savings</span>
+                              <span id="total-savings" class="font-medium">₹<%= totalSavings.toFixed(2) %></span>
+                          </div>
+
+                          <div class="h-px bg-gray-200 my-4"></div>
+
+                          <div class="flex justify-between">
+                              <span class="text-base font-semibold">Total</span>
+                              <span id="final-total" class="text-lg font-bold text-[#8B7355]">
+                                  ₹<%= (total + (total < 500 ? 100 : 0)).toFixed(2) %>
+                              </span>
+                          </div>
+
+                          <button onclick="window.location.href='/checkout'"
+                                  class="w-full mt-6 bg-[#8B7355] text-white py-3 px-4 rounded-lg
+                                         hover:bg-[#A79277] transition-colors duration-300
+                                         focus:outline-none focus:ring-2 focus:ring-[#8B7355] focus:ring-offset-2">
+                              Proceed to Checkout
+                          </button>
                       </div>
-
-                      <div class="flex justify-between text-sm">
-                          <span class="text-gray-600">Delivery Charge</span>
-                          <span id="delivery-charge" class="font-medium">
-                              <%= total < 500 ? `₹100.00` : 'Free' %>
-                          </span>
-                      </div>
-
-                      <div class="flex justify-between text-sm text-green-600">
-                          <span>Total Savings</span>
-                          <span id="total-savings" class="font-medium">₹<%= totalSavings.toFixed(2) %></span>
-                      </div>
-
-                      <div class="h-px bg-gray-200 my-4"></div>
-
-                      <div class="flex justify-between">
-                          <span class="text-base font-semibold">Total</span>
-                          <span id="final-total" class="text-lg font-bold text-[#8B7355]">
-                              ₹<%= (total + (total < 500 ? 100 : 0)).toFixed(2) %>
-                          </span>
-                      </div>
-
-                      <button onclick="window.location.href='/checkout'"
-                              class="w-full mt-6 bg-[#8B7355] text-white py-3 px-4 rounded-lg
-                                     hover:bg-[#A79277] transition-colors duration-300
-                                     focus:outline-none focus:ring-2 focus:ring-[#8B7355] focus:ring-offset-2">
-                          Proceed to Checkout
-                      </button>
                   </div>
-              </div>
-          </aside>
+              </aside>
+          <% } %>
       </div>
   </main>
 </div>

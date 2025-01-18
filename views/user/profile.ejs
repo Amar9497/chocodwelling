@@ -107,8 +107,12 @@
               id="userName"
               name="userName"
               required
+              minlength="3"
+              maxlength="30"
+              pattern="[A-Za-z\s]+"
               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500"
               value="<%= userDetail.name %>"
+              placeholder="Enter your name"
             />
           </div>
           <div>
@@ -132,12 +136,15 @@
               >Phone Number</label
             >
             <input
-              type="text"
+              type="tel"
               id="phoneNumber"
               name="phoneNumber"
               required
+              pattern="[1-9][0-9]{9}"
+              maxlength="10"
               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500"
               value="<%= userDetail.phone %>"
+              placeholder="Enter 10-digit phone number"
             />
           </div>
           <button
@@ -984,39 +991,39 @@ if (!/^[0-9]{6}$/.test(pincode) || /^0{6}$/.test(pincode)) {
 
   //---------------------------VAlidation for Profile----------------------------
 
-  document
-    .getElementById("profile-form")
-    .addEventListener("submit", function (event) {
-      // Get form input values
-      const userName = document.getElementById("userName").value.trim();
-      const phoneNumber = document.getElementById("phoneNumber").value.trim();
+  // document
+  //   .getElementById("profile-form")
+  //   .addEventListener("submit", function (event) {
+  //     // Get form input values
+  //     const userName = document.getElementById("userName").value.trim();
+  //     const phoneNumber = document.getElementById("phoneNumber").value.trim();
 
-      // Regular expressions for validation
-      const namePattern = /^[a-zA-Z\s]+$/;
-      const phonePattern = /^\d{10}$/;
+  //     // Regular expressions for validation
+  //     const namePattern = /^[a-zA-Z\s]+$/;
+  //     const phonePattern = /^\d{10}$/;
 
-      // Validate name
-      if (!namePattern.test(userName)) {
-        Swal.fire({
-          icon: "error",
-          title: "Invalid Name",
-          text: "Please enter a valid name. Only letters and spaces are allowed.",
-        });
-        event.preventDefault();
-        return;
-      }
+  //     // Validate name
+  //     if (!namePattern.test(userName)) {
+  //       Swal.fire({
+  //         icon: "error",
+  //         title: "Invalid Name",
+  //         text: "Please enter a valid name. Only letters and spaces are allowed.",
+  //       });
+  //       event.preventDefault();
+  //       return;
+  //     }
 
-      // Validate phone number
-      if (!phonePattern.test(phoneNumber)) {
-        Swal.fire({
-          icon: "error",
-          title: "Invalid Phone Number",
-          text: "Please enter a valid phone number. It should be 10 digits.",
-        });
-        event.preventDefault();
-        return;
-      }
-    });
+  //     // Validate phone number
+  //     if (!phonePattern.test(phoneNumber)) {
+  //       Swal.fire({
+  //         icon: "error",
+  //         title: "Invalid Phone Number",
+  //         text: "Please enter a valid phone number. It should be 10 digits.",
+  //       });
+  //       event.preventDefault();
+  //       return;
+  //     }
+  //   });
 
   document.getElementById("addressForm").addEventListener("submit", function(e) {
       e.preventDefault();

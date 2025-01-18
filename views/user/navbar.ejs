@@ -1,226 +1,164 @@
 <header class="bg-gradient-to-r from-[#8B7355] to-[#A79277] text-white shadow-lg sticky top-0 z-50">
-  <div class="container mx-auto flex justify-between items-center px-4 py-3">
-    <!-- Logo -->
-    <a href="/home" class="flex-shrink-0">
-      <img
-        src="/public/assets/chocodwellin-logo.png"
-        alt="logo"
-        class="h-12 transform transition-all duration-300 hover:scale-105"
-      />
-    </a>
+    <!-- Main Navigation Container -->
+    <div class="container mx-auto px-4 py-3">
+        <!-- Top Bar - Logo and Icons -->
+        <div class="flex items-center justify-between">
+            <!-- Logo -->
+            <a href="/home" class="flex-shrink-0">
+                <img src="/public/assets/chocodwellin-logo.png" alt="logo" 
+                     class="h-10 sm:h-12 transform transition-all duration-300 hover:scale-105"/>
+            </a>
 
-    <!-- Desktop Navigation -->
-    <nav class="hidden md:flex items-center space-x-8">
-      <a href="/home" 
-         class="nav-link relative font-medium py-2 hover:text-white transition-colors duration-300
-                after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 
-                after:bg-white after:transition-all after:duration-300 hover:after:w-full"
-      >Home</a>
-      <a href="/category" 
-         class="nav-link relative font-medium py-2 hover:text-white transition-colors duration-300
-                after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 
-                after:bg-white after:transition-all after:duration-300 hover:after:w-full"
-      >Categories</a>
-      <a href="/category" 
-         class="nav-link relative font-medium py-2 hover:text-white transition-colors duration-300
-                after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 
-                after:bg-white after:transition-all after:duration-300 hover:after:w-full"
-      >Brand</a>
-      <a href="/allproduct" 
-         class="nav-link relative font-medium py-2 hover:text-white transition-colors duration-300
-                after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 
-                after:bg-white after:transition-all after:duration-300 hover:after:w-full"
-      >All Products</a>
-      
-    </nav>
+            <!-- Desktop Navigation - Hidden on Mobile -->
+            <nav class="hidden lg:flex items-center space-x-6">
+                <a href="/home" class="nav-link hover:text-gray-200">Home</a>
+                <a href="/category" class="nav-link hover:text-gray-200">Categories</a>
+                <a href="/category" class="nav-link hover:text-gray-200">Brand</a>
+                <a href="/allproduct" class="nav-link hover:text-gray-200">All Products</a>
+            </nav>
 
-    <!-- Right Icons -->
-    <div class="hidden md:flex items-center space-x-6">
-      <!-- Search Icon -->
-      <button
-        id="search-toggle"
-        class="group flex items-center space-x-2 p-2 rounded-lg hover:bg-white/10 transition-all duration-300"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5 group-hover:scale-110 transition-transform duration-300"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-        <span class="hidden lg:block font-medium">Search</span>
-      </button>
+            <!-- Right Icons - Always Visible -->
+            <div class="flex items-center space-x-4">
+                <!-- Search Icon -->
+                <button id="search-toggle" 
+                        class="p-2 hover:bg-white/10 rounded-full transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" 
+                         stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </button>
 
-      <!-- Profile Icon -->
-      <button
-        onclick="window.location.href='/profile';"
-        class="group flex items-center space-x-2 p-2 rounded-lg hover:bg-white/10 transition-all duration-300"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M12 12c2.485 0 4.5-2.015 4.5-4.5S14.485 3 12 3 7.5 5.015 7.5 7.5 9.515 12 12 12zm0 2c-2.69 0-8 1.345-8 4v1.5h16V18c0-2.655-5.31-4-8-4z"
-          />
-        </svg>
-      </button>
+                <!-- Cart Icon with Badge -->
+                <a href="/cart" class="p-2 hover:bg-white/10 rounded-full transition-colors ">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" 
+                         stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M3 3h18l-1.5 9H4.5L3 3z M3 3l18 18M3 12h18" />
+                    </svg>
+                    
+                </a>
 
-      <!-- Cart Icon -->
-      <button
-        onclick="window.location.href='/cart';"
-        class="group flex items-center space-x-2 p-2 rounded-lg hover:bg-white/10 transition-all duration-300"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M3 3h18l-1 5H4l-1-5zm2 7h14v8H5v-8zm6 2a1 1 0 11-2 0 1 1 0 012 0zm6 0a1 1 0 11-2 0 1 1 0 012 0z"
-          />
-        </svg>
-      </button>
+                <!-- Wishlist Icon - Hidden on Small Mobile -->
+                <a href="/wishlist" class="hidden sm:block p-2 hover:bg-white/10 rounded-full transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" 
+                         stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                </a>
 
-      <!-- Wishlist Icon -->
-      <button 
-      onclick="window.location.href='/wishlist';"
-      class="group flex items-center space-x-2 p-2 rounded-lg hover:bg-white/10 transition-all duration-300">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M4.5 6.5A5.5 5.5 0 0112 4a5.5 5.5 0 017.5 2.5 6.48 6.48 0 01-2.14 8.78l-5.36 4.57a.75.75 0 01-1.04 0l-5.36-4.57A6.48 6.48 0 014.5 6.5z"
-          />
-        </svg>
-      </button>
-      
+                <!-- Profile Icon - Hidden on Small Mobile -->
+                <a href="/profile" class="hidden sm:block p-2 hover:bg-white/10 rounded-full transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" 
+                         stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                </a>
+
+                <!-- Mobile Menu Toggle -->
+                <button id="mobile-menu-button" class="lg:hidden p-2 hover:bg-white/10 rounded-full transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" 
+                         stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Search Bar - Hidden by Default -->
+        <div id="search-bar" class="hidden mt-3">
+            <form onsubmit="handleSearch(event)" class="flex gap-2">
+                <input type="text" id="searchInput" 
+                       class="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 
+                              focus:outline-none focus:ring-2 focus:ring-white/30 
+                              placeholder-white/70"
+                       placeholder="Search products..."/>
+                <button type="submit" 
+                        class="px-4 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
+                    Search
+                </button>
+            </form>
+        </div>
     </div>
 
-    <!-- Mobile Menu Toggle -->
-    <button 
-      id="menu-toggle" 
-      class="md:hidden p-2 rounded-lg hover:bg-white/10 transition-all duration-300 focus:outline-none"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-      </svg>
-    </button>
-  </div>
-
-  <!-- Search Bar -->
-  <div id="search-bar" class="hidden transform transition-all duration-300">
-    <div class="container mx-auto px-4 py-3 bg-white/5 backdrop-blur-md">
-      <form onsubmit="handleSearch(event)" class="flex items-center gap-4">
-        <input
-          type="text"
-          id="searchInput"
-          name="search"
-          placeholder="Search products..."
-          class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 
-                 focus:outline-none focus:ring-2 focus:ring-white/30 focus:bg-white/20
-                 placeholder-white/70 transition-all duration-300"
-          onkeypress="return /[a-zA-Z0-9\s]/.test(event.key)"
-          oninput="this.value = this.value.replace(/[^a-zA-Z0-9\s]/g, '')"
-          style="text-transform: capitalize;"
-        />
-        <button
-          type="submit"
-          class="bg-white/10 text-white px-6 py-2 rounded-lg hover:bg-white/20 
-                 transition-all duration-300 focus:outline-none focus:ring-2 
-                 focus:ring-white/30"
-        >
-          Search
-        </button>
-      </form>
+    <!-- Mobile Menu - Hidden by Default -->
+    <div id="mobile-menu" class="hidden lg:hidden">
+        <nav class="px-4 py-2 space-y-1 bg-[#A79277]/95 backdrop-blur-sm">
+            <a href="/home" class="block px-4 py-2 rounded-lg hover:bg-white/10 transition-colors">Home</a>
+            <a href="/category" class="block px-4 py-2 rounded-lg hover:bg-white/10 transition-colors">Categories</a>
+            <a href="/category" class="block px-4 py-2 rounded-lg hover:bg-white/10 transition-colors">Brand</a>
+            <a href="/allproduct" class="block px-4 py-2 rounded-lg hover:bg-white/10 transition-colors">All Products</a>
+            <!-- Mobile-only menu items -->
+            <div class="sm:hidden border-t border-white/10 mt-2 pt-2">
+                <a href="/wishlist" class="block px-4 py-2 rounded-lg hover:bg-white/10 transition-colors">Wishlist</a>
+                <a href="/profile" class="block px-4 py-2 rounded-lg hover:bg-white/10 transition-colors">Profile</a>
+            </div>
+        </nav>
     </div>
-  </div>
-
-  <!-- Mobile Menu -->
-  <nav id="mobile-menu" class="hidden md:hidden bg-[#A79277]/95 backdrop-blur-sm">
-    <div class="container mx-auto px-4 py-2 space-y-1">
-      <a href="/home" class="block px-4 py-2 rounded-lg hover:bg-white/10 transition-all duration-300">
-        Home
-      </a>
-      <a href="/category" class="block px-4 py-2 rounded-lg hover:bg-white/10 transition-all duration-300">
-        Categories
-      </a>
-      <a href="/category" class="block px-4 py-2 rounded-lg hover:bg-white/10 transition-all duration-300">
-        Brand
-      </a>
-      <a href="/allproduct" class="block px-4 py-2 rounded-lg hover:bg-white/10 transition-all duration-300">
-        All Products
-      </a>
-    </div>
-  </nav>
 </header>
 
 <script>
-  const menuToggle = document.getElementById("menu-toggle");
-  const mobileMenu = document.getElementById("mobile-menu");
-  const searchToggle = document.getElementById("search-toggle");
-  const searchBar = document.getElementById("search-bar");
+    // Toggle Mobile Menu
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const searchToggle = document.getElementById('search-toggle');
+    const searchBar = document.getElementById('search-bar');
 
-  // Smooth toggle function
-  const smoothToggle = (element) => {
-    if (element.classList.contains('hidden')) {
-      element.classList.remove('hidden');
-      element.classList.add('opacity-0');
-      setTimeout(() => element.classList.remove('opacity-0'), 10);
-    } else {
-      element.classList.add('opacity-0');
-      element.addEventListener('transitionend', () => {
-        element.classList.add('hidden');
-      }, { once: true });
+    function toggleElement(element) {
+        if (element.classList.contains('hidden')) {
+            element.classList.remove('hidden');
+            element.classList.add('animate-fade-in');
+        } else {
+            element.classList.add('animate-fade-out');
+            setTimeout(() => {
+                element.classList.add('hidden');
+                element.classList.remove('animate-fade-out');
+            }, 200);
+        }
     }
-  };
 
-  menuToggle.addEventListener("click", () => smoothToggle(mobileMenu));
-  searchToggle.addEventListener("click", () => smoothToggle(searchBar));
+    mobileMenuButton.addEventListener('click', () => toggleElement(mobileMenu));
+    searchToggle.addEventListener('click', () => toggleElement(searchBar));
 
-  // Close mobile menu on window resize if screen becomes larger
-  window.addEventListener('resize', () => {
-    if (window.innerWidth >= 768) { // md breakpoint
-      mobileMenu.classList.add('hidden');
+    // Close mobile menu on window resize
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 1024) {
+            mobileMenu.classList.add('hidden');
+            searchBar.classList.add('hidden');
+        }
+    });
+
+    // Handle search
+    async function handleSearch(event) {
+        event.preventDefault();
+        const searchInput = document.getElementById('searchInput');
+        const searchTerm = searchInput.value.trim();
+
+        if (searchTerm) {
+            window.location.href = `/allproduct?search=${encodeURIComponent(searchTerm)}`;
+        }
     }
-  });
-
-  // Function to handle search
-  async function handleSearch(event) {
-    event.preventDefault();
-    const searchInput = document.getElementById('searchInput');
-    const searchTerm = searchInput.value.trim();
-
-    if (searchTerm) {
-      // Redirect to all products page with search query
-      window.location.href = `/allproduct?search=${encodeURIComponent(searchTerm)}`;
-    }
-  }
-
-  // Add event listener for search input
-  document.getElementById('searchInput').addEventListener('keypress', function(event) {
-    if (event.key === 'Enter') {
-      handleSearch(event);
-    }
-  });
 </script>
+
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeOut {
+        from { opacity: 1; transform: translateY(0); }
+        to { opacity: 0; transform: translateY(-10px); }
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 0.2s ease-out forwards;
+    }
+
+    .animate-fade-out {
+        animation: fadeOut 0.2s ease-out forwards;
+    }
+</style>

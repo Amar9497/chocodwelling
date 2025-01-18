@@ -283,11 +283,12 @@
                               value="<%= i %>" 
                               id="star<%= i %>" 
                               required 
-                              class="hidden peer"
+                              class="hidden"
                           >
                           <label 
                               for="star<%= i %>" 
-                              class="text-3xl cursor-pointer text-gray-300 hover:text-yellow-400 peer-checked:text-yellow-400"
+                              class="star-label text-3xl cursor-pointer text-gray-300 hover:text-yellow-400"
+                              data-rating="<%= i %>"
                           >★</label>
                       </div>
                   <% } %>
@@ -667,4 +668,41 @@ document.getElementById('reviewModal').addEventListener('click', (e) => {
       }
   }
   </script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const starLabels = document.querySelectorAll('.star-label');
+    
+    // Function to update stars based on selected rating
+    function updateStars(selectedRating) {
+        starLabels.forEach(star => {
+            const rating = parseInt(star.dataset.rating);
+            if (rating <= selectedRating) {
+                star.classList.add('text-yellow-400');
+                star.classList.remove('text-gray-300');
+            } else {
+                star.classList.remove('text-yellow-400');
+                star.classList.add('text-gray-300');
+            }
+        });
+    }
+
+    // Add click event to each star
+    starLabels.forEach(star => {
+        star.addEventListener('click', function() {
+            const rating = parseInt(this.dataset.rating);
+            
+            // Update the radio input
+            const radioInput = document.querySelector(`input[value="${rating}"]`);
+            radioInput.checked = true;
+            
+            // Fill all stars up to the selected one
+            updateStars(rating);
+        });
+    });
+});
+
+// Rest of your existing modal code...
+</script>
 
