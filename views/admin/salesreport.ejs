@@ -162,7 +162,9 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     <%= new Date(order.orderDate).toLocaleDateString() %>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= order.userId.name %></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <%= order.userId ? order.userId.name : 'Unknown User' %>
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= totalQuantity %></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= order.paymentMethod %></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

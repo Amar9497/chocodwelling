@@ -171,7 +171,7 @@
             <% if (currentPage > 1) { %>
             <li>
               <a
-                href="/admin/customers?=<%= currentPage - 1 %>&limit=<%= limit %>&search=<%= search %>"
+                href="/admin/customers?page=<%= currentPage - 1 %>&limit=<%= limit %>&search=<%= search %>"
                 class="px-4 py-2 text-sm lg:text-base bg-[#D2691E] text-white border border-[#A0522D] rounded hover:bg-[#A0522D] transition"
               >
                 Previous
@@ -180,7 +180,7 @@
             <% } %> <% for (let i = 1; i <= totalPages; i++) { %>
             <li>
               <a
-                href="/admin/customers?=<%= i %>&limit=<%= limit %>&search=<%= search %>"
+                href="/admin/customers?page=<%= i %>&limit=<%= limit %>&search=<%= search %>"
                 class="px-4 py-2 text-sm lg:text-base border border-[#A0522D] rounded <%= currentPage == i ? 'bg-[#4E2C0A] text-white' : 'bg-[#FFF8E1] text-[#4E2C0A] hover:bg-[#D2691E] hover:text-white transition' %>"
               >
                 <%= i %>
@@ -189,7 +189,7 @@
             <% } %> <% if (currentPage < totalPages) { %>
             <li>
               <a
-                href="/admin/customers?=<%= currentPage + 1 %>&limit=<%= limit %>&search=<%= search %>"
+                href="/admin/customers?page=<%= currentPage + 1 %>&limit=<%= limit %>&search=<%= search %>"
                 class="px-4 py-2 text-sm lg:text-base bg-[#D2691E] text-white border border-[#A0522D] rounded hover:bg-[#A0522D] transition"
               >
                 Next
