@@ -179,13 +179,15 @@ const checkout = async (req, res) => {
 // ------------------------- add address -----------------------------
 
 const addAddress = async (req, res) => {
+    console.log(req.body);
+    
     try {
         const userId = req.session.user;
         const userAddress = {
             building:req.body.building,
             street:req.body.street,
             city:req.body.city,
-            phonenumber:req.body.phonenumber,
+            phoneNumber:req.body.phonenumber,
             pincode:req.body.pincode,
             landmark:req.body.landmark,
             state:req.body.state,

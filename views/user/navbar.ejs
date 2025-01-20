@@ -72,6 +72,7 @@
         <div id="search-bar" class="hidden mt-3">
             <form onsubmit="handleSearch(event)" class="flex gap-2">
                 <input type="text" id="searchInput" 
+                oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')"
                        class="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 
                               focus:outline-none focus:ring-2 focus:ring-white/30 
                               placeholder-white/70"
